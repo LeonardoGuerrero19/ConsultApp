@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "715221679809",
+    "project_id": "consultapp-29bc9",
+    "storage_bucket": "consultapp-29bc9.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:715221679809:android:b23f9c234ebcc42f5b5e40",
+        "android_client_info": {
+          "package_name": "com.example.funcion_loginregistro"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCSM5JRUrJNiJSq_GzPxbVQiNZtIjalGZk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
