@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".ui.expediente.ExpedienteFragment">
+
+    <LinearLayout
+        android:id="@+id/header_expediente"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:paddingVertical="20sp"
+        android:paddingHorizontal="20dp"
+        android:background="@drawable/rounded2"
+        android:backgroundTint="@color/gray">
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="90dp"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:background="@drawable/rounded"
+            android:backgroundTint="@color/aqua"
+            android:padding="16dp"
+            android:layout_marginEnd="8dp"
+            android:layout_weight="1">
+
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@color/gray" />
+        </LinearLayout>
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/montserrat_bold"
+            android:layout_gravity="center_vertical"
+            android:textSize="24dp"
+            android:layout_marginHorizontal="20dp"
+            android:text="fátima"
+            android:layout_weight="2" />
+
+        <ImageButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:background="@drawable/ic_edit" />
+
+    </LinearLayout>
+
+
+    <!-- datos del paciente -->
+    <LinearLayout
+        android:id="@+id/datosPaciente"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_margin="20dp"
+        android:layout_below="@id/header_expediente" >
+
+        <TextView
+            android:id="@+id/txtEdad"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/montserrat_bold"
+            android:paddingBottom="5dp"
+            android:textSize="18dp"
+            android:text="Edad:" />
+
+        <TextView
+            android:id="@+id/Edad"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/montserrat"
+            android:paddingBottom="8dp"
+            android:textSize="18dp"
+            android:text="19 años" />
+
+        <TextView
+            android:id="@+id/txtFechaNacimiento"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/montserrat_bold"
+            android:paddingBottom="5dp"
+            android:textSize="18dp"
+            android:text="Fecha de nacimiento:" />
+
+        <TextView
+            android:id="@+id/FechaNacimiento"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/montserrat"
+            android:paddingBottom="8dp"
+            android:textSize="18dp"
+            android:text="21 de Septiembre de 2004" />
+
+        <TextView
+            android:id="@+id/txtGenero"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/montserrat_bold"
+            android:paddingBottom="5dp"
+            android:textSize="18dp"
+            android:text="Género:" />
+
+        <TextView
+            android:id="@+id/Genero"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/montserrat"
+            android:paddingBottom="8dp"
+            android:textSize="18dp"
+            android:text="Femenino" />
+
+        <TextView
+            android:id="@+id/txtTelefono"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/montserrat_bold"
+            android:paddingBottom="5dp"
+            android:textSize="18dp"
+            android:text="Télefono de contacto:" />
+
+        <TextView
+            android:id="@+id/Telefono"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/montserrat"
+            android:textSize="18dp"
+            android:text="314-103-5-610" />
+    </LinearLayout>
+
+    <View
+        android:id="@+id/divider"
+        android:layout_width="match_parent"
+        android:layout_height="2dp"
+        android:layout_below="@id/datosPaciente"
+        android:background="@color/aqua"
+        android:layout_marginHorizontal="20dp"
+        android:layout_marginTop="10dp" />
+</RelativeLayout>

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
+    <corners
+        android:bottomLeftRadius="30dp"
+        android:bottomRightRadius="30dp"
+        android:topLeftRadius="0dp"
+        android:topRightRadius="0dp"
+
+        />  <!-- Radio de los bordes redondeados -->
+    <stroke android:width="2dp"/> <!-- Borde alrededor (opcional) -->
+</shape>
