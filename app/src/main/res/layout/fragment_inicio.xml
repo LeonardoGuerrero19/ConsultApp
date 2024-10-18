@@ -1,25 +1,556 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".ui.inicio.InicioFragment">
 
-    <TextView
-        android:id="@+id/text_inicio"
-        android:layout_width="match_parent"
+
+    <!-- RelativeLayout debajo del TextView -->
+    <RelativeLayout
+        android:id="@+id/main"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="8dp"
-        android:textAlignment="center"
-        android:textSize="20sp"
+        android:layout_marginTop="16dp"
+        android:layout_marginHorizontal="16dp"
+        tools:ignore="MissingConstraints">
+
+        <!-- LinearLayout que contiene el saludo y la imagen de perfil -->
+        <LinearLayout
+            android:id="@+id/header_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="20dp"
+            android:layout_marginTop="20dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <!-- TextView con el mensaje de bienvenida que se actualizará dinámicamente -->
+            <TextView
+                android:id="@+id/text_inicio"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:textSize="24sp"
+                android:fontFamily="@font/montserrat_bold" />
+
+            <!-- Imagen de perfil que se mantiene -->
+            <ImageView
+                android:id="@+id/imgPerfil"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_gravity="end"
+                android:contentDescription="Imagen de perfil"/>
+        </LinearLayout>
+
+        <View
+            android:id="@+id/divider"
+            android:layout_width="match_parent"
+            android:layout_height="2dp"
+            android:layout_below="@id/header_title"
+            android:background="@color/aqua"
+            android:layout_marginHorizontal="20dp"
+            android:layout_marginTop="10dp" />
+
+        <!-- proximas citas sección -->
+        <LinearLayout
+            android:id="@+id/ProxCitas"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/divider"
+            android:layout_marginHorizontal="20dp"
+            android:layout_marginTop="20dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/txtProxCitas"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:fontFamily="@font/montserrat_bold"
+                android:text="Próximas citas"
+                android:textSize="20sp" />
+
+            <Button
+                android:id="@+id/txtMore"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_gravity="end"
+                android:fontFamily="@font/montserrat_bold"
+                android:gravity="center_vertical"
+                android:paddingVertical="0dp"
+                android:paddingRight="0dp"
+                android:text="ver todo"
+                android:backgroundTint="@color/white"
+                android:textColor="@color/aqua"
+                android:textSize="14dp" />
+        </LinearLayout>
+
+        <HorizontalScrollView
+            android:id="@+id/scroll"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/ProxCitas"
+            android:fillViewport="true"
+            android:scrollbars="none">
+
+            <LinearLayout
+                android:id="@+id/Citas"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/ProxCitas"
+                android:layout_marginHorizontal="20dp"
+                android:layout_marginTop="20dp"
+                android:orientation="horizontal">
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical"
+                    android:paddingVertical="10sp"
+                    android:paddingHorizontal="18sp"
+                    android:layout_marginRight="10dp"
+                    android:background="@drawable/rounded_textview"
+                    android:backgroundTint="@color/aqua" >
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/montserrat_bold"
+                        android:text="Patología"
+                        android:textColor="@color/white"
+                        android:textSize="16dp" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/montserrat"
+                        android:paddingTop="4dp"
+                        android:textColor="@color/white"
+                        android:text="Dra. Lorena Villarreal Murillo"
+                        android:textSize="14sp" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/montserrat"
+                        android:text="Viernes 30 de Agosto"
+                        android:textSize="14sp"
+                        android:textColor="@color/white"
+                        android:paddingTop="4dp" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/montserrat"
+                        android:text="10:00 - 10:30 AM"
+                        android:textSize="14sp"
+                        android:textColor="@color/white"
+                        android:paddingTop="4dp"/>
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical"
+                    android:paddingVertical="10sp"
+                    android:paddingHorizontal="18sp"
+                    android:layout_marginRight="10dp"
+                    android:background="@drawable/rounded_textview"
+                    android:backgroundTint="@color/gray" >
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/montserrat_bold"
+                        android:text="Patología"
+                        android:textColor="@color/black"
+                        android:textSize="16dp" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/montserrat"
+                        android:paddingTop="4dp"
+                        android:textColor="@color/black"
+                        android:text="Dra. Lorena Villarreal Murillo"
+                        android:textSize="14sp" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/montserrat"
+                        android:text="Viernes 30 de Agosto"
+                        android:textSize="14sp"
+                        android:textColor="@color/black"
+                        android:paddingTop="4dp" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/montserrat"
+                        android:text="10:00 - 10:30 AM"
+                        android:textSize="14sp"
+                        android:textColor="@color/black"
+                        android:paddingTop="4dp"/>
+                </LinearLayout>
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical"
+                    android:paddingVertical="10sp"
+                    android:paddingHorizontal="18sp"
+                    android:layout_marginRight="10dp"
+                    android:background="@drawable/rounded_textview"
+                    android:backgroundTint="@color/aqua" >
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/montserrat_bold"
+                        android:text="Patología"
+                        android:textColor="@color/white"
+                        android:textSize="16dp" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/montserrat"
+                        android:paddingTop="4dp"
+                        android:textColor="@color/white"
+                        android:text="Dra. Lorena Villarreal Murillo"
+                        android:textSize="14sp" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/montserrat"
+                        android:text="Viernes 30 de Agosto"
+                        android:textSize="14sp"
+                        android:textColor="@color/white"
+                        android:paddingTop="4dp" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/montserrat"
+                        android:text="10:00 - 10:30 AM"
+                        android:textSize="14sp"
+                        android:textColor="@color/white"
+                        android:paddingTop="4dp"/>
+                </LinearLayout>
+            </LinearLayout>
+        </HorizontalScrollView>
+
+        <!-- servicios sección -->
+        <LinearLayout
+            android:id="@+id/Servicios"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/scroll"
+            android:layout_marginHorizontal="20dp"
+            android:layout_marginTop="20dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/txtServicios"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:fontFamily="@font/montserrat_bold"
+                android:text="Servicios"
+                android:textSize="20sp" />
+
+            <Button
+                android:id="@+id/txtMore2"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_gravity="end"
+                android:fontFamily="@font/montserrat_bold"
+                android:gravity="center_vertical"
+                android:paddingVertical="0dp"
+                android:paddingRight="0dp"
+                android:text="ver todo"
+                android:backgroundTint="@color/white"
+                android:textColor="@color/aqua"
+                android:textSize="14dp" />
+        </LinearLayout>
+
+        <GridLayout
+            android:id="@+id/gridServicios"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/Servicios"
+            android:layout_marginHorizontal="20dp"
+            android:layout_marginTop="20dp"
+            android:columnCount="3"
+            android:rowCount="2" >
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_rowWeight="1"
+                android:layout_marginRight="10dp"
+                android:layout_columnWeight="1"
+                android:orientation="vertical"
+                android:gravity="center">
+
+                <Button
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:backgroundTint="@color/gray"
+                    android:textColor="@color/black"
+                    android:textSize="10dp"
+                    android:text="Cardiología" />
+            </LinearLayout>
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_rowWeight="1"
+                android:layout_marginRight="10dp"
+                android:layout_columnWeight="1"
+                android:orientation="vertical"
+                android:gravity="center">
+
+                <Button
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:backgroundTint="@color/gray"
+                    android:textColor="@color/black"
+                    android:textSize="10dp"
+                    android:text="Odontología" />
+            </LinearLayout>
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_rowWeight="1"
+                android:layout_columnWeight="1"
+                android:orientation="vertical"
+                android:gravity="center">
+
+                <Button
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:backgroundTint="@color/gray"
+                    android:textColor="@color/black"
+                    android:textSize="10dp"
+                    android:text="Pediatría" />
+            </LinearLayout>
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_rowWeight="1"
+                android:layout_marginRight="10dp"
+                android:layout_columnWeight="1"
+                android:orientation="vertical"
+                android:gravity="center">
+
+                <Button
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:backgroundTint="@color/gray"
+                    android:textColor="@color/black"
+                    android:textSize="10dp"
+                    android:text="Ginecología" />
+            </LinearLayout>
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_rowWeight="1"
+                android:layout_marginRight="10dp"
+                android:layout_columnWeight="1"
+                android:orientation="vertical"
+                android:gravity="center">
+
+                <Button
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:backgroundTint="@color/gray"
+                    android:textColor="@color/black"
+                    android:textSize="10dp"
+                    android:text="Oftalmología" />
+            </LinearLayout>
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_rowWeight="1"
+                android:layout_columnWeight="1"
+                android:orientation="vertical"
+                android:gravity="center">
+
+                <Button
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:backgroundTint="@color/gray"
+                    android:textColor="@color/black"
+                    android:textSize="10dp"
+                    android:text="Nutrición" />
+            </LinearLayout>
+
+
+        </GridLayout>
+
+        <!-- Personal Médico sección -->
+        <LinearLayout
+            android:id="@+id/personalmedico"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="20dp"
+            android:layout_marginTop="20dp"
+            android:layout_below="@id/gridServicios"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/gridServicios"
+                android:orientation="horizontal"
+                android:gravity="end"> <!-- Alinea los elementos a la derecha -->
+
+                <TextView
+                    android:id="@+id/txtPersonalMedico"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:fontFamily="@font/montserrat_bold"
+                    android:text="Personal Médico"
+                    android:textSize="20sp" />
+
+                <Button
+                    android:id="@+id/txtMore3"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_gravity="end"
+                    android:backgroundTint="@color/white"
+                    android:fontFamily="@font/montserrat_bold"
+                    android:paddingVertical="0dp"
+                    android:paddingRight="0dp"
+                    android:text="ver todo"
+                    android:textColor="@color/aqua"
+                    android:textSize="14dp" />
+
+
+            </LinearLayout>
+
+
+            <LinearLayout
+                android:id="@+id/perfilesMedicos"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <!-- Aquí puedes agregar la información de cada médico -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:padding="10dp">
+
+                    <ImageView
+                        android:id="@+id/imgMedico1"
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:src="@drawable/ic_medico" />
+
+                    <TextView
+                        android:id="@+id/txtMedico1"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="10dp"
+                        android:fontFamily="@font/montserrat"
+                        android:text="Dr. Juan Pérez"
+                        android:textSize="16sp"/>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="end"> <!-- Alinea los elementos a la derecha -->
+
+                        <Button
+                            android:id="@+id/btnVerPerfil1"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:backgroundTint="@color/gray"
+                            android:textColor="@color/black"
+                            android:layout_marginLeft="50dp"
+                            android:textSize="10dp"
+                            android:text="ver perfil"
+                            app:layout_constraintLeft_toRightOf="@+id/txtMedico1"
+                            app:layout_constraintRight_toRightOf="parent"/>
+                    </LinearLayout>
+                </LinearLayout>
+
+                <!-- Agrega más perfiles de médicos de manera similar -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:padding="10dp">
+
+                    <ImageView
+                        android:id="@+id/imgMedico2"
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:src="@drawable/ic_medico" /> <!-- Cambia la imagen según sea necesario -->
+
+                    <TextView
+                        android:id="@+id/txtMedico2"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="10dp"
+                        android:fontFamily="@font/montserrat"
+                        android:text="Dra. Ana Martínez"
+                        android:textSize="16sp"/>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="end"> <!-- Alinea los elementos a la derecha -->
+
+                        <Button
+                            android:id="@+id/btnVerPerfil2"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:backgroundTint="@color/gray"
+                            android:textColor="@color/black"
+                            android:layout_marginLeft="30dp"
+                            android:textSize="10dp"
+                            android:text="ver perfil"
+                            app:layout_constraintLeft_toRightOf="@+id/txtMedico1"
+                            app:layout_constraintRight_toRightOf="parent"/>
+                    </LinearLayout>
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+    </RelativeLayout>
+
+
+
+    <com.google.android.material.bottomnavigation.BottomNavigationView
+        android:id="@+id/bottom_navigation"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:menu="@menu/bottom_nav_menu"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintEnd_toEndOf="parent"
+        app:labelVisibilityMode="labeled"
+        app:itemIconTint="@color/navigation_item_color"
+        app:itemTextColor="@color/navigation_item_color"/>
 
 
-
-</androidx.constraintlayout.widget.ConstraintLayout>
+</RelativeLayout>

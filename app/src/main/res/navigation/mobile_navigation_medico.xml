@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/mobile_navigation_medico.xml"
+    app:startDestination="@id/calendario_medico">
+
+    <fragment
+        android:id="@+id/calendario_medico"
+        android:name="com.example.c.CalendarioMedicoFragment"
+        android:label="fragment_calendario_medico"
+        tools:layout="@layout/fragment_calendario_medico" />
+    <fragment
+        android:id="@+id/historialPaciente"
+        android:name="com.example.c.HistorialPacienteFragment"
+        android:label="fragment_historial_paciente"
+        tools:layout="@layout/fragment_historial_paciente" />
+    <fragment
+        android:id="@+id/perfilMedico"
+        android:name="com.example.c.PerfilMedicoFragment"
+        android:label="fragment_perfil_medico"
+        tools:layout="@layout/fragment_perfil_medico" />
+</navigation>

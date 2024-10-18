@@ -10,7 +10,7 @@ public class CalendarioViewModel extends ViewModel {
 
     public CalendarioViewModel() {
         mText = new MutableLiveData<>();
-        mText.setValue("This is dashboard fragment");
+        mText.setValue("Calendario de Citas");
     }
 
     public LiveData<String> getText() {

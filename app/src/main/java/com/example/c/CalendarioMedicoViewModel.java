@@ -1,19 +1,20 @@
-package com.example.c.ui.expediente;
+package com.example.c;
 
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
-public class ExpedienteViewModel extends ViewModel {
+public class CalendarioMedicoViewModel extends ViewModel {
 
     private final MutableLiveData<String> mText;
 
-    public ExpedienteViewModel() {
+    public CalendarioMedicoViewModel() {
         mText = new MutableLiveData<>();
-        mText.setValue("Expediente Médico"); // Personaliza el texto según sea necesario
+        mText.setValue("Calendario de Citas");
     }
 
     public LiveData<String> getText() {
         return mText;
     }
 }
+    // TODO: Implement the ViewModel

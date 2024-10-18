@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -8,91 +9,181 @@
 
     <TextView
         android:id="@+id/text_expediente"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="8dp"
-        android:textAlignment="center"
-        android:textSize="20sp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        android:layout_marginStart="16dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-        <TextView
-            android:id="@+id/text_titulo"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:text="Expediente Medico"
-            android:textSize="24dp"
-            android:textStyle="bold"
-            android:textColor="@color/black"
-            android:layout_marginTop="15dp"
-            android:layout_marginStart="16dp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
-    <TextView
-        android:id="@+id/text_nombre"
-        android:layout_width="0dp"
+    <LinearLayout
+        android:id="@+id/header_expediente"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Nombre del Paciente:"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/text_titulo" />
-    <TextView
-        android:id="@+id/text_numcuenta"
-        android:layout_width="0dp"
+        android:orientation="horizontal"
+        android:paddingVertical="20dp"
+        android:paddingHorizontal="20dp"
+        android:background="@drawable/rounded2"
+        android:backgroundTint="@color/gray"
+        app:layout_constraintTop_toBottomOf="@+id/text_expediente">
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="90dp"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:background="@drawable/rounded"
+            android:backgroundTint="@color/aqua"
+            android:padding="16dp"
+            android:layout_marginEnd="8dp"
+            android:layout_weight="1">
+
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@color/gray" />
+        </LinearLayout>
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/montserrat_bold"
+            android:layout_gravity="center_vertical"
+            android:textSize="24sp"
+            android:layout_marginHorizontal="20dp"
+            android:text="fátima"
+            android:layout_weight="2" />
+
+        <ImageButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:background="@drawable/ic_edit" />
+    </LinearLayout>
+
+    <!-- Datos del paciente -->
+    <LinearLayout
+        android:id="@+id/datosPaciente"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Número de cuenta:"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/text_nombre" />
-
-
-    <TextView
-            android:id="@+id/text_edad"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:text="Edad:"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/text_numcuenta" />
+        android:orientation="vertical"
+        android:layout_margin="20dp"
+        app:layout_constraintTop_toBottomOf="@+id/header_expediente">
 
         <TextView
-            android:id="@+id/text_direccion"
-            android:layout_width="0dp"
+            android:id="@+id/txtEdad"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Domicilio:"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/text_edad" />
+            android:fontFamily="@font/montserrat_bold"
+            android:paddingBottom="5dp"
+            android:textSize="18sp"
+            android:text="Edad:" />
 
         <TextView
-            android:id="@+id/text_historial_medico"
-            android:layout_width="0dp"
+            android:id="@+id/Edad"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Historial Médico:"
-            android:textSize="20dp"
-            android:textStyle="bold"
-            android:textColor="@color/black"
-            android:layout_marginStart="16dp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/text_direccion" />
+            android:fontFamily="@font/montserrat"
+            android:paddingBottom="8dp"
+            android:textSize="18sp"
+            android:text="19 años" />
 
         <TextView
-            android:id="@+id/text_detalles_historial"
-            android:layout_width="0dp"
+            android:id="@+id/txtFechaNacimiento"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="No se ha registrado historial médico."
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/text_historial_medico" />
+            android:fontFamily="@font/montserrat_bold"
+            android:paddingBottom="5dp"
+            android:textSize="18sp"
+            android:text="Fecha de nacimiento:" />
 
-    <!-- Botón de navegación inferior -->
+        <TextView
+            android:id="@+id/FechaNacimiento"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/montserrat"
+            android:paddingBottom="8dp"
+            android:textSize="18sp"
+            android:text="21 de Septiembre de 2004" />
+
+        <TextView
+            android:id="@+id/txtGenero"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/montserrat_bold"
+            android:paddingBottom="5dp"
+            android:textSize="18sp"
+            android:text="Género:" />
+
+        <TextView
+            android:id="@+id/Genero"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/montserrat"
+            android:paddingBottom="8dp"
+            android:textSize="18sp"
+            android:text="Femenino" />
+
+        <TextView
+            android:id="@+id/txtTelefono"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/montserrat_bold"
+            android:paddingBottom="5dp"
+            android:textSize="18sp"
+            android:text="Teléfono de contacto:" />
+
+        <TextView
+            android:id="@+id/Telefono"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/montserrat"
+            android:textSize="18sp"
+            android:text="314-103-5-610" />
+    </LinearLayout>
+
+    <View
+        android:id="@+id/divider"
+        android:layout_width="match_parent"
+        android:layout_height="2dp"
+        android:background="@color/aqua"
+        android:layout_marginHorizontal="20dp"
+        android:layout_marginTop="10dp"
+        app:layout_constraintTop_toBottomOf="@id/datosPaciente" />
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_marginTop="16dp"
+        app:layout_constraintTop_toBottomOf="@+id/datosPaciente"
+        app:layout_constraintBottom_toTopOf="@+id/bottom_navigation">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/text_historial_medico"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Historial Médico:"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                android:layout_marginStart="16dp" />
+
+            <TextView
+                android:id="@+id/text_detalles_historial"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="No se ha registrado historial médico."
+                android:fontFamily="@font/montserrat"
+                android:layout_marginStart="8dp" />
+
+        </LinearLayout>
+    </ScrollView>
+
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/bottom_navigation"
         android:layout_width="0dp"
@@ -101,5 +192,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:labelVisibilityMode="labeled"/>
+        app:labelVisibilityMode="labeled"
+        app:itemIconTint="@color/navigation_item_color"
+        app:itemTextColor="@color/navigation_item_color" />
 </androidx.constraintlayout.widget.ConstraintLayout>
