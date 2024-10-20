@@ -5,14 +5,14 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".IniciopActivity">
-
+    tools:context=".AdminActivity">
 
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/texto"
-        android:textSize="30sp" />
+        android:text="Hola soy un fucking texto de admin bro"
+        android:textSize="40dp"/>
 
     <Button
         android:layout_width="match_parent"
@@ -20,6 +20,5 @@
         android:layout_below="@+id/texto"
         android:id="@+id/btn_cerrarS"
         android:text="Cerrar sesion"/>
-
 
 </RelativeLayout>

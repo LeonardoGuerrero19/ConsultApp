@@ -5,21 +5,20 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".IniciopActivity">
+    tools:context=".VerificacionActivity">
 
-
-    <TextView
+    <EditText
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/texto"
-        android:textSize="30sp" />
+        android:id="@+id/veryCode"
+        android:hint="Introduzca su codigo de confirmación.">
+    </EditText>
 
     <Button
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/texto"
-        android:id="@+id/btn_cerrarS"
-        android:text="Cerrar sesion"/>
-
+        android:id="@+id/btn_verificar"
+        android:layout_below="@+id/veryCode"
+        android:text="Verificar codigo"/>
 
 </RelativeLayout>

@@ -16,6 +16,8 @@ import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.Volley;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.android.material.snackbar.Snackbar;
 import com.android.volley.Request;
@@ -24,6 +26,8 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import org.json.JSONException;
 import org.json.JSONObject;
+import android.content.Intent;
+
 
 import java.util.HashMap;
 import java.util.Map;
@@ -42,7 +46,6 @@ public class RegistroActivity extends AppCompatActivity {
         mFirestore = FirebaseFirestore.getInstance();
         mAuth = FirebaseAuth.getInstance();
 
-        // Inicializar Volley RequestQueue
         requestQueue = Volley.newRequestQueue(this);
 
         nombre = findViewById(R.id.nombre);
@@ -83,13 +86,13 @@ public class RegistroActivity extends AppCompatActivity {
                     public void onResponse(JSONObject response) {
                         try {
                             JSONObject data = response.getJSONObject("data");
-                            String status = data.getString("status");
+                            String estado = data.getString("status");
 
                             // Verificar si el correo es 'valid' o 'webmail' (esto indica que es válido)
-                            if (status.equals("valid") || status.equals("webmail")) {
+                            if (estado.equals("valid") || estado.equals("webmail")) {
                                 RegisterUser(nombreUser, correoUser, contraUser); // Registro si es válido
                             } else {
-                                Snackbar.make(view, "El correo no es válido.", Snackbar.LENGTH_SHORT).show();
+                                Snackbar.make(view, "El correo no existe o no es valido.", Snackbar.LENGTH_SHORT).show();
                             }
                         } catch (JSONException e) {
                             Snackbar.make(view, "Error al verificar el correo.", Snackbar.LENGTH_SHORT).show();
@@ -103,7 +106,6 @@ public class RegistroActivity extends AppCompatActivity {
                 });
 
                 requestQueue.add(jsonObjectRequest);
-
             }
         });
     }
@@ -111,7 +113,7 @@ public class RegistroActivity extends AppCompatActivity {
     // Método para verificar malas palabras usando una lista manual
     private boolean containsBadWords(String input) {
         // Lista de malas palabras en español e inglés
-        String[] badWords = {
+        String[] palabrasBan = {
                 "mierda", "cabrón", "pendejo", "puto", "puta", "imbécil", "idiota",
                 "tarado", "estúpido", "culo", "tetas", "verga", "pito", "pene",
                 "chichi", "nalgas", "negro", "negrata", "chino", "judío", "nazi",
@@ -119,12 +121,12 @@ public class RegistroActivity extends AppCompatActivity {
                 "orgasmo", "marihuana", "cocaína", "droga", "porro", "crack",
                 "heroína", "gay", "lesbiana", "transexual", "travesti", "dios",
                 "cristo", "infiel", "hereje", "anticristo", "fuck", "bitch",
-                "bastard", "shit", "asshole", "dick", "cunt"
+                "bastard", "shit", "asshole", "dick", "cunt", "@"
         };
 
-        for (String badWord : badWords) {
-            if (input.toLowerCase().contains(badWord)) {
-                return true; // Si el nombre contiene una mala palabra
+        for (String palabraBan : palabrasBan) {
+            if (input.toLowerCase().contains(palabraBan)) {
+                return true;
             }
         }
         return false; // Si no contiene ninguna mala palabra
@@ -136,24 +138,44 @@ public class RegistroActivity extends AppCompatActivity {
             @Override
             public void onComplete(@NonNull Task<AuthResult> task) {
                 if (task.isSuccessful()) {
-                    String id = mAuth.getCurrentUser().getUid();
-                    Map<String, Object> map = new HashMap<>();
-                    map.put("id", id);
-                    map.put("nombre", nombreUser);
-                    map.put("correo", correoUser);
-                    map.put("contrasena", contraUser);
+                    FirebaseUser user = mAuth.getCurrentUser();
+                    if (user != null) {
+                        // Enviar correo de verificación
+                        user.sendEmailVerification().addOnCompleteListener(new OnCompleteListener<Void>() {
+                            @Override
+                            public void onComplete(@NonNull Task<Void> task) {
+                                if (task.isSuccessful()) {
+                                    Snackbar.make(findViewById(R.id.btn_registro), "Registro exitoso. Verifique su correo para activar la cuenta.", Snackbar.LENGTH_SHORT).show();
+                                } else {
+                                    Snackbar.make(findViewById(R.id.btn_registro), "Error al enviar el correo de verificación.", Snackbar.LENGTH_SHORT).show();
+                                }
+                            }
+                        });
 
-                    mFirestore.collection("user").document(id).set(map).addOnSuccessListener(new OnSuccessListener<Void>() {
-                        @Override
-                        public void onSuccess(Void unused) {
-                            Snackbar.make(findViewById(R.id.btn_registro), "Registro guardado con éxito.", Snackbar.LENGTH_SHORT).show();
-                        }
-                    }).addOnFailureListener(new OnFailureListener() {
-                        @Override
-                        public void onFailure(@NonNull Exception e) {
-                            Snackbar.make(findViewById(R.id.btn_registro), "Error al guardar", Snackbar.LENGTH_SHORT).show();
-                        }
-                    });
+                        // Guardar los datos del usuario en Firestore con rol de "usuario"
+                        String id = user.getUid();
+                        Map<String, Object> map = new HashMap<>();
+                        map.put("id", id);
+                        map.put("nombre", nombreUser);
+                        map.put("correo", correoUser);
+                        map.put("rol", "usuario"); // Asignar rol de "usuario"
+
+                        mFirestore.collection("users").document(id).set(map)
+                                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                    @Override
+                                    public void onSuccess(Void unused) {
+                                        // Redirigir a LoginActivity después del registro exitoso
+                                        Intent intent = new Intent(RegistroActivity.this, LoginActivity.class);
+                                        startActivity(intent);
+                                        finish(); // Cierra la actividad actual
+                                    }
+                                }).addOnFailureListener(new OnFailureListener() {
+                                    @Override
+                                    public void onFailure(@NonNull Exception e) {
+                                        Snackbar.make(findViewById(R.id.btn_registro), "Error al guardar", Snackbar.LENGTH_SHORT).show();
+                                    }
+                                });
+                    }
                 } else {
                     Snackbar.make(findViewById(R.id.btn_registro), "Error al registrar: " + task.getException().getMessage(), Snackbar.LENGTH_SHORT).show();
                 }
@@ -165,4 +187,6 @@ public class RegistroActivity extends AppCompatActivity {
             }
         });
     }
+
+
 }

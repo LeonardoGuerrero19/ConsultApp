@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".MedicoActivity">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:padding="16dp"
+        android:background="#F5F5F5">
+
+        <!-- Imagen de perfil del médico -->
+        <ImageView
+            android:id="@+id/img_perfil_medico"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:src="@drawable/medico"
+            android:layout_gravity="center" />
+
+        <!-- EditText para el nombre del médico -->
+        <EditText
+            android:id="@+id/et_nombre_medico"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Nombre"
+            android:padding="12dp"
+            android:textColor="@android:color/black"
+            android:textSize="16sp"
+            android:layout_marginTop="16dp" />
+
+        <!-- Spinner para la especialización del médico -->
+        <Spinner
+            android:id="@+id/spinner_especializacion_medico"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp" />
+
+        <!-- Spinner para los horarios del médico -->
+        <Spinner
+            android:id="@+id/spinner_horarios"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp" />
+
+        <!-- EditText para el teléfono del médico -->
+        <EditText
+            android:id="@+id/et_telefono_medico"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Teléfono de contacto"
+            android:padding="12dp"
+            android:textColor="@android:color/black"
+            android:textSize="16sp"
+            android:layout_marginTop="12dp"
+            android:inputType="phone" />
+
+        <!-- Botón para guardar los datos -->
+        <Button
+            android:id="@+id/btn_guardar_medico"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Guardar"
+            android:backgroundTint="#4CAF50"
+            android:textColor="@android:color/white"
+            android:layout_marginTop="16dp" />
+
+        <!-- Botón para cerrar sesión -->
+        <Button
+            android:id="@+id/btn_cerrarS"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Cerrar sesión"
+            android:layout_marginTop="12dp"
+            android:backgroundTint="#f44336"
+            android:textColor="@android:color/white" />
+    </LinearLayout>
+
+</RelativeLayout>

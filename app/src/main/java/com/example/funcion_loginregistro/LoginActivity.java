@@ -11,6 +11,9 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.DocumentSnapshot;
+
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
@@ -60,7 +63,7 @@ public class LoginActivity extends AppCompatActivity {
                 String correoUser = correo.getText().toString().trim();
                 String contraUser = contrasena.getText().toString().trim();
 
-                if (correoUser.isEmpty() || contraUser.isEmpty()) { // Cambié '&&' por '||'
+                if (correoUser.isEmpty() || contraUser.isEmpty()) {
                     Toast.makeText(LoginActivity.this, "Ingrese todos los datos", Toast.LENGTH_SHORT).show();
                 } else {
                     loginUser(correoUser, contraUser);
@@ -89,20 +92,59 @@ public class LoginActivity extends AppCompatActivity {
             @Override
             public void onComplete(@NonNull Task<AuthResult> task) {
                 if (task.isSuccessful()) {
-                    finish();
-                    startActivity(new Intent(LoginActivity.this, IniciopActivity.class));
-                    Toast.makeText(LoginActivity.this, "Bienvenido", Toast.LENGTH_SHORT).show();
+                    FirebaseUser user = mAuth.getCurrentUser();
+                    if (user != null && !user.isEmailVerified()) { // Verificar si el correo está verificado
+                        mAuth.signOut(); // Cerrar sesión si el correo no está verificado
+                        Toast.makeText(LoginActivity.this, "Por favor, verifica tu correo electrónico.", Toast.LENGTH_SHORT).show();
+                    } else {
+                        checkUserRole(user.getUid()); // Verificar el rol del usuario
+                    }
                 } else {
-                    Toast.makeText(LoginActivity.this, "Error al iniciar sesión", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(LoginActivity.this, "Error al iniciar sesión 1", Toast.LENGTH_SHORT).show();
                 }
             }
         }).addOnFailureListener(new OnFailureListener() {
             @Override
             public void onFailure(@NonNull Exception e) {
-                Toast.makeText(LoginActivity.this, "Error al iniciar sesión", Toast.LENGTH_SHORT).show();
+                Toast.makeText(LoginActivity.this, "Error al iniciar sesión 2", Toast.LENGTH_SHORT).show();
             }
         });
     }
+
+    private void checkUserRole(String uid) {
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        db.collection("users").document(uid).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                if (task.isSuccessful()) {
+                    DocumentSnapshot document = task.getResult();
+                    if (document.exists()) {
+                        String rol = document.getString("rol"); // Asegúrate de que el campo esté correctamente escrito
+                        if ("administrador".equals(rol)) {
+                            // Redirigir a AdminActivity
+                            Intent intent = new Intent(LoginActivity.this, AdminActivity.class);
+                            startActivity(intent);
+                            finish();
+                        } else if ("medico".equals(rol)) {
+                            // Redirigir a MedicoActivity
+                            Intent intent = new Intent(LoginActivity.this, MedicoActivity.class);
+                            startActivity(intent);
+                            finish();
+                        } else {
+                            // Redirigir a la actividad principal para otros roles (usuarios)
+                            startActivity(new Intent(LoginActivity.this, IniciopActivity.class));
+                            finish();
+                        }
+                    } else {
+                        Toast.makeText(LoginActivity.this, "Error: No se encontró el documento de rol", Toast.LENGTH_SHORT).show();
+                    }
+                } else {
+                    Toast.makeText(LoginActivity.this, "Error al obtener los datos del usuario", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+    }
+
 
     private void signInWithGoogle() {
         Intent signInIntent = googleSignInClient.getSignInIntent();
@@ -114,8 +156,8 @@ public class LoginActivity extends AppCompatActivity {
         super.onStart();
         FirebaseUser user = mAuth.getCurrentUser();
         if (user != null) {
-            startActivity(new Intent(LoginActivity.this, IniciopActivity.class));
-            finish();
+            // Si el usuario está autenticado, verificar su rol en Firestore antes de redirigir
+            checkUserRole(user.getUid());
         }
     }
 
