@@ -5,20 +5,18 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".activity_inicio">
+    tools:context=".activity_vistaMedico">
 
     <TextView
-        android:layout_width="match_parent"
+        android:id="@+id/referencia"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/texto"
-        android:text="Hola soy el Leo"
-        android:textSize="30dp">
-    </TextView>
+        android:text="vista de un medido"/>
 
     <Button
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/texto"
+        android:layout_below="@+id/referencia"
         android:id="@+id/btn_cerrarS"
         android:text="Cerrar sesion"/>
 

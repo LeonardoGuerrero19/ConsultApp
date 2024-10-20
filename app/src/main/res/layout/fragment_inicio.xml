@@ -22,7 +22,6 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:fontFamily="@font/montserrat_bold"
-            android:text="Hola, fátima"
             android:textColor="@color/black"
             android:textSize="24sp" />
 
@@ -274,6 +273,7 @@
     </LinearLayout>
 
     <GridLayout
+        android:id="@+id/grid_servicios"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@+id/Servicios"
@@ -383,6 +383,13 @@
                 android:text="Nutrición" />
         </LinearLayout>
     </GridLayout>
+
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/grid_servicios"
+        android:id="@+id/btn_cerrarS"
+        android:text="Cerrar sesion"/>
 
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/bottom_navigation"

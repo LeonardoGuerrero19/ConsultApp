@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".informacion_personal_paciente">
+
+    <LinearLayout
+        android:id="@+id/imgPerfil"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:orientation="vertical"
+        android:gravity="center_horizontal">
+
+        <LinearLayout
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:background="@drawable/rounded"
+            android:backgroundTint="@color/aqua"
+            android:gravity="center"
+            android:orientation="horizontal"
+            android:padding="16dp">
+
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@color/gray" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/txtEdad"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/imgPerfil"
+        android:text="Edad"
+        android:layout_marginTop="40dp"
+        android:layout_marginHorizontal="20dp"
+        android:textColor="@color/black"
+        android:fontFamily="@font/montserrat"
+        android:textSize="22dp" />
+
+    <EditText
+        android:id="@+id/Edad"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:inputType="number"
+        android:layout_below="@id/txtEdad"
+        android:layout_marginHorizontal="20dp"
+        android:layout_marginTop="20dp"
+        android:background="@drawable/rounded"
+        android:backgroundTint="@color/gray"
+        android:padding="20dp" />
+
+    <TextView
+        android:id="@+id/txtFechaNacimiento"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/Edad"
+        android:text="Fecha de nacimiento"
+        android:layout_marginTop="40dp"
+        android:layout_marginHorizontal="20dp"
+        android:textColor="@color/black"
+        android:fontFamily="@font/montserrat"
+        android:textSize="22dp" />
+
+    <EditText
+        android:id="@+id/FechaNacimiento"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/txtFechaNacimiento"
+        android:layout_marginHorizontal="20dp"
+        android:layout_marginTop="20dp"
+        android:background="@drawable/rounded"
+        android:backgroundTint="@color/gray"
+        android:padding="20dp" />
+
+    <TextView
+        android:id="@+id/txtGenero"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/FechaNacimiento"
+        android:text="Género"
+        android:layout_marginTop="40dp"
+        android:layout_marginHorizontal="20dp"
+        android:textColor="@color/black"
+        android:fontFamily="@font/montserrat"
+        android:textSize="22dp" />
+
+    <EditText
+        android:id="@+id/Genero"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/txtGenero"
+        android:layout_marginHorizontal="20dp"
+        android:layout_marginTop="20dp"
+        android:background="@drawable/rounded"
+        android:backgroundTint="@color/gray"
+        android:padding="20dp" />
+
+    <TextView
+        android:id="@+id/txtTelefono"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/Genero"
+        android:text="Télefono de contacto"
+        android:layout_marginTop="40dp"
+        android:layout_marginHorizontal="20dp"
+        android:textColor="@color/black"
+        android:fontFamily="@font/montserrat"
+        android:textSize="22dp" />
+
+    <EditText
+        android:id="@+id/Telefono"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/txtTelefono"
+        android:layout_marginHorizontal="20dp"
+        android:layout_marginTop="20dp"
+        android:background="@drawable/rounded"
+        android:backgroundTint="@color/gray"
+        android:padding="20dp" />
+
+    <Button
+        android:id="@+id/btnEditarInfo"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/Telefono"
+        android:layout_marginTop="50dp"
+        android:layout_marginHorizontal="20dp"
+        android:backgroundTint="@color/aqua"
+        android:text="EDITAR"
+        android:textColor="@color/white"
+        android:fontFamily="@font/montserrat_bold"
+        android:textSize="22dp"
+        android:padding="10dp" />
+</RelativeLayout>
