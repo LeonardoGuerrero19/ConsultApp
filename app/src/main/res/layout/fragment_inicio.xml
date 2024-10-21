@@ -11,10 +11,7 @@
     <RelativeLayout
         android:id="@+id/main"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:layout_marginHorizontal="16dp"
-        tools:ignore="MissingConstraints">
+        android:layout_height="wrap_content">
 
         <!-- LinearLayout que contiene el saludo y la imagen de perfil -->
         <LinearLayout

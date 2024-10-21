@@ -1,0 +1,75 @@
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_margin="8dp"
+    app:cardCornerRadius="8dp"
+    android:background="@color/black"
+    app:cardElevation="4dp">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="16dp">
+
+        <!-- Número de cita -->
+        <TextView
+            android:id="@+id/tvNumeroCita"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="2889845673"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/btnConfirmarAsistencia"/>
+
+        <!-- Nombre del paciente -->
+        <TextView
+            android:id="@+id/tvPaciente"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Paciente: Lorena Villarreal"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tvNumeroCita"
+            app:layout_constraintEnd_toStartOf="@+id/btnConfirmarAsistencia"/>
+
+        <!-- Hora de la cita -->
+        <TextView
+            android:id="@+id/tvHora"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="10:00 - 10:30 AM"
+            android:textSize="14sp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tvPaciente"
+            app:layout_constraintEnd_toStartOf="@+id/btnConfirmarAsistencia"/>
+
+        <!-- Imagen para confirmar asistencia -->
+        <ImageButton
+            android:id="@+id/btnConfirmarAsistencia"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:src="@drawable/ic_asistio"
+            android:background="@drawable/selected_circle"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toTopOf="@id/btnConfirmarCancelacion"
+            android:layout_marginStart="16dp"
+            android:contentDescription="Asistió" />
+
+        <!-- Imagen para confirmar cancelación -->
+        <ImageButton
+            android:id="@+id/btnConfirmarCancelacion"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:src="@drawable/ic_cancelada"
+            android:background="@drawable/selected_circle"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/btnConfirmarAsistencia"
+            android:contentDescription="Cancelada"
+            android:layout_marginTop="8dp" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</androidx.cardview.widget.CardView>
