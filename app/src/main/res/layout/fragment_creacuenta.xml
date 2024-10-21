@@ -236,4 +236,28 @@
 
     </com.google.android.material.textfield.TextInputLayout>
 
+    <CheckBox
+        android:id="@+id/boxacept"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/idnotiene"
+        android:layout_alignParentEnd="true"
+        android:layout_marginTop="6dp"
+        android:layout_marginEnd="344dp"
+        android:text="" />
+
+    <Button
+        android:id="@+id/btntermcond"
+        android:layout_width="wrap_content"
+        android:layout_height="63dp"
+        android:layout_below="@+id/idnotiene"
+        android:layout_alignParentEnd="true"
+        android:layout_marginTop="1dp"
+        android:layout_marginEnd="141dp"
+        android:background="@android:color/transparent"
+        android:text="Terminos y Condiciones"
+        android:textColor="#68B0AB"
+        android:textSize="13sp"
+        android:textStyle="normal|bold" />
+
 </RelativeLayout>
