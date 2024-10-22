@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/mobile_navigation"
+    app:startDestination="@id/navigation_inicio">
+
+    <fragment
+        android:id="@+id/navigation_inicio"
+        android:name="com.example.proyecto_consultapp.ui.inicio.InicioFragment"
+        android:label="@string/title_inicio"
+        tools:layout="@layout/fragment_inicio" />
+
+    <fragment
+        android:id="@+id/navigation_calendario"
+        android:name="com.example.proyecto_consultapp.ui.calendario.CalendarioFragment"
+        android:label="@string/title_calendario"
+        tools:layout="@layout/fragment_calendario" />
+
+    <fragment
+        android:id="@+id/navigation_expediente"
+        android:name="com.example.proyecto_consultapp.ui.expediente.ExpedienteFragment"
+        android:label="@string/title_expediente"
+        tools:layout="@layout/fragment_expediente" />
+
+    <fragment
+        android:id="@+id/navigation_notificaciones"
+        android:name="com.example.proyecto_consultapp.ui.notificaciones.NotificacionesFragment"
+        android:label="@string/title_notificaciones"
+        tools:layout="@layout/fragment_notificaciones" />
+</navigation>
