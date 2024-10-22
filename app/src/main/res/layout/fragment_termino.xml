@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp"
+    android:background="@android:color/white"
+    android:gravity="center"
+    android:weightSum="1">
+
+    <!-- Título de la página -->
+    <TextView
+        android:id="@+id/title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Términos y Condiciones"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        android:textColor="@android:color/black"
+        android:layout_gravity="center"
+        android:layout_marginBottom="16dp" />
+
+    <!-- ScrollView para texto de términos y condiciones -->
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1">
+
+        <TextView
+            android:id="@+id/text_terms_conditions"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="La utilización de este sitio y de cualquiera de las aplicaciones de Consultapp constituye el pleno y expreso consentimiento por parte del usuario para observar y sujetarse respecto de cada uno de los términos y condiciones aquí contenidos, así como de las políticas de privacidad, políticas de seguridad y otros documentos que conformen parte o regulen la participación del usuario en este sitio o aplicación. En el supuesto que cualquiera de los términos a los que deberá sujetarse el usuario sean contrarios a sus intereses, deberá abstenerse de utilizar este sitio o aplicación.
+
+1. Servicios Médicos
+
+Consultapp facilita la programación de citas con profesionales médicos y el acceso a servicios de salud, sin embargo, no realiza diagnósticos médicos ni ofrece tratamiento de manera directa. La información provista en la aplicación tiene un carácter informativo y administrativo. Para diagnósticos específicos, consultas médicas o tratamientos, el usuario debe acudir a un profesional de la salud certificado. En caso de emergencia, contacte inmediatamente a los servicios de emergencia locales.
+
+2. Responsabilidad del Usuario
+
+El usuario se compromete a utilizar la aplicación de manera responsable y en conformidad con las leyes y regulaciones aplicables, incluidas, pero no limitadas a, aquellas relacionadas con la protección de datos personales y el uso de servicios médicos. El usuario será responsable de la veracidad de la información que proporcione dentro de la aplicación y acepta que cualquier información incorrecta o falsa puede generar la suspensión o cancelación de su cuenta.
+
+3. Protección de Datos
+
+El tratamiento de los datos personales proporcionados a Consultapp se regirá por la Ley Federal de Protección de Datos Personales en Posesión de los Particulares, en México, y por las normativas aplicables en otros territorios en caso de usuarios internacionales. Nos comprometemos a implementar medidas de seguridad adecuadas para proteger la información personal y utilizaremos estos datos solo para los fines médicos y administrativos expresados en nuestras políticas de privacidad. Consultapp no comparte ni venderá la información personal de los usuarios a terceros sin el consentimiento expreso del usuario.
+
+4. Modificaciones a los Términos
+
+Nos reservamos el derecho de modificar los presentes términos y condiciones en cualquier momento. Dichas modificaciones serán notificadas a través de los medios de contacto proporcionados por los usuarios, o mediante publicaciones visibles dentro de la aplicación. El uso continuado de la aplicación después de la modificación de estos términos implica la aceptación de las mismas. Si no estás de acuerdo con las modificaciones, te pedimos que descontinúes el uso de Consultapp.
+
+5. Uso Aceptable
+
+Los usuarios se comprometen a no utilizar la aplicación para fines ilícitos, fraudulentos o malintencionados, como intentar acceder sin autorización a cuentas de otros usuarios, distribuir malware, o realizar cualquier acto que dañe la reputación o el correcto funcionamiento de la aplicación. Nos reservamos el derecho a tomar medidas contra cualquier uso indebido, incluyendo la suspensión o cancelación de la cuenta del usuario.
+
+6. Limitación de Responsabilidad
+
+Consultapp no garantiza la disponibilidad ininterrumpida de los servicios, ya que pueden verse interrumpidos por mantenimiento, fallos técnicos o circunstancias fuera de nuestro control. No somos responsables por la pérdida de datos, retrasos en los servicios o cualquier otra cuestión que escape de nuestro control directo.
+
+7. Legislación Aplicable y Jurisdicción
+
+Cualquier controversia relacionada con la interpretación y aplicación de los presentes Términos y Condiciones se regirá por las leyes mexicanas y será dirimida en los tribunales competentes de la Ciudad de México, Distrito Federal, renunciando los usuarios al fuero de sus domicilios actuales o futuros.
+
+8. Requisitos de Edad
+
+El uso de Consultapp está destinado exclusivamente a mayores de 18 años. Si el usuario es menor de edad, deberá contar con el consentimiento expreso de sus padres o tutores legales, quienes asumirán la responsabilidad total por el uso de la aplicación por parte del menor.
+
+9. Uso de Datos para Marketing y Publicidad
+
+Con su consentimiento, es posible que utilicemos la información personal para enviarle comunicaciones de marketing sobre productos, servicios o promociones de terceros que consideremos que pueden ser de su interés. Podrá optar por dejar de recibir estas comunicaciones en cualquier momento.
+
+10. Derechos del Usuario sobre su Información Personal
+
+Los usuarios pueden ejercer sus derechos ARCO (Acceso, Rectificación, Cancelación y Oposición) en cualquier momento, solicitando modificaciones o la eliminación de sus datos personales en nuestras bases de datos. Para ejercer estos derechos, puede contactarnos directamente en [correo de soporte].
+
+11. Veracidad de la Información Médica
+
+Es responsabilidad del usuario proporcionar información médica completa y veraz en todo momento. Consultapp no se hace responsable de daños o perjuicios derivados de información incorrecta o incompleta proporcionada por el usuario.
+
+16. Aviso sobre Riesgos Tecnológicos
+
+Consultapp no se responsabiliza por pérdidas o daños causados por ataques de hackers, virus u otros riesgos tecnológicos que puedan afectar el funcionamiento de la aplicación, a pesar de las medidas de seguridad implementadas.
+
+17. Servicios de Terceros
+
+El uso de algunos servicios ofrecidos en Consultapp puede implicar la interacción con servicios de terceros (por ejemplo, sistemas de autenticación, mapa). Al utilizar estos servicios, el usuario acepta los términos y políticas de estos terceros, que pueden variar en función de la localización.
+
+18. Política de Privacidad
+
+Para obtener más información sobre cómo manejamos sus datos personales, por favor consulte nuestra [Política de Privacidad](enlace a política completa), que forma parte integral de estos términos."
+            android:textColor="@android:color/black"
+            android:textSize="14sp"
+            android:justificationMode="inter_word"
+            android:lineSpacingExtra="4dp" />
+
+    </ScrollView>
+
+</LinearLayout>
