@@ -1,4 +1,3 @@
-<?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
@@ -11,14 +10,74 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/texto"
-        android:text="Hola soy un fucking texto de admin bro"
-        android:textSize="40dp"/>
+        android:text="Registrar Médico"
+        android:textSize="30dp"
+        android:layout_marginTop="20dp"
+        android:gravity="center"/>
 
-    <Button
+    <!-- Nombre del médico -->
+    <EditText
+        android:id="@+id/nombreMedico"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@+id/texto"
+        android:hint="Nombre del Médico"
+        android:layout_marginTop="16dp"/>
+
+    <!-- Correo del médico -->
+    <EditText
+        android:id="@+id/correoMedico"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/nombreMedico"
+        android:hint="Correo del Médico"
+        android:layout_marginTop="16dp"
+        android:inputType="textEmailAddress"/>
+
+    <!-- Contraseña -->
+    <EditText
+        android:id="@+id/contrasenaMedico"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/correoMedico"
+        android:hint="Contraseña"
+        android:layout_marginTop="16dp"
+        android:inputType="textPassword"/>
+
+    <!-- Teléfono -->
+    <EditText
+        android:id="@+id/telefonoMedico"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:layout_below="@+id/contrasenaMedico"
+        android:hint="Teléfono del Médico" />
+
+    <!-- Spinner de especialización -->
+    <Spinner
+        android:id="@+id/spinner_especializacion"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/telefonoMedico"
+        android:layout_marginTop="16dp"
+        android:hint="Selecciona Especialización"/>
+
+    <!-- Botón para registrar médico -->
+    <Button
+        android:id="@+id/btn_registrarMedico"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/spinner_especializacion"
+        android:text="Registrar Médico"
+        android:layout_marginTop="16dp"/>
+
+    <!-- Botón para cerrar sesión -->
+    <Button
         android:id="@+id/btn_cerrarS"
-        android:text="Cerrar sesion"/>
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/btn_registrarMedico"
+        android:text="Cerrar sesión"
+        android:layout_marginTop="16dp"/>
 
 </RelativeLayout>

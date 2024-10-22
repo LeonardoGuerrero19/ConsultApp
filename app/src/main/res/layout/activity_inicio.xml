@@ -7,19 +7,43 @@
     android:layout_height="match_parent"
     tools:context=".IniciopActivity">
 
-
+    <!-- Texto de bienvenida -->
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/texto"
-        android:textSize="30sp" />
+        android:textSize="30sp"
+        android:layout_marginTop="16dp"
+        android:padding="16dp"
+        android:text="Hola, bienvenido"/>
 
-    <Button
+    <!-- Contenedor para mostrar las citas -->
+    <LinearLayout
+        android:id="@+id/citas_container"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/texto"
-        android:id="@+id/btn_cerrarS"
-        android:text="Cerrar sesion"/>
+        android:layout_below="@id/texto"
+        android:orientation="vertical"
+        android:padding="16dp"
+        android:layout_marginTop="16dp" />
 
+    <!-- Contenedor para los botones dinámicos (servicios) -->
+    <LinearLayout
+        android:id="@+id/btn_container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/citas_container"
+        android:orientation="vertical"
+        android:padding="16dp"
+        android:layout_marginTop="16dp" />
+
+    <!-- Botón de cerrar sesión ubicado en la parte inferior -->
+    <Button
+        android:id="@+id/btn_cerrarS"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Cerrar sesión"
+        android:layout_alignParentBottom="true"
+        android:layout_margin="16dp" />
 
 </RelativeLayout>

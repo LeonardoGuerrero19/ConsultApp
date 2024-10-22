@@ -3,36 +3,24 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".MedicoActivity">
+    tools:context=".CrearCitaActivity">
 
     <!-- Título que muestra el nombre y especialización del médico -->
     <TextView
-        android:id="@+id/nombreMedico"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Nombre del Médico - Especialización"
-        android:textSize="30sp"
-        android:layout_marginTop="20dp"
-        android:gravity="center"/>
+        android:text="Agenda de citas"
+        android:id="@+id/text"
+        android:textSize="30dp"/>
 
-    <!-- Nombre del médico (solo si lo necesitas separado) -->
-    <TextView
-        android:id="@+id/tvNombreMedico"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/nombreMedico"
-        android:textSize="18sp"
-        android:layout_marginTop="16dp"
-        android:gravity="center"/>
-
-    <!-- Especialización del médico (solo si lo necesitas separado) -->
+    <!-- Servicio seleccionado) -->
     <TextView
         android:id="@+id/nombreServicio"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/tvNombreMedico"
+        android:layout_below="@id/text"
         android:textSize="18sp"
-        android:layout_marginTop="8dp"
+        android:layout_marginTop="10dp"
         android:gravity="center"/>
 
     <!-- Calendario para seleccionar fecha -->
@@ -43,29 +31,29 @@
         android:layout_below="@id/nombreServicio"
         android:layout_marginTop="20dp"/>
 
-    <!-- Spinner para seleccionar horario -->
+    <!-- Aquí quiero agregar los horarios consultados de la database -->
     <Spinner
         android:id="@+id/spinnerHorarios"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/calendarView"
-        android:layout_marginTop="16dp"
-        android:hint="Selecciona Horario"/>
+        android:layout_marginTop="20dp"/>
+
 
     <!-- Botón para guardar los datos -->
     <Button
-        android:id="@+id/btnGuardarHorario"
+        android:id="@+id/btnGuardarCita"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/spinnerHorarios"
         android:text="Guardar Horario"
-        android:layout_marginTop="16dp"/>
+        android:layout_marginTop="40dp"/>
 
     <Button
         android:id="@+id/btn_cerrarS"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/btnGuardarHorario"
+        android:layout_below="@+id/btnGuardarCita"
         android:text="Cerrar sesión"
         android:layout_marginTop="16dp"/>
 </RelativeLayout>

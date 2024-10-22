@@ -113,7 +113,7 @@ public class LoginActivity extends AppCompatActivity {
 
     private void checkUserRole(String uid) {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
-        db.collection("users").document(uid).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+        db.collection("user").document(uid).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
             @Override
             public void onComplete(@NonNull Task<DocumentSnapshot> task) {
                 if (task.isSuccessful()) {
@@ -127,7 +127,7 @@ public class LoginActivity extends AppCompatActivity {
                             finish();
                         } else if ("medico".equals(rol)) {
                             // Redirigir a MedicoActivity
-                            Intent intent = new Intent(LoginActivity.this, MedicoActivity.class);
+                            Intent intent = new Intent(LoginActivity.this, InicioMedicoActivity.class);
                             startActivity(intent);
                             finish();
                         } else {

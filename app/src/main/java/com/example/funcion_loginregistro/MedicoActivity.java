@@ -2,13 +2,12 @@ package com.example.funcion_loginregistro;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.EditText;
+import android.widget.CalendarView;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
-import android.widget.AdapterView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -17,141 +16,124 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.HashMap;
 
 public class MedicoActivity extends AppCompatActivity {
-
-    private EditText nombreMedico, telefonoMedico;
-    private Button btnGuardarMedico, btnCerrarSesion;
+    private TextView nombreMedico, especializacionMedico;
+    private CalendarView calendarView;
+    private Spinner spinnerHorarios;
+    private Button btnGuardarHorario, btn_cerrarS;
     private FirebaseFirestore db;
-    private Spinner spinnerEspecializacionMedico, spinnerHorarioMedico;
     private FirebaseAuth mAuth;
 
-    // Lista para guardar los horarios seleccionados
-    private List<String> horariosSeleccionados;
+    private String fechaSeleccionada;
+    private List<String> horariosSeleccionados = new ArrayList<>();
+    private String nombreMedicoLogueado; // Variable para almacenar el nombre del médico
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_medico);
 
-        // Inicializar Firebase Firestore y Auth
+        // Iniciar servicios Firebase
         db = FirebaseFirestore.getInstance();
         mAuth = FirebaseAuth.getInstance();
 
-        // Inicializar la lista de horarios seleccionados
-        horariosSeleccionados = new ArrayList<>();
+        // Referencias ids desde layout
+        nombreMedico = findViewById(R.id.tvNombreMedico);
+        especializacionMedico = findViewById(R.id.nombreServicio);
+        calendarView = findViewById(R.id.calendarView);
+        spinnerHorarios = findViewById(R.id.spinnerHorarios);
+        btnGuardarHorario = findViewById(R.id.btnGuardarHorario);
+        btn_cerrarS = findViewById(R.id.btn_cerrarS);
 
-        // Referencias a los elementos de la interfaz
-        nombreMedico = findViewById(R.id.et_nombre_medico);
-        telefonoMedico = findViewById(R.id.et_telefono_medico);
-        btnGuardarMedico = findViewById(R.id.btn_guardar_medico);
-        btnCerrarSesion = findViewById(R.id.btn_cerrarS);
-        spinnerEspecializacionMedico = findViewById(R.id.spinner_especializacion_medico);
-        spinnerHorarioMedico = findViewById(R.id.spinner_horarios);
+        // Cargar información del médico
+        cargarInformacionMedico();
 
-        // Cargar especializaciones y horarios desde Firestore
-        cargarEspecializacionesDesdeFirestore();
+        // Cargar horarios desde Firestore
         cargarHorariosDesdeFirestore();
 
+        // Cargar citas del médico
+        cargarCitasDelMedico();
+
+        // Listener para el calendario
+        calendarView.setOnDateChangeListener((view, year, month, dayOfMonth) -> {
+            // Formato de la fecha seleccionada
+            fechaSeleccionada = dayOfMonth + "/" + (month + 1) + "/" + year; // Mes es 0-indexed
+            Toast.makeText(MedicoActivity.this, "Fecha seleccionada: " + fechaSeleccionada, Toast.LENGTH_SHORT).show();
+        });
+
         // Listener para el botón de guardar
-        btnGuardarMedico.setOnClickListener(view -> {
-            String nombre = nombreMedico.getText().toString().trim();
-            String especializacion = spinnerEspecializacionMedico.getSelectedItem().toString();
-            String telefono = telefonoMedico.getText().toString().trim();
-
-            // Validar si los campos están vacíos
-            if (nombre.isEmpty() || especializacion.isEmpty() || telefono.isEmpty()) {
-                Toast.makeText(MedicoActivity.this, "Por favor, complete todos los campos", Toast.LENGTH_SHORT).show();
-            } else if (!validarTelefono(telefono)) {
-                Toast.makeText(MedicoActivity.this, "Número de teléfono inválido", Toast.LENGTH_SHORT).show();
+        btnGuardarHorario.setOnClickListener(v -> {
+            if (fechaSeleccionada != null && !horariosSeleccionados.isEmpty()) {
+                guardarHorariosEnFirestore();
             } else {
-                verificarTelefonoDuplicado(telefono, nombre, especializacion, horariosSeleccionados);
+                Toast.makeText(MedicoActivity.this, "Seleccione una fecha y horarios", Toast.LENGTH_SHORT).show();
             }
         });
 
-        // Listener para cerrar sesión
-        btnCerrarSesion.setOnClickListener(view -> {
+        // Cerrar sesión
+        btn_cerrarS.setOnClickListener(view -> {
             mAuth.signOut();
-            finish();
-            startActivity(new Intent(MedicoActivity.this, LoginActivity.class));
+            Intent intent = new Intent(MedicoActivity.this, LoginActivity.class);
+            startActivity(intent);
+            finish(); // Cierra la actividad actual
         });
-
-        // Listener para guardar automáticamente el horario seleccionado
-        // Listener para guardar automáticamente el horario seleccionado
-        spinnerHorarioMedico.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
-                String horarioSeleccionado = spinnerHorarioMedico.getSelectedItem().toString();
-
-                // Verifica si el usuario seleccionó un horario válido (excluyendo el placeholder)
-                if (!horarioSeleccionado.equals("Seleccione sus horarios")) {
-                    // Agregar el horario a la lista de horarios seleccionados
-                    if (!horariosSeleccionados.contains(horarioSeleccionado)) {
-                        horariosSeleccionados.add(horarioSeleccionado);
-                        Toast.makeText(MedicoActivity.this, "Horario agregado: " + horarioSeleccionado, Toast.LENGTH_SHORT).show();
-                    }
-                }
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> parentView) {
-                // No hacer nada
-            }
-        });
-
-    }
-    private boolean validarTelefono(String telefono) {
-        return telefono.matches("\\d{10}"); // Ejemplo: Validar que sea un número de 10 dígitos
     }
 
-    // Método para verificar si el teléfono ya está registrado en Firestore
-    private void verificarTelefonoDuplicado(String telefono, String nombre, String especializacion, List<String> horarios) {
-        db.collection("medicos")
-                .whereEqualTo("telefono", telefono)
-                .get()
-                .addOnCompleteListener(task -> {
-                    if (task.isSuccessful()) {
-                        // Comprobar si la lista de documentos está vacía
-                        if (task.getResult().isEmpty()) {
-                            // Si no hay duplicados, guardar el médico en Firestore
-                            guardarMedicoEnFirestore(nombre, especializacion, telefono, horarios);
-                        } else {
-                            // Si hay duplicados, mostrar mensaje
-                            Toast.makeText(MedicoActivity.this, "El teléfono ya está registrado", Toast.LENGTH_SHORT).show();
-                        }
-                    } else {
-                        // Manejar error de consulta
-                        Toast.makeText(MedicoActivity.this, "Error al verificar el teléfono", Toast.LENGTH_SHORT).show();
-                    }
-                });
-    }
-
-
-    private void cargarEspecializacionesDesdeFirestore() {
-        db.collection("servicios").document("rySIMH9TTamnp7dxQuDj")
+    private void cargarInformacionMedico() {
+        String uid = mAuth.getCurrentUser().getUid(); // Obtener UID del médico logueado
+        db.collection("user").document(uid)
                 .get()
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
                         DocumentSnapshot document = task.getResult();
                         if (document.exists()) {
-                            List<String> especializaciones = (List<String>) document.get("valor");
-                            if (especializaciones != null) {
-                                ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, especializaciones);
-                                adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-                                spinnerEspecializacionMedico.setAdapter(adapter);
-                            } else {
-                                Toast.makeText(MedicoActivity.this, "No se encontraron especializaciones", Toast.LENGTH_SHORT).show();
-                            }
+                            String nombre = document.getString("nombre");
+                            String especializacion = document.getString("especializacion");
+
+                            // Actualizar el TextView con el nombre y la especialización
+                            String titulo = nombre + " - " + especializacion;
+                            nombreMedico.setText(titulo); // Actualiza el TextView
+                            nombreMedicoLogueado = nombre; // Almacenar nombre del médico logueado
                         } else {
                             Toast.makeText(MedicoActivity.this, "El documento no existe", Toast.LENGTH_SHORT).show();
                         }
                     } else {
-                        Toast.makeText(MedicoActivity.this, "Error al cargar especializaciones", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(MedicoActivity.this, "Error al cargar información del médico", Toast.LENGTH_SHORT).show();
                     }
                 });
+    }
+
+    private void cargarCitasDelMedico() {
+        String uid = mAuth.getCurrentUser().getUid(); // Obtener UID del médico logueado
+        db.collection("citas")
+                .whereEqualTo("medico", nombreMedicoLogueado) // Filtrar citas por el nombre del médico
+                .get()
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        List<String> citas = new ArrayList<>();
+                        for (DocumentSnapshot document : task.getResult()) {
+                            String servicio = document.getString("servicio");
+                            String fecha = document.getString("fecha");
+                            String horario = document.getString("horario");
+                            citas.add("Servicio: " + servicio + ", Fecha: " + fecha + ", Horario: " + horario);
+                        }
+                        mostrarCitas(citas);
+                    } else {
+                        Toast.makeText(MedicoActivity.this, "Error al cargar citas", Toast.LENGTH_SHORT).show();
+                    }
+                });
+    }
+
+    private void mostrarCitas(List<String> citas) {
+        // Aquí puedes mostrar las citas en la UI, por ejemplo, en un RecyclerView o ListView
+        // Para este ejemplo, solo mostraré un Toast
+        for (String cita : citas) {
+            Toast.makeText(this, cita, Toast.LENGTH_SHORT).show();
+        }
     }
 
     private void cargarHorariosDesdeFirestore() {
@@ -171,7 +153,7 @@ public class MedicoActivity extends AppCompatActivity {
                                 // Configurar el ArrayAdapter con los horarios
                                 ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, horariosConPlaceholder);
                                 adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-                                spinnerHorarioMedico.setAdapter(adapter);
+                                spinnerHorarios.setAdapter(adapter);
                             } else {
                                 Toast.makeText(MedicoActivity.this, "No se encontraron horarios", Toast.LENGTH_SHORT).show();
                             }
@@ -184,20 +166,44 @@ public class MedicoActivity extends AppCompatActivity {
                 });
     }
 
+    private void guardarHorariosEnFirestore() {
+        // Crear un mapa para guardar los datos
+        Map<String, Object> data = new HashMap<>();
+        data.put("fecha", fechaSeleccionada);
+        data.put("horarios", horariosSeleccionados);
 
-    private void guardarMedicoEnFirestore(String nombre, String especializacion, String telefono, List<String> horarios) {
-        Map<String, Object> medico = new HashMap<>();
-        medico.put("nombre", nombre);
-        medico.put("especializacion", especializacion);
-        medico.put("telefono", telefono);
-        medico.put("horarios", horarios);  // Guardar la lista de horarios seleccionados
+        // Agregar nombre y especialización
+        String uid = mAuth.getCurrentUser().getUid(); // Obtener UID del médico logueado
+        db.collection("user").document(uid)
+                .get()
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        DocumentSnapshot document = task.getResult();
+                        if (document.exists()) {
+                            String nombre = document.getString("nombre");
+                            String especializacion = document.getString("especializacion");
 
-        db.collection("medicos").add(medico)
-                .addOnSuccessListener(documentReference -> {
-                    Toast.makeText(MedicoActivity.this, "Datos guardados exitosamente", Toast.LENGTH_SHORT).show();
-                })
-                .addOnFailureListener(e -> {
-                    Toast.makeText(MedicoActivity.this, "Error al guardar los datos", Toast.LENGTH_SHORT).show();
+                            // Agregar nombre y especialización al mapa
+                            data.put("nombre", nombre);
+                            data.put("especializacion", especializacion);
+
+                            // Guardar en la colección "horarios_medicos" o donde desees
+                            db.collection("horarios_medicos").add(data)
+                                    .addOnSuccessListener(documentReference -> {
+                                        Toast.makeText(MedicoActivity.this, "Horarios guardados con éxito", Toast.LENGTH_SHORT).show();
+                                        // Limpiar selecciones
+                                        fechaSeleccionada = null;
+                                        horariosSeleccionados.clear();
+                                    })
+                                    .addOnFailureListener(e -> {
+                                        Toast.makeText(MedicoActivity.this, "Error al guardar horarios: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                                    });
+                        } else {
+                            Toast.makeText(MedicoActivity.this, "El documento no existe", Toast.LENGTH_SHORT).show();
+                        }
+                    } else {
+                        Toast.makeText(MedicoActivity.this, "Error al cargar información del médico", Toast.LENGTH_SHORT).show();
+                    }
                 });
     }
 }
