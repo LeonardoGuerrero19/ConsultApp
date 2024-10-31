@@ -1,0 +1,222 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".politicas">
+
+    <TextView
+        android:id="@+id/text"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="20dp"
+        android:fontFamily="@font/montserrat_bold"
+        android:textColor="@color/black"
+        android:textSize="26dp"
+        android:text="Términos y Condiciones" />
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginHorizontal="20dp"
+        android:layout_below="@id/text">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="20dp"
+                android:fontFamily="@font/montserrat_medium"
+                android:textColor="@color/black"
+                android:textSize="16dp"
+                android:text="La utilización de este sitio y de cualquiera de las aplicaciones de ConsultApp constituye el pleno y expreso consentimiento por parte del usuario para observar y sujetarse respecto de cada uno de los términos y condiciones aquí contenidos, así como de las políticas de privacidad, políticas de seguridad y otros documentos que conformen parte o regulen la participación del usuario en este sitio o aplicación. En el supuesto que cualquiera de los términos a los que deberá sujetarse el usuario sean contrarios a sus intereses, deberá abstenerse de utilizar este sitio o aplicación. " />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="5dp"
+                android:fontFamily="@font/montserrat_bold"
+                android:textColor="@color/aqua"
+                android:textSize="16dp"
+                android:text="1.- Servicios médicos" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="20dp"
+                android:fontFamily="@font/montserrat_medium"
+                android:textColor="@color/black"
+                android:textSize="16dp"
+                android:text="ConsultApp facilita la programación de citas con profesionales médicos y el acceso a servicios de salud, sin embargo, no realiza diagnósticos médicos ni ofrece tratamiento de manera directa. La información provista en la aplicación es de carácter informativo y administrativo. Para diagnósticos específicos, consultas médicas o tratamientos, el usuario debe acudir a un profesional de la salud certificado (especialista). En caso de emergencia, contacte inmediatamente a los servicios de emergencia locales. Ejemplo: 911, Cruz Roja." />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="5dp"
+                android:fontFamily="@font/montserrat_bold"
+                android:textColor="@color/aqua"
+                android:textSize="16dp"
+                android:text="2.- Responsabilidad del usuario" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="20dp"
+                android:fontFamily="@font/montserrat_medium"
+                android:textColor="@color/black"
+                android:textSize="16dp"
+                android:text="El usuario se compromete a utilizar la aplicación de manera correcta y en conformidad con las leyes y regulaciones aplicables, que incluye la protección de datos personales y el uso de servicios médicos. El usuario será responsable de la veracidad de la información que proporcione dentro de la aplicación y deberá aceptar que cualquier información incorrecta o falsa le generará la suspensión o cancelación de su cuenta." />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="5dp"
+                android:fontFamily="@font/montserrat_bold"
+                android:textColor="@color/aqua"
+                android:textSize="16dp"
+                android:text="3.- Protección de datos" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="20dp"
+                android:fontFamily="@font/montserrat_medium"
+                android:textColor="@color/black"
+                android:textSize="16dp"
+                android:text="El tratamiento de los datos personales proporcionados a ConsultApp se regirá por la Ley Federal de Protección de Datos Personales en Posesión de los Particulares en México y por las normativas aplicables en otros territorios en caso de usuarios internacionales. Nos comprometemos a implementar medidas de seguridad adecuadas para proteger la información personal y utilizaremos estos datos solo para los fines médicos y administrativos expresados en nuestras políticas de privacidad. ConsultApp no comparte, ni venderá la información personal de los usuarios a terceros, sólo si el usuario lo solicita mediante un escrito." />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="5dp"
+                android:fontFamily="@font/montserrat_bold"
+                android:textColor="@color/aqua"
+                android:textSize="16dp"
+                android:text="4.- Modificaciones a los términos " />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="20dp"
+                android:fontFamily="@font/montserrat_medium"
+                android:textColor="@color/black"
+                android:textSize="16dp"
+                android:text="Nos reservamos el derecho de modificar los presentes términos y condiciones en cualquier momento. Dichas modificaciones serán notificadas a través de los medios de contacto proporcionados por los usuarios o, mediante publicaciones visibles dentro de la aplicación. Si el usuario no acepta en tiempo la modificación, no podrá ingresar a la aplicación, hasta que haga contacto con el administrador de dicha aplicación." />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="5dp"
+                android:fontFamily="@font/montserrat_bold"
+                android:textColor="@color/aqua"
+                android:textSize="16dp"
+                android:text="5.- Uso aceptable" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="20dp"
+                android:fontFamily="@font/montserrat_medium"
+                android:textColor="@color/black"
+                android:textSize="16dp"
+                android:text="Los usuarios se deben comprometer a no utilizar la aplicación para fines ilícitos, fraudulentos o malintencionados, como intentar acceder sin autorización a cuentas de otros usuarios, realizar malware o cualquier acto que dañe la reputación y el correcto funcionamiento de la aplicación. En caso de hacer cualquier uso indebido, se tomarán las medidas adecuadas que será la suspensión o cancelación de la cuenta del usuario." />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="5dp"
+                android:fontFamily="@font/montserrat_bold"
+                android:textColor="@color/aqua"
+                android:textSize="16dp"
+                android:text="6.- Limitación de responsabilidad" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="20dp"
+                android:fontFamily="@font/montserrat_medium"
+                android:textColor="@color/black"
+                android:textSize="16dp"
+                android:text="En caso de que por mantenimiento, fallos técnicos o circunstancias fuera de nuestro control, ConsultApp trabajará para que en el menor tiempo posible se pueda recuperar el servicio y así evitar la pérdida de datos, retrasos en los servicios o cualquier otra cuestión." />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="5dp"
+                android:fontFamily="@font/montserrat_bold"
+                android:textColor="@color/aqua"
+                android:textSize="16dp"
+                android:text="7.- Requisitos de edad" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="20dp"
+                android:fontFamily="@font/montserrat_medium"
+                android:textColor="@color/black"
+                android:textSize="16dp"
+                android:text="Esta aplicación está destinada a ser manejada por personas mayores de 18 años y en caso de que sea utilizada por un menor de edad, deberá contar con el consentimiento de sus padres o tutores legales, quienes asumirán la responsabilidad total por el uso de la aplicación por parte del menor." />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="5dp"
+                android:fontFamily="@font/montserrat_bold"
+                android:textColor="@color/aqua"
+                android:textSize="16dp"
+                android:text="8.- Derechos del usuario sobre su información personal" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="20dp"
+                android:fontFamily="@font/montserrat_medium"
+                android:textColor="@color/black"
+                android:textSize="16dp"
+                android:text="Los usuarios pueden ejercer sus derechos ARCO (Acceso, Rectificación, Cancelación y Oposición) en cualquier momento, pudiendo hacer modificaciones o eliminando sus datos personales que se encuentran registrados en nuestras bases de datos." />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="5dp"
+                android:fontFamily="@font/montserrat_bold"
+                android:textColor="@color/aqua"
+                android:textSize="16dp"
+                android:text="9.- Veracidad de la información médica" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="20dp"
+                android:fontFamily="@font/montserrat_medium"
+                android:textColor="@color/black"
+                android:textSize="16dp"
+                android:text="Es responsabilidad del doctor que atiende al usuario de proporcionar información médica completa y veraz en todo momento. ConsultApp no se hace responsable de una información incorrecta o incompleta proporcionada por el doctor a cargo." />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="5dp"
+                android:fontFamily="@font/montserrat_bold"
+                android:textColor="@color/aqua"
+                android:textSize="16dp"
+                android:text="10.- Aviso sobre riesgos tecnológicos " />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="20dp"
+                android:fontFamily="@font/montserrat_medium"
+                android:textColor="@color/black"
+                android:textSize="16dp"
+                android:text="ConsultApp entregará la aplicación con las medidas de seguridad necesarias para un buen funcionamiento de dicha aplicación. En caso de sufrir algún daño por ataques de hackers, virus, etc. ConsultApp investigará el motivo y si fue ocasionado por el usuario por hacer mal uso, no nos haremos responsables del daño." />
+        </LinearLayout>
+    </ScrollView>
+
+</RelativeLayout>

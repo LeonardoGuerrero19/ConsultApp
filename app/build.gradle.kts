@@ -1,4 +1,6 @@
 plugins {
+    id("com.google.gms.google-services")
+
     alias(libs.plugins.android.application)
 }
 
@@ -32,11 +34,16 @@ android {
 }
 
 dependencies {
-
+    implementation("com.android.volley:volley:1.2.1")
+    implementation("com.google.android.gms:play-services-auth:20.5.0") // Para la autenticación de Google
+    implementation("com.google.firebase:firebase-analytics")
+    implementation(platform("com.google.firebase:firebase-bom:33.4.0"))
     implementation(libs.appcompat)
     implementation(libs.material)
     implementation(libs.activity)
     implementation(libs.constraintlayout)
+    implementation(libs.google.firebase.auth)
+    implementation(libs.google.firebase.firestore)
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)

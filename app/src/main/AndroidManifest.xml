@@ -13,7 +13,22 @@
         android:theme="@style/Theme.ConsultApp"
         tools:targetApi="31">
         <activity
-            android:name=".prueba"
+            android:name=".IniciopActivity"
+            android:exported="false" />
+        <activity
+            android:name=".MedicoActivity"
+            android:exported="false" />
+        <activity
+            android:name=".AdminActivity"
+            android:exported="false" />
+        <activity
+            android:name=".politicas"
+            android:exported="false" />
+        <activity
+            android:name=".registro"
+            android:exported="false" />
+        <activity
+            android:name=".login"
             android:exported="false" />
         <activity
             android:name=".MainActivity"
