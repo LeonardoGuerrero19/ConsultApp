@@ -1,7 +1,6 @@
 package com.example.funcion_loginregistro;
 
 import android.os.Bundle;
-import android.view.View;
 import android.content.Intent;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -9,7 +8,6 @@ import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.Toast;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.firebase.auth.FirebaseAuth;
@@ -21,7 +19,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class AdminActivity extends AppCompatActivity {
+public class RegistrarMedicoActivity extends AppCompatActivity {
     private EditText etNombreMedico, etCorreoMedico, etContrasenaMedico, etTelefonoMedico;
     private Spinner spinnerEspecializacion;
     private Button btnRegistrarMedico, btnCerrarS;
@@ -31,7 +29,7 @@ public class AdminActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_admin);
+        setContentView(R.layout.activity_registrar_medico);
 
         // Inicializar FirebaseAuth y Firestore
         mAuth = FirebaseAuth.getInstance();
@@ -52,7 +50,7 @@ public class AdminActivity extends AppCompatActivity {
         // Cerrar sesión
         btnCerrarS.setOnClickListener(view -> {
             mAuth.signOut();
-            Intent intent = new Intent(AdminActivity.this, LoginActivity.class);
+            Intent intent = new Intent(RegistrarMedicoActivity.this, LoginActivity.class);
             startActivity(intent);
             finish(); // Cierra la actividad actual
         });
@@ -68,31 +66,31 @@ public class AdminActivity extends AppCompatActivity {
             if (!nombre.isEmpty() && !correo.isEmpty() && !contrasena.isEmpty() && !telefono.isEmpty() && !especializacion.isEmpty()) {
                 registrarMedico(nombre, correo, contrasena, telefono, especializacion);
             } else {
-                Toast.makeText(AdminActivity.this, "Complete todos los campos", Toast.LENGTH_SHORT).show();
+                Toast.makeText(RegistrarMedicoActivity.this, "Complete todos los campos", Toast.LENGTH_SHORT).show();
             }
         });
     }
 
     private void cargarEspecializacionesDesdeFirestore() {
-        db.collection("servicios").document("rySIMH9TTamnp7dxQuDj")
+        db.collection("Servicios").document("Todos los servicios")
                 .get()
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
                         DocumentSnapshot document = task.getResult();
                         if (document.exists()) {
-                            List<String> especializaciones = (List<String>) document.get("valor");
+                            List<String> especializaciones = (List<String>) document.get("Servicios");
                             if (especializaciones != null) {
                                 ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, especializaciones);
                                 adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
                                 spinnerEspecializacion.setAdapter(adapter);
                             } else {
-                                Toast.makeText(AdminActivity.this, "No se encontraron especializaciones", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(RegistrarMedicoActivity.this, "No se encontraron especializaciones", Toast.LENGTH_SHORT).show();
                             }
                         } else {
-                            Toast.makeText(AdminActivity.this, "El documento no existe", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(RegistrarMedicoActivity.this, "El documento no existe", Toast.LENGTH_SHORT).show();
                         }
                     } else {
-                        Toast.makeText(AdminActivity.this, "Error al cargar especializaciones", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(RegistrarMedicoActivity.this, "Error al cargar especializaciones", Toast.LENGTH_SHORT).show();
                     }
                 });
     }
@@ -108,7 +106,7 @@ public class AdminActivity extends AppCompatActivity {
                 Map<String, Object> medico = new HashMap<>();
                 medico.put("nombre", nombre);
                 medico.put("correo", correo);
-                medico.put("telefono", telefono);  // Agregar el teléfono
+                medico.put("telefono", telefono);
                 medico.put("especializacion", especializacion);
                 medico.put("rol", "medico");
 
@@ -116,14 +114,14 @@ public class AdminActivity extends AppCompatActivity {
                 db.collection("user").document(uid).set(medico).addOnSuccessListener(aVoid -> {
                     // Enviar correo de verificación
                     enviarCorreoVerificacion();
-                    Toast.makeText(AdminActivity.this, "Médico registrado con éxito. Se ha enviado un correo de verificación.", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(RegistrarMedicoActivity.this, "Médico registrado con éxito. Se ha enviado un correo de verificación.", Toast.LENGTH_SHORT).show();
                     // Limpiar campos
                     limpiarCampos();
                 }).addOnFailureListener(e -> {
-                    Toast.makeText(AdminActivity.this, "Error al registrar médico", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(RegistrarMedicoActivity.this, "Error al registrar médico", Toast.LENGTH_SHORT).show();
                 });
             } else {
-                Toast.makeText(AdminActivity.this, "Error en el registro", Toast.LENGTH_SHORT).show();
+                Toast.makeText(RegistrarMedicoActivity.this, "Error en el registro", Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -133,9 +131,9 @@ public class AdminActivity extends AppCompatActivity {
         if (user != null) {
             user.sendEmailVerification().addOnCompleteListener(task -> {
                 if (task.isSuccessful()) {
-                    Toast.makeText(AdminActivity.this, "Correo de verificación enviado", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(RegistrarMedicoActivity.this, "Correo de verificación enviado", Toast.LENGTH_SHORT).show();
                 } else {
-                    Toast.makeText(AdminActivity.this, "Error al enviar el correo de verificación", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(RegistrarMedicoActivity.this, "Error al enviar el correo de verificación", Toast.LENGTH_SHORT).show();
                 }
             });
         }

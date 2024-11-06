@@ -60,6 +60,7 @@ public class CrearCitaActivity extends AppCompatActivity {
             cargarHorariosParaFecha(nombreServicio, fechaSeleccionada);
         });
 
+
         // Configurar el botón para cerrar sesión
         btn_cerrarS.setOnClickListener(view -> {
             mAuth.signOut();

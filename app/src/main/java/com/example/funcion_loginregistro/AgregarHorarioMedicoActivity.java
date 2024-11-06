@@ -20,7 +20,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class MedicoActivity extends AppCompatActivity {
+public class AgregarHorarioMedicoActivity extends AppCompatActivity {
     private TextView nombreMedico, especializacionMedico;
     private CalendarView calendarView;
     private Spinner spinnerHorarios;
@@ -62,7 +62,7 @@ public class MedicoActivity extends AppCompatActivity {
         calendarView.setOnDateChangeListener((view, year, month, dayOfMonth) -> {
             // Formato de la fecha seleccionada
             fechaSeleccionada = dayOfMonth + "/" + (month + 1) + "/" + year; // Mes es 0-indexed
-            Toast.makeText(MedicoActivity.this, "Fecha seleccionada: " + fechaSeleccionada, Toast.LENGTH_SHORT).show();
+            Toast.makeText(AgregarHorarioMedicoActivity.this, "Fecha seleccionada: " + fechaSeleccionada, Toast.LENGTH_SHORT).show();
         });
 
         // Listener para el botón de guardar
@@ -70,14 +70,14 @@ public class MedicoActivity extends AppCompatActivity {
             if (fechaSeleccionada != null && !horariosSeleccionados.isEmpty()) {
                 guardarHorariosEnFirestore();
             } else {
-                Toast.makeText(MedicoActivity.this, "Seleccione una fecha y horarios", Toast.LENGTH_SHORT).show();
+                Toast.makeText(AgregarHorarioMedicoActivity.this, "Seleccione una fecha y horarios", Toast.LENGTH_SHORT).show();
             }
         });
 
         // Cerrar sesión
         btn_cerrarS.setOnClickListener(view -> {
             mAuth.signOut();
-            Intent intent = new Intent(MedicoActivity.this, LoginActivity.class);
+            Intent intent = new Intent(AgregarHorarioMedicoActivity.this, LoginActivity.class);
             startActivity(intent);
             finish(); // Cierra la actividad actual
         });
@@ -99,10 +99,10 @@ public class MedicoActivity extends AppCompatActivity {
                             nombreMedico.setText(titulo); // Actualiza el TextView
                             nombreMedicoLogueado = nombre; // Almacenar nombre del médico logueado
                         } else {
-                            Toast.makeText(MedicoActivity.this, "El documento no existe", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(AgregarHorarioMedicoActivity.this, "El documento no existe", Toast.LENGTH_SHORT).show();
                         }
                     } else {
-                        Toast.makeText(MedicoActivity.this, "Error al cargar información del médico", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(AgregarHorarioMedicoActivity.this, "Error al cargar información del médico", Toast.LENGTH_SHORT).show();
                     }
                 });
     }
@@ -123,7 +123,7 @@ public class MedicoActivity extends AppCompatActivity {
                         }
                         mostrarCitas(citas);
                     } else {
-                        Toast.makeText(MedicoActivity.this, "Error al cargar citas", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(AgregarHorarioMedicoActivity.this, "Error al cargar citas", Toast.LENGTH_SHORT).show();
                     }
                 });
     }
@@ -155,13 +155,13 @@ public class MedicoActivity extends AppCompatActivity {
                                 adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
                                 spinnerHorarios.setAdapter(adapter);
                             } else {
-                                Toast.makeText(MedicoActivity.this, "No se encontraron horarios", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(AgregarHorarioMedicoActivity.this, "No se encontraron horarios", Toast.LENGTH_SHORT).show();
                             }
                         } else {
-                            Toast.makeText(MedicoActivity.this, "El documento no existe", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(AgregarHorarioMedicoActivity.this, "El documento no existe", Toast.LENGTH_SHORT).show();
                         }
                     } else {
-                        Toast.makeText(MedicoActivity.this, "Error al cargar horarios", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(AgregarHorarioMedicoActivity.this, "Error al cargar horarios", Toast.LENGTH_SHORT).show();
                     }
                 });
     }
@@ -190,19 +190,19 @@ public class MedicoActivity extends AppCompatActivity {
                             // Guardar en la colección "horarios_medicos" o donde desees
                             db.collection("horarios_medicos").add(data)
                                     .addOnSuccessListener(documentReference -> {
-                                        Toast.makeText(MedicoActivity.this, "Horarios guardados con éxito", Toast.LENGTH_SHORT).show();
+                                        Toast.makeText(AgregarHorarioMedicoActivity.this, "Horarios guardados con éxito", Toast.LENGTH_SHORT).show();
                                         // Limpiar selecciones
                                         fechaSeleccionada = null;
                                         horariosSeleccionados.clear();
                                     })
                                     .addOnFailureListener(e -> {
-                                        Toast.makeText(MedicoActivity.this, "Error al guardar horarios: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                                        Toast.makeText(AgregarHorarioMedicoActivity.this, "Error al guardar horarios: " + e.getMessage(), Toast.LENGTH_SHORT).show();
                                     });
                         } else {
-                            Toast.makeText(MedicoActivity.this, "El documento no existe", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(AgregarHorarioMedicoActivity.this, "El documento no existe", Toast.LENGTH_SHORT).show();
                         }
                     } else {
-                        Toast.makeText(MedicoActivity.this, "Error al cargar información del médico", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(AgregarHorarioMedicoActivity.this, "Error al cargar información del médico", Toast.LENGTH_SHORT).show();
                     }
                 });
     }

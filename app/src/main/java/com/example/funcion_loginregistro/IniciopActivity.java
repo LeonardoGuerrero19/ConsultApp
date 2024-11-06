@@ -65,11 +65,11 @@ public class IniciopActivity extends AppCompatActivity {
     }
 
     private void cargarServicios() {
-        mFirestore.collection("servicios").document("1Z7EvzPiLVTgCcDHqf30").get().addOnCompleteListener(task -> {
+        mFirestore.collection("Servicios").document("Todos los servicios").get().addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
                 DocumentSnapshot document = task.getResult();
                 if (document.exists()) {
-                    List<String> nombresServicios = (List<String>) document.get("nombres");
+                    List<String> nombresServicios = (List<String>) document.get("Servicios");
                     if (nombresServicios != null) {
                         for (String nombreServicio : nombresServicios) {
                             agregarBotonServicio(nombreServicio);

@@ -15,16 +15,22 @@
         android:theme="@style/Theme.FuncionLoginRegistro"
         tools:targetApi="31">
         <activity
+            android:name=".AgregarServicioActivity"
+            android:exported="false" />
+        <activity
+            android:name=".InicioAdminActivity"
+            android:exported="false" />
+        <activity
             android:name=".InicioMedicoActivity"
             android:exported="false" />
         <activity
             android:name=".CrearCitaActivity"
             android:exported="false" />
         <activity
-            android:name=".MedicoActivity"
+            android:name=".AgregarHorarioMedicoActivity"
             android:exported="false" />
         <activity
-            android:name=".AdminActivity"
+            android:name=".RegistrarMedicoActivity"
             android:exported="false" />
         <activity
             android:name=".MainActivity"

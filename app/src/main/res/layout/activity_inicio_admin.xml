@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".InicioAdminActivity">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/texto"
+        android:text="Hola, soy la main activity del admin"
+        android:textSize="40dp"/>
+
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/texto"
+        android:id="@+id/btn_registrarMedico"
+        android:hint="Registrar un nuevo médico"/>
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/btn_AgregarServicio"
+        android:layout_below="@+id/btn_registrarMedico"
+        android:text="Agregar nuevo servicio"
+        android:layout_marginTop="16dp"/>
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/btn_cerrarS"
+        android:layout_below="@+id/btn_AgregarServicio"
+        android:text="Cerrar sesión"
+        android:layout_marginTop="16dp"/>
+
+
+</RelativeLayout>

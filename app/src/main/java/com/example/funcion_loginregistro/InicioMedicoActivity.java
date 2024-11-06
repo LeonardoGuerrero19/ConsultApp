@@ -44,7 +44,7 @@ public class InicioMedicoActivity extends AppCompatActivity {
 
         // Configurar el botón para redirigir a MedicoActivity (Horarios del médico)
         btn_horarios_medico.setOnClickListener(v -> {
-            Intent intent = new Intent(InicioMedicoActivity.this, MedicoActivity.class);
+            Intent intent = new Intent(InicioMedicoActivity.this, AgregarHorarioMedicoActivity.class);
             startActivity(intent);
         });
 

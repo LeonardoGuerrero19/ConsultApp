@@ -46,7 +46,7 @@ public class LoginActivity extends AppCompatActivity {
 
         // Inicialización de Google Sign-In
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                .requestIdToken(getString(R.string.default_web_client_id)) // Asegúrate de tener este ID en strings.xml
+                .requestIdToken(getString(R.string.default_web_client_id))
                 .requestEmail()
                 .build();
         googleSignInClient = GoogleSignIn.getClient(this, gso);
@@ -94,10 +94,10 @@ public class LoginActivity extends AppCompatActivity {
                 if (task.isSuccessful()) {
                     FirebaseUser user = mAuth.getCurrentUser();
                     if (user != null && !user.isEmailVerified()) { // Verificar si el correo está verificado
-                        mAuth.signOut(); // Cerrar sesión si el correo no está verificado
+                        mAuth.signOut();
                         Toast.makeText(LoginActivity.this, "Por favor, verifica tu correo electrónico.", Toast.LENGTH_SHORT).show();
                     } else {
-                        checkUserRole(user.getUid()); // Verificar el rol del usuario
+                        checkUserRole(user.getUid()); // Verificar el rol
                     }
                 } else {
                     Toast.makeText(LoginActivity.this, "Error al iniciar sesión 1", Toast.LENGTH_SHORT).show();
@@ -119,10 +119,10 @@ public class LoginActivity extends AppCompatActivity {
                 if (task.isSuccessful()) {
                     DocumentSnapshot document = task.getResult();
                     if (document.exists()) {
-                        String rol = document.getString("rol"); // Asegúrate de que el campo esté correctamente escrito
+                        String rol = document.getString("rol");
                         if ("administrador".equals(rol)) {
                             // Redirigir a AdminActivity
-                            Intent intent = new Intent(LoginActivity.this, AdminActivity.class);
+                            Intent intent = new Intent(LoginActivity.this, InicioAdminActivity.class);
                             startActivity(intent);
                             finish();
                         } else if ("medico".equals(rol)) {
@@ -131,7 +131,6 @@ public class LoginActivity extends AppCompatActivity {
                             startActivity(intent);
                             finish();
                         } else {
-                            // Redirigir a la actividad principal para otros roles (usuarios)
                             startActivity(new Intent(LoginActivity.this, IniciopActivity.class));
                             finish();
                         }
@@ -156,7 +155,7 @@ public class LoginActivity extends AppCompatActivity {
         super.onStart();
         FirebaseUser user = mAuth.getCurrentUser();
         if (user != null) {
-            // Si el usuario está autenticado, verificar su rol en Firestore antes de redirigir
+            // Si el usuario esta logueado verificar y redirigir dependiendo su rol.
             checkUserRole(user.getUid());
         }
     }
@@ -164,7 +163,7 @@ public class LoginActivity extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        // Resultados de Google Sign-In
+
         if (requestCode == RC_SIGN_IN) {
             Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
             handleSignInResult(task);
@@ -187,7 +186,6 @@ public class LoginActivity extends AppCompatActivity {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if (task.isSuccessful()) {
-                            // Inicio de sesión exitoso
                             FirebaseUser user = mAuth.getCurrentUser();
                             finish();
                             startActivity(new Intent(LoginActivity.this, IniciopActivity.class));
