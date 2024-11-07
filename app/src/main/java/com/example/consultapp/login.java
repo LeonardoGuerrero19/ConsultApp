@@ -12,6 +12,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.example.consultapp.ui.home.HomeFragment;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.DocumentSnapshot;
 
@@ -137,5 +138,14 @@ public class login extends AppCompatActivity {
                 }
             }
         });
+    }
+
+    protected void onStart() {
+        super.onStart();
+        FirebaseUser user = mAuth.getCurrentUser();
+        if (user != null) {
+            // Si el usuario está autenticado, verificar su rol en Firestore antes de redirigir
+            checkUserRole(user.getUid());
+        }
     }
 }

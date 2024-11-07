@@ -1,51 +1,43 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/main"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".login">
+    android:orientation="vertical"
+    android:background="@drawable/dialog_bkg">
 
     <ImageView
-        android:id="@+id/imageView"
-        android:layout_width="250dp"
-        android:layout_height="250dp"
-        android:layout_marginHorizontal="20dp"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="50dp"
-        android:layout_marginBottom="50dp"
-        app:srcCompat="@drawable/iniciosesion" />
+        android:layout_width="70dp"
+        android:layout_height="wrap_content"
+        android:src="@drawable/round_remove_24"
+        android:scaleType="centerCrop"
+        android:layout_gravity="center" />
 
     <TextView
         android:id="@+id/text"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/imageView"
         android:layout_marginHorizontal="20dp"
+        android:layout_marginTop="20dp"
         android:fontFamily="@font/montserrat_bold"
         android:textColor="@color/aqua"
         android:textSize="26dp"
-        android:text="Inicia Sesión" />
+        android:text="Agregar especialidad" />
 
     <TextView
-        android:id="@+id/text1"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/text"
         android:layout_marginHorizontal="20dp"
         android:layout_marginTop="30dp"
         android:layout_marginBottom="15dp"
         android:fontFamily="@font/montserrat_medium"
         android:textColor="@color/black"
         android:textSize="20dp"
-        android:text="Correo" />
+        android:text="Nombre" />
 
     <EditText
-        android:id="@+id/correo"
+        android:id="@+id/nombre_especialidad"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/text1"
         android:layout_marginHorizontal="20dp"
         android:padding="20dp"
         android:fontFamily="@font/montserrat_medium"
@@ -55,23 +47,20 @@
         android:textSize="20dp" />
 
     <TextView
-        android:id="@+id/text2"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/correo"
         android:layout_marginHorizontal="20dp"
         android:layout_marginTop="30dp"
         android:layout_marginBottom="15dp"
         android:fontFamily="@font/montserrat_medium"
         android:textColor="@color/black"
         android:textSize="20dp"
-        android:text="Contraseña" />
+        android:text="Descripción" />
 
     <EditText
-        android:id="@+id/contrasena"
+        android:id="@+id/descripcion_especialidad"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/text2"
         android:layout_marginHorizontal="20dp"
         android:padding="20dp"
         android:fontFamily="@font/montserrat_medium"
@@ -79,47 +68,19 @@
         android:background="@drawable/rounded"
         android:backgroundTint="@color/gray"
         android:textSize="20dp" />
-
-    <LinearLayout
-        android:id="@+id/linear"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginHorizontal="20dp"
-        android:layout_marginTop="20dp"
-        android:orientation="horizontal"
-        android:layout_below="@id/contrasena" >
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="¿No tienes una cuenta?  "
-            android:fontFamily="@font/montserrat_medium"
-            android:textSize="16dp"
-            android:layout_gravity="center_vertical"/>
-
-        <TextView
-            android:id="@+id/txtRegistrate"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Regístrate"
-            android:textSize="16dp"
-            android:fontFamily="@font/montserrat_bold"
-            android:textColor="@color/aqua"
-            android:layout_gravity="center_vertical"/>
-    </LinearLayout>
 
     <Button
-        android:id="@+id/btnIniciarSesion"
+        android:id="@+id/btnAgregarEspecialidad"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/linear"
         android:layout_marginTop="50dp"
+        android:layout_marginBottom="20dp"
         android:padding="15dp"
         android:backgroundTint="@color/aqua"
         android:layout_marginHorizontal="20dp"
         android:fontFamily="@font/montserrat_bold"
         android:textSize="22dp"
-        android:text="INICIAR SESION"
+        android:text="AGREGAR"
         android:textColor="@color/white" />
 
-</RelativeLayout>
+</LinearLayout>
