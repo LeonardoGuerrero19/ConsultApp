@@ -1,9 +1,14 @@
-package com.example.consultapp.ui.home;
+package com.example.consultapp;
 
 import android.app.Dialog;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
+
+import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
 import android.text.TextUtils;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -14,41 +19,31 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import androidx.annotation.NonNull;
-import androidx.fragment.app.Fragment;
-import androidx.lifecycle.ViewModelProvider;
-import androidx.recyclerview.widget.GridLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-
-import com.example.consultapp.R;
-import com.example.consultapp.ServicioAdapter;
-import com.example.consultapp.databinding.FragmentHomeBinding;
+import com.example.consultapp.databinding.FragmentEspecialidadesBinding;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
-public class HomeFragment extends Fragment {
+public class EspecialidadesFragment extends Fragment {
 
     private EditText agregarServicioEditText;
     private Button agregarServicioButton;
-    private FragmentHomeBinding binding;  // Binding para acceder a las vistas
     private RecyclerView recyclerViewServicios;
+    private FragmentEspecialidadesBinding binding;  // Binding para acceder a las vistas
     private ServicioAdapter servicioAdapter;
     private List<String> listaServicios = new ArrayList<>();  // Lista para almacenar los nombres de los servicios
 
-    public View onCreateView(@NonNull LayoutInflater inflater,
-                             ViewGroup container, Bundle savedInstanceState) {
-        // Inflar el layout y obtener la instancia del binding
-        binding = FragmentHomeBinding.inflate(inflater, container, false);
-        View root = binding.getRoot(); // Obtén la vista raíz
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        // Inicializa el binding
+        binding = FragmentEspecialidadesBinding.inflate(inflater, container, false);
 
-        // Inicializar las vistas
+        // Configura el RecyclerView y el adaptador
         recyclerViewServicios = binding.recyclerViewServicios;
-
-        // Configurar el RecyclerView como una cuadrícula de 2 columnas
         recyclerViewServicios.setLayoutManager(new GridLayoutManager(getContext(), 2));
         servicioAdapter = new ServicioAdapter(listaServicios);
         recyclerViewServicios.setAdapter(servicioAdapter);
@@ -56,33 +51,12 @@ public class HomeFragment extends Fragment {
         // Cargar los servicios existentes desde Firestore
         cargarServicios();
 
-        // Obtén el FloatingActionButton desde el binding y configura el clic
+        // Configura el FloatingActionButton y su clic
         FloatingActionButton fab = binding.floatingActionButton;
-        fab.setOnClickListener(view ->
-                showBottomDialog()
-        );
+        fab.setOnClickListener(view -> showBottomDialog());
 
-
-        return root;
-    }
-
-    private void agregarServicio() {
-        String agregarServicio = agregarServicioEditText.getText().toString().trim();
-        if (!TextUtils.isEmpty(agregarServicio)) {
-            // Agregar el nuevo servicio a Firestore
-            FirebaseFirestore.getInstance().collection("Servicios")
-                    .document("Todos los servicios")
-                    .update("Servicios", FieldValue.arrayUnion(agregarServicio))
-                    .addOnSuccessListener(aVoid -> {
-                        agregarServicioEditText.setText(""); // Limpiar el campo de texto
-                        cargarServicios(); // Llamada para refrescar la lista completa
-                    })
-                    .addOnFailureListener(e -> {
-                        Toast.makeText(getContext(), "Error al agregar servicio", Toast.LENGTH_SHORT).show();
-                    });
-        } else {
-            Toast.makeText(getContext(), "Ingrese un nombre de servicio", Toast.LENGTH_SHORT).show();
-        }
+        // Retorna la vista raíz de binding
+        return binding.getRoot();
     }
 
     private void cargarServicios() {
@@ -119,11 +93,13 @@ public class HomeFragment extends Fragment {
         // Obtener referencias a los elementos del modal
         EditText editarServicioModal = dialog.findViewById(R.id.nombre_especialidad);
         Button botonAgregarServicioModal = dialog.findViewById(R.id.btnAgregarEspecialidad);
+        EditText descripcionServicioModal = dialog.findViewById(R.id.descripcion_especialidad);
 
         // Configurar el clic en el botón del modal
         botonAgregarServicioModal.setOnClickListener(v -> {
             String servicioNombre = editarServicioModal.getText().toString().trim();
-            agregarServicioDesdeModal(servicioNombre);
+            String descripcion = descripcionServicioModal.getText().toString().trim(); // Obtener la descripción
+            agregarServicioDesdeModal(servicioNombre, descripcion);
             dialog.dismiss();  // Cerrar el modal después de agregar
         });
 
@@ -134,23 +110,42 @@ public class HomeFragment extends Fragment {
         dialog.getWindow().setGravity(Gravity.BOTTOM);
     }
 
-    private void agregarServicioDesdeModal(String servicioNombre) {
-        if (!TextUtils.isEmpty(servicioNombre)) {
-            // Agregar el nuevo servicio a Firestore
-            FirebaseFirestore.getInstance().collection("Servicios")
-                    .document("Todos los servicios")
-                    .update("Servicios", FieldValue.arrayUnion(servicioNombre))
-                    .addOnSuccessListener(aVoid -> {
-                        cargarServicios(); // Llamada para refrescar la lista completa
-                        Toast.makeText(getContext(), "Servicio agregado", Toast.LENGTH_SHORT).show();
-                    })
-                    .addOnFailureListener(e -> {
-                        Toast.makeText(getContext(), "Error al agregar servicio", Toast.LENGTH_SHORT).show();
-                    });
-        } else {
+    private void agregarServicioDesdeModal(String servicioNombre, String descripcion) {
+        if (TextUtils.isEmpty(servicioNombre)) {
             Toast.makeText(getContext(), "Ingrese un nombre de servicio", Toast.LENGTH_SHORT).show();
+            return;
         }
+
+        if (TextUtils.isEmpty(descripcion)) {
+            Toast.makeText(getContext(), "Ingrese una descripción del servicio", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        // Agregar el servicio al documento "Todos los servicios" (para mantener la lista completa)
+        FirebaseFirestore.getInstance().collection("Servicios")
+                .document("Todos los servicios")
+                .update("Servicios", FieldValue.arrayUnion(servicioNombre))
+                .addOnSuccessListener(aVoid -> {
+                    // Después de actualizar la lista, crear un documento separado para el servicio
+                    FirebaseFirestore.getInstance().collection("Servicios")
+                            .document(servicioNombre) // Nombre del servicio como ID del documento individual
+                            .set(new HashMap<String, Object>() {{
+                                put("nombre", servicioNombre); // Campo nombre
+                                put("descripcion", descripcion); // Campo descripción
+                            }})
+                            .addOnSuccessListener(aVoid1 -> {
+                                cargarServicios(); // Refrescar la lista completa
+                                Toast.makeText(getContext(), "Servicio agregado", Toast.LENGTH_SHORT).show();
+                            })
+                            .addOnFailureListener(e -> {
+                                Toast.makeText(getContext(), "Error al crear documento individual para el servicio", Toast.LENGTH_SHORT).show();
+                            });
+                })
+                .addOnFailureListener(e -> {
+                    Toast.makeText(getContext(), "Error al agregar servicio a la lista", Toast.LENGTH_SHORT).show();
+                });
     }
+
 
     @Override
     public void onDestroyView() {

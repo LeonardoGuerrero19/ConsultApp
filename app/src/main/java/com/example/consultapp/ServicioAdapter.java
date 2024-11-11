@@ -33,7 +33,7 @@ public class ServicioAdapter extends RecyclerView.Adapter<ServicioAdapter.Servic
 
         // Establece un listener de clic para cada botón de servicio
         holder.servicioButton.setOnClickListener(v -> {
-            // Crea un Intent para abrir la ServicioDetalleActivity
+            // Crea un Intent para abrir la ServicioDetalle
             Intent intent = new Intent(v.getContext(), ServicioDetalle.class);
             intent.putExtra("NOMBRE_SERVICIO", servicio); // Pasa el nombre del servicio
             v.getContext().startActivity(intent); // Inicia la actividad

@@ -41,6 +41,12 @@ dependencies {
     implementation("com.google.android.gms:play-services-auth:20.5.0") // Para la autenticación de Google
     implementation("com.google.firebase:firebase-analytics")
     implementation(platform("com.google.firebase:firebase-bom:33.4.0"))
+    implementation("com.google.firebase:firebase-auth:21.0.5")  // Por ejemplo, si usas Firebase Auth
+    implementation("com.google.firebase:firebase-firestore:24.0.0")  // Si usas Firestore
+    implementation("com.google.android.gms:play-services-auth:20.0.0")  // Para Google Play Services
+    implementation("com.google.firebase:firebase-auth:version") // Usa la última versión estable
+    implementation ("com.google.firebase:firebase-firestore:version")
+    implementation ("com.google.android.gms:play-services-auth:version")
     implementation(libs.appcompat)
     implementation(libs.material)
     implementation(libs.activity)
@@ -53,6 +59,7 @@ dependencies {
     implementation(libs.navigation.ui)
     implementation(libs.annotations)
     implementation(libs.annotations)
+    implementation(libs.recyclerview)
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)

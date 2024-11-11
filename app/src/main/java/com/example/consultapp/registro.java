@@ -2,6 +2,7 @@ package com.example.consultapp;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
@@ -36,6 +37,8 @@ import org.json.JSONObject;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Random;
+import java.util.UUID;
 
 public class registro extends AppCompatActivity {
 
@@ -188,27 +191,33 @@ public class registro extends AppCompatActivity {
 
                         // Guardar los datos del usuario en Firestore con rol de "usuario"
                         String id = user.getUid();
-                        Map<String, Object> map = new HashMap<>();
-                        map.put("id", id);
-                        map.put("nombre", nombreUser);
-                        map.put("correo", correoUser);
-                        map.put("rol", "usuario"); // Asignar rol de "usuario"
 
-                        mFirestore.collection("users").document(id).set(map)
-                                .addOnSuccessListener(new OnSuccessListener<Void>() {
-                                    @Override
-                                    public void onSuccess(Void unused) {
-                                        // Redirigir a LoginActivity después del registro exitoso
-                                        Intent intent = new Intent(registro.this, login.class);
-                                        startActivity(intent);
-                                        finish(); // Cierra la actividad actual
-                                    }
-                                }).addOnFailureListener(new OnFailureListener() {
-                                    @Override
-                                    public void onFailure(@NonNull Exception e) {
-                                        Snackbar.make(findViewById(R.id.btnRegistrar), "Error al guardar", Snackbar.LENGTH_SHORT).show();
-                                    }
-                                });
+                        // Llamar a la función para generar y verificar el número de cuenta único
+                        generarNumeroCuentaUnico(mFirestore, numeroCuenta -> {
+
+                            Map<String, Object> map = new HashMap<>();
+                            map.put("id", id);
+                            map.put("nombre", nombreUser);
+                            map.put("numeroCuenta", numeroCuenta);
+                            map.put("correo", correoUser);
+                            map.put("rol", "usuario"); // Asignar rol de "usuario"
+
+                            mFirestore.collection("user").document(id).set(map)
+                                    .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                        @Override
+                                        public void onSuccess(Void unused) {
+                                            // Redirigir a LoginActivity después del registro exitoso
+                                            Intent intent = new Intent(registro.this, login.class);
+                                            startActivity(intent);
+                                            finish(); // Cierra la actividad actual
+                                        }
+                                    }).addOnFailureListener(new OnFailureListener() {
+                                        @Override
+                                        public void onFailure(@NonNull Exception e) {
+                                            Snackbar.make(findViewById(R.id.btnRegistrar), "Error al guardar", Snackbar.LENGTH_SHORT).show();
+                                        }
+                                    });
+                        });
                     }
                 } else {
                     Snackbar.make(findViewById(R.id.btnRegistrar), "Error al registrar: " + task.getException().getMessage(), Snackbar.LENGTH_SHORT).show();
@@ -220,5 +229,28 @@ public class registro extends AppCompatActivity {
                 Snackbar.make(findViewById(R.id.btnRegistrar), "Error al registrar: " + e.getMessage(), Snackbar.LENGTH_SHORT).show();
             }
         });
+    }
+
+    private void generarNumeroCuentaUnico(FirebaseFirestore db, OnNumeroCuentaGeneradoListener listener) {
+        int numeroCuenta = 10000000 + new Random().nextInt(90000000);
+
+        // Consultar Firestore para verificar unicidad
+        db.collection("users")
+                .whereEqualTo("numeroCuenta", numeroCuenta)
+                .get()
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful() && task.getResult().isEmpty()) {
+                        // El número es único, devolvemos el número generado
+                        listener.onNumeroCuentaGenerado(numeroCuenta);
+                    } else {
+                        // Si ya existe, generar un nuevo número de cuenta
+                        generarNumeroCuentaUnico(db, listener);
+                    }
+                });
+    }
+
+    // Interfaz para callback
+    interface OnNumeroCuentaGeneradoListener {
+        void onNumeroCuentaGenerado(int numeroCuenta);
     }
 }

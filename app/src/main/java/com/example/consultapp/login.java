@@ -2,6 +2,8 @@ package com.example.consultapp;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -12,56 +14,47 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.example.consultapp.ui.home.HomeFragment;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.DocumentSnapshot;
 
-import com.google.android.gms.auth.api.signin.GoogleSignIn;
-import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
-import com.google.android.gms.auth.api.signin.GoogleSignInClient;
-import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
-import com.google.android.gms.common.api.ApiException;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.Task;
-import com.google.firebase.FirebaseApp;
-import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.auth.GoogleAuthProvider;
 import com.google.firebase.auth.AuthResult;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
+
+import org.checkerframework.checker.units.qual.C;
+
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 
 public class login extends AppCompatActivity {
 
-    TextView textRegistrate;
-    EditText correo, contrasena;
-    Button btnLogin;
-    FirebaseAuth mAuth;
-    private static final int RC_SIGN_IN = 9001; // Código de solicitud para Google Sign-In
-    private GoogleSignInClient googleSignInClient;
+    private EditText correo, contrasena;
+    private Button btnIniciarSesion;
+    private TextView txtRegistrate;
+    private FirebaseFirestore db;
+    private FirebaseAuth auth;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
-        FirebaseApp.initializeApp(this);
-        mAuth = FirebaseAuth.getInstance();
 
-        // Inicialización de Google Sign-In
-        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                .requestIdToken(getString(R.string.default_web_client_id)) // Asegúrate de tener este ID en strings.xml
-                .requestEmail()
-                .build();
-        googleSignInClient = GoogleSignIn.getClient(this, gso);
+        auth = FirebaseAuth.getInstance(); // Para autenticación
+        db = FirebaseFirestore.getInstance(); // Para base de datos
 
         correo = findViewById(R.id.correo);
         contrasena = findViewById(R.id.contrasena);
-        btnLogin = findViewById(R.id.btnIniciarSesion);
-        textRegistrate = findViewById(R.id.txtRegistrate);
+        btnIniciarSesion = findViewById(R.id.btnIniciarSesion);
+        txtRegistrate = findViewById(R.id.txtRegistrate);
 
-        btnLogin.setOnClickListener(new View.OnClickListener() {
+        btnIniciarSesion.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v) {
+            public void onClick(View view) {
                 String correoUser = correo.getText().toString().trim();
                 String contraUser = contrasena.getText().toString().trim();
 
@@ -73,26 +66,26 @@ public class login extends AppCompatActivity {
             }
         });
 
-        textRegistrate.setOnClickListener(new View.OnClickListener() {
+        // Evento de clic para registrar
+        txtRegistrate.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(login.this, registro.class);
-                startActivity(intent);
+                startActivity(new Intent(login.this, registro.class));
             }
         });
     }
 
     private void loginUser(String correoUser, String contraUser) {
-        mAuth.signInWithEmailAndPassword(correoUser, contraUser).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
+        auth.signInWithEmailAndPassword(correoUser, contraUser).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
             @Override
             public void onComplete(@NonNull Task<AuthResult> task) {
                 if (task.isSuccessful()) {
-                    FirebaseUser user = mAuth.getCurrentUser();
+                    FirebaseUser user = auth.getCurrentUser();
                     if (user != null && !user.isEmailVerified()) { // Verificar si el correo está verificado
-                        mAuth.signOut(); // Cerrar sesión si el correo no está verificado
+                        auth.signOut();
                         Toast.makeText(login.this, "Por favor, verifica tu correo electrónico.", Toast.LENGTH_SHORT).show();
                     } else {
-                        checkUserRole(user.getUid()); // Verificar el rol del usuario
+                        checkUserRole(user.getUid()); // Verificar el rol
                     }
                 } else {
                     Toast.makeText(login.this, "Error al iniciar sesión 1", Toast.LENGTH_SHORT).show();
@@ -114,7 +107,7 @@ public class login extends AppCompatActivity {
                 if (task.isSuccessful()) {
                     DocumentSnapshot document = task.getResult();
                     if (document.exists()) {
-                        String rol = document.getString("rol"); // Asegúrate de que el campo esté correctamente escrito
+                        String rol = document.getString("rol");
                         if ("administrador".equals(rol)) {
                             // Redirigir a AdminActivity
                             Intent intent = new Intent(login.this, AdminActivity.class);
@@ -126,7 +119,6 @@ public class login extends AppCompatActivity {
                             startActivity(intent);
                             finish();
                         } else {
-                            // Redirigir a la actividad principal para otros roles (usuarios)
                             startActivity(new Intent(login.this, IniciopActivity.class));
                             finish();
                         }
@@ -140,11 +132,12 @@ public class login extends AppCompatActivity {
         });
     }
 
-    protected void onStart() {
+    @Override
+    public void onStart() {
         super.onStart();
-        FirebaseUser user = mAuth.getCurrentUser();
+        FirebaseUser user = auth.getCurrentUser();
         if (user != null) {
-            // Si el usuario está autenticado, verificar su rol en Firestore antes de redirigir
+            // Si el usuario esta logueado verificar y redirigir dependiendo su rol.
             checkUserRole(user.getUid());
         }
     }

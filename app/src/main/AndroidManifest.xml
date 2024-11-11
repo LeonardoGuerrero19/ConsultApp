@@ -3,6 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
     <application
         android:allowBackup="true"
@@ -15,12 +16,27 @@
         android:theme="@style/Theme.ConsultApp"
         tools:targetApi="31">
         <activity
-            android:name=".ServicioDetalle"
+            android:name=".PerfilPersonalMedico"
+            android:exported="false" />
+        <activity
+            android:name=".DetalleMedico"
+            android:exported="false" />
+        <activity
+            android:name=".EditarPersonalMedico"
+            android:exported="false" />
+        <activity
+            android:name=".EditarDoctorActivity"
+            android:exported="false" />
+        <activity
+            android:name=".RegistroDoctor"
             android:exported="false" />
         <activity
             android:name=".AdminActivity"
-            android:exported="false"
-            android:label="@string/title_activity_admin" />
+            android:exported="true"
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
+        <activity
+            android:name=".ServicioDetalle"
+            android:exported="false" />
         <activity
             android:name=".IniciopActivity"
             android:exported="false" />

@@ -3,6 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
+    android:paddingHorizontal="20dp"
     android:background="@drawable/dialog_bkg">
 
     <ImageView
@@ -13,15 +14,22 @@
         android:layout_gravity="center" />
 
     <TextView
-        android:id="@+id/text"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="20dp"
-        android:layout_marginTop="20dp"
-        android:fontFamily="@font/montserrat_bold"
-        android:textColor="@color/aqua"
-        android:textSize="26dp"
-        android:text="Agregar especialidad" />
+        android:layout_marginTop="30dp"
+        android:layout_marginBottom="15dp"
+        android:fontFamily="@font/montserrat_medium"
+        android:textColor="@color/black"
+        android:textSize="20dp"
+        android:text="Horario de inicio" />
+
+    <TimePicker
+        android:id="@+id/timePickerInicio"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:timePickerMode="spinner" />
 
     <TextView
         android:layout_width="match_parent"
@@ -32,56 +40,27 @@
         android:fontFamily="@font/montserrat_medium"
         android:textColor="@color/black"
         android:textSize="20dp"
-        android:text="Nombre" />
+        android:text="Horario de salida" />
 
-    <EditText
-        android:id="@+id/nombre_especialidad"
-        android:layout_width="match_parent"
+    <TimePicker
+        android:id="@+id/timePickerFin"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginHorizontal="20dp"
-        android:padding="20dp"
-        android:fontFamily="@font/montserrat_medium"
-        android:textColor="@color/black"
-        android:background="@drawable/rounded"
-        android:backgroundTint="@color/gray"
-        android:textSize="20dp" />
-
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginHorizontal="20dp"
-        android:layout_marginTop="30dp"
-        android:layout_marginBottom="15dp"
-        android:fontFamily="@font/montserrat_medium"
-        android:textColor="@color/black"
-        android:textSize="20dp"
-        android:text="Descripción" />
-
-    <EditText
-        android:id="@+id/descripcion_especialidad"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginHorizontal="20dp"
-        android:padding="20dp"
-        android:fontFamily="@font/montserrat_medium"
-        android:textColor="@color/black"
-        android:background="@drawable/rounded"
-        android:backgroundTint="@color/gray"
-        android:textSize="20dp" />
+        android:layout_gravity="center_horizontal"
+        android:timePickerMode="spinner" />
 
     <Button
-        android:id="@+id/btnAgregarEspecialidad"
+        android:id="@+id/btnAceptar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="50dp"
         android:layout_marginBottom="20dp"
         android:padding="15dp"
-        android:background="@drawable/rounded_button"
         android:backgroundTint="@color/aqua"
         android:layout_marginHorizontal="20dp"
         android:fontFamily="@font/montserrat_bold"
         android:textSize="22dp"
-        android:text="AGREGAR"
+        android:text="ACEPTAR"
         android:textColor="@color/white" />
 
 </LinearLayout>

@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:backgroundTint="@color/gray"
+    android:layout_marginBottom="20dp"
+    android:padding="20dp"
+    android:background="@drawable/rounded">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical" >
+        <!-- TextView para la especialización del doctor -->
+        <TextView
+            android:id="@+id/doctorServiceTextView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="5dp"
+            android:textSize="20dp"
+            android:fontFamily="@font/montserrat_bold"
+            android:textColor="@color/black" />
+
+        <!-- TextView para el nombre del doctor -->
+        <TextView
+            android:id="@+id/doctorNameTextView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="20dp"
+            android:fontFamily="@font/montserrat_medium"
+            android:textColor="@color/black" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="10dp"
+            android:gravity="center">
+
+            <ImageButton
+                android:id="@+id/btn_ver"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:padding="10dp"
+                android:background="@drawable/button_border"
+                android:src="@drawable/round_remove_red_eye_24"
+                android:layout_marginEnd="5dp" />
+
+            <ImageButton
+                android:id="@+id/btn_editar"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:padding="10dp"
+                android:background="@drawable/rounded"
+                android:backgroundTint="@color/aqua"
+                android:src="@drawable/round_edit_24"
+                android:layout_marginEnd="5dp" />
+
+            <ImageButton
+                android:id="@+id/btn_eliminar"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:padding="10dp"
+                android:background="@drawable/button_border"
+                android:src="@drawable/round_delete_24"
+                android:layout_marginStart="5dp" />
+
+        </LinearLayout>
+    </LinearLayout>
+
+</LinearLayout>
