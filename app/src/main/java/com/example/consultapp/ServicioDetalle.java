@@ -3,7 +3,6 @@ package com.example.consultapp;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.TextView;
@@ -14,10 +13,8 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.firebase.firestore.DocumentReference;
-import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FieldValue;
-import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
 import java.util.ArrayList;
@@ -163,7 +160,7 @@ public class ServicioDetalle extends AppCompatActivity {
                         servicioRef.delete()
                                 .addOnSuccessListener(aVoid1 -> {
                                     Toast.makeText(ServicioDetalle.this, "Servicio eliminado correctamente", Toast.LENGTH_SHORT).show();
-                                    Intent intent = new Intent(ServicioDetalle.this, HomeFragment.class);
+                                    Intent intent = new Intent(ServicioDetalle.this, InicioAdminFragment.class);
                                     startActivity(intent);
                                     finish();
                                 })

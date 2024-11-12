@@ -3,7 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".HomeFragment">
+    tools:context=".InicioAdminFragment">
 
     <!-- TODO: Update blank fragment layout -->
     <TextView
@@ -12,4 +12,10 @@
         android:layout_centerInParent="true"
         android:text="@string/hello_blank_fragment" />
 
+    <Button
+        android:id="@+id/btn_cerrarS"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Cerrar sesión"
+        android:layout_marginTop="16dp"/>
 </RelativeLayout>
