@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".PerfilDoc">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/header_profile_doctor"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/nombre"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:layout_marginBottom="10dp"
+            android:layout_marginHorizontal="20dp"
+            android:textSize="26dp"
+            android:fontFamily="@font/montserrat_bold"
+            android:textColor="@color/black" />
+
+        <TextView
+            android:id="@+id/especializacion"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="20dp"
+            android:textSize="20dp"
+            android:layout_marginBottom="20dp"
+            android:fontFamily="@font/montserrat_medium"
+            android:textColor="@color/black" />
+
+    </LinearLayout>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="20dp"
+        android:layout_marginTop="20dp"
+        android:layout_marginBottom="10dp"
+        android:textSize="20dp"
+        android:fontFamily="@font/montserrat_bold"
+        android:textColor="@color/black"
+        android:text="Sobre mi:" />
+
+    <Button
+        android:id="@+id/btn_descripcion"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="20dp"
+        android:fontFamily="@font/montserrat_medium"
+        android:textColor="@color/black"
+        android:padding="0dp"
+        android:backgroundTint="#0000"
+        android:textAlignment="textStart"
+        android:textSize="20dp"
+        android:text="Añade una descripcion"
+        android:drawableEnd="@drawable/round_navigate_next_24" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="20dp"
+        android:layout_margin="20dp"
+        android:textSize="20dp"
+        android:fontFamily="@font/montserrat_bold"
+        android:textColor="@color/black"
+        android:text="Horario de servicio:" />
+
+    <TextView
+        android:id="@+id/horario"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="20dp"
+        android:textSize="20dp"
+        android:fontFamily="@font/montserrat_medium"
+        android:textColor="@color/black" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="20dp"
+        android:textSize="20dp"
+        android:fontFamily="@font/montserrat_bold"
+        android:textColor="@color/black"
+        android:text="Télefono de contacto:" />
+
+    <TextView
+        android:id="@+id/telefono"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="20dp"
+        android:textSize="20dp"
+        android:fontFamily="@font/montserrat_medium"
+        android:textColor="@color/black" />
+
+    <Button
+        android:id="@+id/btn_cerrarS"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Cerrar sesión"
+        android:layout_marginTop="16dp"/>
+
+
+
+</LinearLayout>

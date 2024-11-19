@@ -33,6 +33,7 @@ public class HorariosFragment extends Fragment {
     private LinearLayout linearLayoutHorarios;
     private String fechaSeleccionada;
     private List<String> horariosSeleccionados = new ArrayList<>();
+    private List<Button> botonesHorarios = new ArrayList<>(); // Lista para guardar referencias a los botones
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater,
@@ -53,11 +54,11 @@ public class HorariosFragment extends Fragment {
         // Inicializar el LinearLayout para los botones
         linearLayoutHorarios = binding.linearLayoutHorarios;
 
-        // Obtener el ID del usuario logueado
-        String userId = mAuth.getCurrentUser().getUid();
+        // Obtener el ID del médico logueado
+        String medicoId = mAuth.getCurrentUser().getUid();
 
-        // Llamar al método para obtener los datos del usuario logueado
-        getUserDataFromDatabase(userId);
+        // Llamar al método para obtener los datos del médico logueado
+        getMedicoDataFromDatabase(medicoId);
 
         // Listener para el calendario
         calendarView.setOnDateChangeListener((view, year, month, dayOfMonth) -> {
@@ -78,94 +79,89 @@ public class HorariosFragment extends Fragment {
         return root;
     }
 
-    // Modificar el código para agregar los botones en grupos de tres
-    private void getUserDataFromDatabase(String userId) {
-        // Obtener la referencia del documento del usuario en Firestore
-        DocumentReference userDocRef = db.collection("user").document(userId);
+    private void getMedicoDataFromDatabase(String medicoId) {
+        DocumentReference medicoDocRef = db.collection("medicos").document(medicoId);
 
-        // Obtener los datos del usuario (nombre, especialización y horarios)
-        userDocRef.get().addOnSuccessListener(documentSnapshot -> {
+        medicoDocRef.get().addOnSuccessListener(documentSnapshot -> {
             if (documentSnapshot.exists()) {
-                // Obtener el nombre y especialización del usuario
-                String nombre = documentSnapshot.getString("nombre");
-                String especializacion = documentSnapshot.getString("especializacion");
-
-                // Obtener los horarios desde Firestore
-                List<String> horarios = (List<String>) documentSnapshot.get("horario");
+                List<String> horarios = (List<String>) documentSnapshot.get("horarios");
 
                 if (horarios != null && !horarios.isEmpty()) {
-                    // Limpiar el LinearLayout antes de agregar los nuevos botones
                     linearLayoutHorarios.removeAllViews();
+                    botonesHorarios.clear(); // Limpiar lista de botones
 
-                    // Crear un contenedor horizontal para los botones
                     LinearLayout horizontalLayout = new LinearLayout(getContext());
                     horizontalLayout.setOrientation(LinearLayout.HORIZONTAL);
                     horizontalLayout.setLayoutParams(new LinearLayout.LayoutParams(
                             LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT));
 
-                    // Variable para contar el número de botones
                     int count = 0;
 
-                    // Crear un botón por cada horario
                     for (String horario : horarios) {
                         Button horarioButton = new Button(getContext());
                         horarioButton.setText(horario);
-                        horarioButton.setLayoutParams(new LinearLayout.LayoutParams(
-                                0, LinearLayout.LayoutParams.WRAP_CONTENT, 1)); // Cada botón ocupa un 1/3 del espacio
-                        horarioButton.setBackgroundColor(getResources().getColor(R.color.aqua));
-                        horarioButton.setBackground(getResources().getDrawable(R.drawable.rounded_button));
 
+                        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+                                0, LinearLayout.LayoutParams.WRAP_CONTENT, 1);
+                        params.setMargins(20, 20, 20, 20);
+                        horarioButton.setLayoutParams(params);
 
-                        // Acción al hacer clic en el botón
+                        horarioButton.setBackgroundResource(R.drawable.boton_selector);
+
                         horarioButton.setOnClickListener(v -> {
-                            if (horariosSeleccionados.contains(horario)) {
-                                horariosSeleccionados.remove(horario); // Desmarcar horario
-                                horarioButton.setBackgroundResource(R.drawable.boton_no_seleccionado); // Estilo para no seleccionado
+                            if (horarioButton.isSelected()) {
+                                horarioButton.setSelected(false);
+                                horariosSeleccionados.remove(horario);
                             } else {
-                                horariosSeleccionados.add(horario); // Marcar horario
-                                horarioButton.setBackgroundResource(R.drawable.boton_seleccionado); // Estilo para seleccionado
+                                horarioButton.setSelected(true);
+                                horariosSeleccionados.add(horario);
                             }
                         });
 
-                        // Agregar el botón al contenedor horizontal
-                        horizontalLayout.addView(horarioButton);
+                        // Guardar referencia del botón en la lista
+                        botonesHorarios.add(horarioButton);
 
-                        // Si ya hay tres botones, añadir el contenedor horizontal al LinearLayout principal y crear uno nuevo
+                        horizontalLayout.addView(horarioButton);
                         count++;
+
                         if (count % 3 == 0) {
                             linearLayoutHorarios.addView(horizontalLayout);
                             horizontalLayout = new LinearLayout(getContext());
                             horizontalLayout.setOrientation(LinearLayout.HORIZONTAL);
                             horizontalLayout.setLayoutParams(new LinearLayout.LayoutParams(
-                                    LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT));
+                                    LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT));
                         }
                     }
 
-                    // Si el último grupo tiene menos de tres botones, agregar el contenedor restante
                     if (count % 3 != 0) {
+                        int remainingButtons = 3 - (count % 3);
+
+                        for (int i = 0; i < remainingButtons; i++) {
+                            View emptyView = new View(getContext());
+                            LinearLayout.LayoutParams emptyParams = new LinearLayout.LayoutParams(
+                                    0, LinearLayout.LayoutParams.WRAP_CONTENT, 1);
+                            emptyView.setLayoutParams(emptyParams);
+                            horizontalLayout.addView(emptyView);
+                        }
+
                         linearLayoutHorarios.addView(horizontalLayout);
                     }
-
                 } else {
                     Toast.makeText(getContext(), "No se encontraron horarios disponibles", Toast.LENGTH_SHORT).show();
                 }
             }
         }).addOnFailureListener(e -> {
-            // Manejar error
-            Toast.makeText(getContext(), "Error al cargar los datos del usuario", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getContext(), "Error al cargar los datos del médico", Toast.LENGTH_SHORT).show();
         });
     }
 
-
     private void guardarHorariosEnFirestore() {
-        // Crear un mapa para guardar los datos
         Map<String, Object> data = new HashMap<>();
         data.put("fecha", fechaSeleccionada);
         data.put("horarios", horariosSeleccionados);
 
-        // Agregar nombre y especialización
-        String uid = mAuth.getCurrentUser().getUid(); // Obtener UID del médico logueado
-        db.collection("user").document(uid)
+        String uid = mAuth.getCurrentUser().getUid();
+        db.collection("medicos").document(uid)
                 .get()
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
@@ -174,32 +170,35 @@ public class HorariosFragment extends Fragment {
                             String nombre = document.getString("nombre");
                             String especializacion = document.getString("especializacion");
 
-                            // Agregar nombre y especialización al mapa
                             data.put("nombre", nombre);
                             data.put("especializacion", especializacion);
 
-                            // Guardar en la colección "horarios_medicos" o donde desees
                             db.collection("horarios_medicos").add(data)
                                     .addOnSuccessListener(documentReference -> {
                                         Toast.makeText(getContext(), "Horarios guardados con éxito", Toast.LENGTH_SHORT).show();
-                                        // Limpiar selecciones
-                                        fechaSeleccionada = null;
-                                        horariosSeleccionados.clear();
+                                        limpiarSelecciones(); // Llamar a método para deseleccionar botones
                                     })
                                     .addOnFailureListener(e -> {
                                         Toast.makeText(getContext(), "Error al guardar horarios: " + e.getMessage(), Toast.LENGTH_SHORT).show();
                                     });
-                        } else {
-                            Toast.makeText(getContext(), "El documento no existe", Toast.LENGTH_SHORT).show();
                         }
-                    } else {
-                        Toast.makeText(getContext(), "Error al cargar información del médico", Toast.LENGTH_SHORT).show();
                     }
                 });
+    }
+
+    private void limpiarSelecciones() {
+        fechaSeleccionada = null;
+        horariosSeleccionados.clear();
+
+        // Deseleccionar todos los botones
+        for (Button button : botonesHorarios) {
+            button.setSelected(false);
+        }
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
+        binding = null;
     }
 }

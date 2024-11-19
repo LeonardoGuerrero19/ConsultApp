@@ -21,25 +21,5 @@ public class PerfilPersonalMedico extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_perfil_personal_medico);
-
-        // Obtener el ID del médico del Intent
-        medicoId = getIntent().getStringExtra("medicoId");
-
-        // Referencias a los elementos del layout
-        nombre = findViewById(R.id.nombre);
-        especializacion = findViewById(R.id.especializacion);
-
-        // Cargar los datos del médico desde la base de datos
-        FirebaseFirestore db = FirebaseFirestore.getInstance();
-        db.collection("user").document(medicoId).get()
-                .addOnSuccessListener(documentSnapshot -> {
-                    if (documentSnapshot.exists()) {
-                        Medico medico = documentSnapshot.toObject(Medico.class);
-                        if (medico != null) {
-                            nombre.setText(medico.getNombre());
-                            especializacion.setText(medico.getEspecializacion());
-                        }
-                    }
-                });
     }
 }

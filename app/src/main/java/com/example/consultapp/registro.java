@@ -29,12 +29,14 @@ import com.google.android.gms.tasks.Task;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseAuthUserCollisionException;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
@@ -111,7 +113,7 @@ public class registro extends AppCompatActivity {
 
                             // Verificar si el correo es 'valid' o 'webmail' (esto indica que es válido)
                             if (estado.equals("valid") || estado.equals("webmail")) {
-                                RegisterUser(nombreUser, correoUser, contraUser); // Registro si es válido
+                                registerUser(nombreUser, correoUser, contraUser, view); // Registro si es válido
                             } else {
                                 Snackbar.make(view, "El correo no existe o no es valido.", Snackbar.LENGTH_SHORT).show();
                             }
@@ -170,87 +172,116 @@ public class registro extends AppCompatActivity {
     }
 
     // Método de registro de usuario en Firebase
-    private void RegisterUser(String nombreUser, String correoUser, String contraUser) {
-        mAuth.createUserWithEmailAndPassword(correoUser, contraUser).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
-            @Override
-            public void onComplete(@NonNull Task<AuthResult> task) {
-                if (task.isSuccessful()) {
-                    FirebaseUser user = mAuth.getCurrentUser();
-                    if (user != null) {
-                        // Enviar correo de verificación
-                        user.sendEmailVerification().addOnCompleteListener(new OnCompleteListener<Void>() {
-                            @Override
-                            public void onComplete(@NonNull Task<Void> task) {
-                                if (task.isSuccessful()) {
-                                    Snackbar.make(findViewById(R.id.btnRegistrar), "Registro exitoso. Verifique su correo para activar la cuenta.", Snackbar.LENGTH_SHORT).show();
-                                } else {
-                                    Snackbar.make(findViewById(R.id.btnRegistrar), "Error al enviar el correo de verificación.", Snackbar.LENGTH_SHORT).show();
-                                }
+    private void registerUser(String nombreUser, String correoUser, String contraUser, View view) {
+        // Validar la contraseña primero
+        String passwordValidationMessage = validatePassword(contraUser);
+        if (!passwordValidationMessage.isEmpty()) {
+            Snackbar.make(view, passwordValidationMessage, Snackbar.LENGTH_SHORT).show();
+            return; // Salir si la contraseña no cumple los requisitos
+        }
+
+        // Registrar el usuario con Firebase Authentication
+        mAuth.createUserWithEmailAndPassword(correoUser, contraUser)
+                .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
+                    @Override
+                    public void onComplete(@NonNull Task<AuthResult> task) {
+                        if (task.isSuccessful()) {
+                            // Registro exitoso
+                            FirebaseUser user = mAuth.getCurrentUser();
+                            if (user != null) {
+                                // Enviar correo de verificación
+                                sendVerificationEmail(user, view);
+
+                                // Guardar en Firestore
+                                saveUserToFirestore(user.getUid(), nombreUser, correoUser, view);
                             }
-                        });
-
-                        // Guardar los datos del usuario en Firestore con rol de "usuario"
-                        String id = user.getUid();
-
-                        // Llamar a la función para generar y verificar el número de cuenta único
-                        generarNumeroCuentaUnico(mFirestore, numeroCuenta -> {
-
-                            Map<String, Object> map = new HashMap<>();
-                            map.put("id", id);
-                            map.put("nombre", nombreUser);
-                            map.put("numeroCuenta", numeroCuenta);
-                            map.put("correo", correoUser);
-                            map.put("rol", "usuario"); // Asignar rol de "usuario"
-
-                            mFirestore.collection("user").document(id).set(map)
-                                    .addOnSuccessListener(new OnSuccessListener<Void>() {
-                                        @Override
-                                        public void onSuccess(Void unused) {
-                                            // Redirigir a LoginActivity después del registro exitoso
-                                            Intent intent = new Intent(registro.this, login.class);
-                                            startActivity(intent);
-                                            finish(); // Cierra la actividad actual
-                                        }
-                                    }).addOnFailureListener(new OnFailureListener() {
-                                        @Override
-                                        public void onFailure(@NonNull Exception e) {
-                                            Snackbar.make(findViewById(R.id.btnRegistrar), "Error al guardar", Snackbar.LENGTH_SHORT).show();
-                                        }
-                                    });
-                        });
+                        } else {
+                            // Capturar y manejar el error de colisión de correo (Correo ya registrado)
+                            Exception exception = task.getException();
+                            if (exception != null) {
+                                if (exception instanceof FirebaseAuthUserCollisionException) {
+                                    Snackbar.make(view, "Este correo ya está registrado. Intenta con otro o recupéralo.", Snackbar.LENGTH_SHORT).show();
+                                } else {
+                                    Snackbar.make(view, "Error al registrar: Correo ya registrado ", Snackbar.LENGTH_SHORT).show();
+                                }
+                            } else {
+                                Snackbar.make(view, "Error desconocido al registrar.", Snackbar.LENGTH_SHORT).show();
+                            }
+                        }
                     }
-                } else {
-                    Snackbar.make(findViewById(R.id.btnRegistrar), "Error al registrar: " + task.getException().getMessage(), Snackbar.LENGTH_SHORT).show();
-                }
-            }
-        }).addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception e) {
-                Snackbar.make(findViewById(R.id.btnRegistrar), "Error al registrar: " + e.getMessage(), Snackbar.LENGTH_SHORT).show();
-            }
-        });
-    }
-
-    private void generarNumeroCuentaUnico(FirebaseFirestore db, OnNumeroCuentaGeneradoListener listener) {
-        int numeroCuenta = 10000000 + new Random().nextInt(90000000);
-
-        // Consultar Firestore para verificar unicidad
-        db.collection("users")
-                .whereEqualTo("numeroCuenta", numeroCuenta)
-                .get()
-                .addOnCompleteListener(task -> {
-                    if (task.isSuccessful() && task.getResult().isEmpty()) {
-                        // El número es único, devolvemos el número generado
-                        listener.onNumeroCuentaGenerado(numeroCuenta);
-                    } else {
-                        // Si ya existe, generar un nuevo número de cuenta
-                        generarNumeroCuentaUnico(db, listener);
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        // Capturar fallos generales
+                        Snackbar.make(view, "Error al registrar: Error general" , Snackbar.LENGTH_SHORT).show();
                     }
                 });
     }
 
-    // Interfaz para callback
-    interface OnNumeroCuentaGeneradoListener {
-        void onNumeroCuentaGenerado(int numeroCuenta);
+    // Método para enviar correo de verificación
+    private void sendVerificationEmail(FirebaseUser user, View view) {
+        user.sendEmailVerification()
+                .addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        if (task.isSuccessful()) {
+                            Snackbar.make(view, "Registro exitoso. Verifica tu correo para activar la cuenta.", Snackbar.LENGTH_SHORT).show();
+                        } else {
+                            Snackbar.make(view, "Error al enviar el correo de verificación.", Snackbar.LENGTH_SHORT).show();
+                        }
+                    }
+                });
+    }
+
+    // Método para guardar al usuario en Firestore
+    private void saveUserToFirestore(String userId, String nombreUser, String correoUser, View view) {
+        FirebaseFirestore mFirestore = FirebaseFirestore.getInstance();
+
+        // Crear número de cuenta
+        int year = Calendar.getInstance().get(Calendar.YEAR);
+        int randomNum = (int) (Math.random() * 9000) + 1000;
+        String numeroCuenta = year + String.valueOf(randomNum);
+
+        // Crear el mapa de datos del usuario
+        Map<String, Object> userMap = new HashMap<>();
+        userMap.put("id", userId);
+        userMap.put("nombre", nombreUser);
+        userMap.put("correo", correoUser);
+        userMap.put("rol", "usuario");
+        userMap.put("numeroCuenta", numeroCuenta);
+
+        mFirestore.collection("user").document(userId).set(userMap)
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+                        Snackbar.make(view, "Usuario registrado correctamente.", Snackbar.LENGTH_SHORT).show();
+                        // Redirige a la pantalla de login
+                        startActivity(new Intent(registro.this, login.class));
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Snackbar.make(view, "Error al guardar los datos en Firestore: " + e.getMessage(), Snackbar.LENGTH_SHORT).show();
+                    }
+                });
+    }
+
+    // Método para validar la contraseña
+    private String validatePassword(String password) {
+        if (password.length() < 6) {
+            return "La contraseña debe tener al menos 6 caracteres.";
+        }
+        if (!password.matches(".*[A-Z].*")) {
+            return "La contraseña debe contener al menos una letra mayúscula.";
+        }
+        if (!password.matches(".*[a-z].*")) {
+            return "La contraseña debe contener al menos una letra minúscula.";
+        }
+        if (!password.matches(".*\\d.*")) {
+            return "La contraseña debe contener al menos un número.";
+        }
+        return ""; // Si pasa todas las validaciones
     }
 }

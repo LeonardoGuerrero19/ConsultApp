@@ -91,36 +91,63 @@ public class login extends AppCompatActivity {
 
     private void checkUserRole(String uid) {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
+
+        // Buscar primero en la colección "user"
         db.collection("user").document(uid).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
             @Override
             public void onComplete(@NonNull Task<DocumentSnapshot> task) {
                 if (task.isSuccessful()) {
                     DocumentSnapshot document = task.getResult();
                     if (document.exists()) {
-                        String rol = document.getString("rol");
-                        if ("administrador".equals(rol)) {
-                            // Redirigir a AdminActivity
-                            Intent intent = new Intent(login.this, AdminActivity.class);
-                            startActivity(intent);
-                            finish();
-                        } else if ("medico".equals(rol)) {
-                            // Redirigir a MedicoActivity
-                            Intent intent = new Intent(login.this, MedicoActivity.class);
-                            startActivity(intent);
-                            finish();
-                        } else {
-                            startActivity(new Intent(login.this, IniciopActivity.class));
-                            finish();
-                        }
+                        // Usuario encontrado en "user"
+                        redirigirPorRol(document);
                     } else {
-                        Toast.makeText(login.this, "Error: No se encontró el documento de rol", Toast.LENGTH_SHORT).show();
+                        // Intentar buscar en la colección "medicos"
+                        db.collection("medicos").document(uid).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                            @Override
+                            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                                if (task.isSuccessful()) {
+                                    DocumentSnapshot document = task.getResult();
+                                    if (document.exists()) {
+                                        // Usuario encontrado en "medicos"
+                                        redirigirPorRol(document);
+                                    } else {
+                                        Toast.makeText(login.this, "Usuario no encontrado", Toast.LENGTH_SHORT).show();
+                                    }
+                                } else {
+                                    Toast.makeText(login.this, "Error al buscar en 'medicos'", Toast.LENGTH_SHORT).show();
+                                }
+                            }
+                        });
                     }
                 } else {
-                    Toast.makeText(login.this, "Error al obtener los datos del usuario", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(login.this, "Error al buscar en 'user'", Toast.LENGTH_SHORT).show();
                 }
             }
         });
     }
+
+    // Método para redirigir basado en el rol
+    private void redirigirPorRol(DocumentSnapshot document) {
+        String rol = document.getString("rol");
+        if ("administrador".equals(rol)) {
+            // Redirigir a AdminActivity
+            Intent intent = new Intent(login.this, AdminActivity.class);
+            startActivity(intent);
+            finish();
+        } else if ("medico".equals(rol)) {
+            // Redirigir a MedicoActivity
+            Intent intent = new Intent(login.this, MedicoActivity.class);
+            startActivity(intent);
+            finish();
+        } else {
+            // Redirigir a una vista general para usuarios
+            Intent intent = new Intent(login.this, UserActivity.class);
+            startActivity(intent);
+            finish();
+        }
+    }
+
 
     @Override
     public void onStart() {

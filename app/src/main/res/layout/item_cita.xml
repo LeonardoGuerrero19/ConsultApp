@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:backgroundTint="@color/gray"
+    android:background="@drawable/rounded"
+    android:padding="16dp">
+
+    <TextView
+        android:id="@+id/textServicio"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Servicio"
+        android:textStyle="bold"
+        android:textSize="16sp" />
+
+    <TextView
+        android:id="@+id/textFecha"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Fecha" />
+
+    <TextView
+        android:id="@+id/textHorario"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Horario" />
+</LinearLayout>

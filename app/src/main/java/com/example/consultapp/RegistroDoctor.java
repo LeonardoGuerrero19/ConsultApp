@@ -21,6 +21,8 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
 
+import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -32,7 +34,7 @@ public class RegistroDoctor extends AppCompatActivity {
     private Button horarioButton, btnRegistrarMedico;
     private FirebaseAuth mAuth;
     private FirebaseFirestore db;
-    private String horarioSeleccionado;
+    private List<String> horarioSeleccionado;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -92,16 +94,24 @@ public class RegistroDoctor extends AppCompatActivity {
             int horaFin = timePickerFin.getHour();
             int minutoFin = timePickerFin.getMinute();
 
-            // Actualizar el horario en la variable global
-            horarioSeleccionado = String.format("%02d:%02d - %02d:%02d", horaInicio, minutoInicio, horaFin, minutoFin);
+            // Generar la lista de horarios
+            List<String> horarios = generarHorarios(horaInicio, minutoInicio, horaFin, minutoFin);
 
-            // Actualizar el horario en el botón
-            horarioButton.setText(horarioSeleccionado);
+            // Verifica que la lista no esté vacía
+            if (horarios.isEmpty()) {
+                Toast.makeText(this, "El rango de horario no es válido.", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            horarioSeleccionado = generarHorarios(horaInicio, minutoInicio, horaFin, minutoFin);
+
+            // Actualizar el texto del botón para mostrar el rango
+            horarioButton.setText(String.format("%02d:%02d - %02d:%02d", horaInicio, minutoInicio, horaFin, minutoFin));
+
 
             // Cerrar el diálogo
             dialog.dismiss();
         });
-
         dialog.show();
         dialog.getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
@@ -128,7 +138,7 @@ public class RegistroDoctor extends AppCompatActivity {
                 });
     }
 
-    private void registrarMedico(String nombre, String especializacion, String correo, String contrasena, String telefono, String horario) {
+    private void registrarMedico(String nombre, String especializacion, String correo, String contrasena, String telefono, List<String> horarios) {
         mAuth.createUserWithEmailAndPassword(correo, contrasena).addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
                 String uid = mAuth.getCurrentUser().getUid();
@@ -141,10 +151,10 @@ public class RegistroDoctor extends AppCompatActivity {
                 medico.put("correo", correo);
                 medico.put("telefono", telefono);
                 medico.put("rol", "medico");
-                medico.put("horario", horario);  // Guardar horario en Firestore
+                medico.put("horarios", horarios); // Guardar el ArrayList de horarios
 
-                // Guardar datos en Firestore en la colección "user"
-                db.collection("user").document(uid).set(medico).addOnSuccessListener(aVoid -> {
+                // Guardar datos en Firestore
+                db.collection("medicos").document(uid).set(medico).addOnSuccessListener(aVoid -> {
                     enviarCorreoVerificacion();
                     Toast.makeText(RegistroDoctor.this, "Médico registrado con éxito", Toast.LENGTH_SHORT).show();
                 }).addOnFailureListener(e -> {
@@ -167,5 +177,31 @@ public class RegistroDoctor extends AppCompatActivity {
                 }
             });
         }
+    }
+
+    private List<String> generarHorarios(int horaInicio, int minutoInicio, int horaFin, int minutoFin) {
+        List<String> horarios = new ArrayList<>();
+
+        // Convertir la hora inicial y final a minutos totales desde la medianoche
+        int inicioEnMinutos = horaInicio * 60 + minutoInicio;
+        int finEnMinutos = horaFin * 60 + minutoFin;
+
+        // Asegurarse de que el rango es válido
+        if (inicioEnMinutos >= finEnMinutos) {
+            return horarios; // Devuelve una lista vacía si el rango no es válido
+        }
+
+        // Iterar desde el inicio hasta el final en intervalos de 30 minutos
+        for (int tiempo = inicioEnMinutos; tiempo <= finEnMinutos; tiempo += 30) {
+            int horas = tiempo / 60;
+            int minutos = tiempo % 60;
+
+            // Formatear el tiempo en formato de 12 horas
+            String periodo = (horas >= 12) ? "PM" : "AM";
+            int horasFormato12 = (horas == 0 || horas == 12) ? 12 : horas % 12;
+            horarios.add(String.format("%02d:%02d %s", horasFormato12, minutos, periodo));
+        }
+
+        return horarios;
     }
 }

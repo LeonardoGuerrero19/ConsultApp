@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_marginHorizontal="20dp"
+    tools:context=".ui.inicio.InicioFragment">
+
+    <LinearLayout
+        android:id="@+id/linear"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical" >
+
+        <TextView
+            android:id="@+id/text_saludo"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginVertical="20dp"
+            android:fontFamily="@font/montserrat_bold"
+            android:textSize="22dp"
+            android:textColor="@color/black" />
+
+        <ImageButton
+            android:id="@+id/image"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_plus"
+            android:background="?attr/selectableItemBackgroundBorderless" />
+    </LinearLayout>
+
+    <View
+        android:id="@+id/divider"
+        android:layout_width="match_parent"
+        android:layout_height="2dp"
+        android:layout_below="@id/linear"
+        android:background="@color/aqua" />
+
+    <TextView
+        android:id="@+id/txtProximasCitas"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/divider"
+        android:layout_marginVertical="20dp"
+        android:text="Proximas citas"
+        android:fontFamily="@font/montserrat_bold"
+        android:textSize="20dp" />
+
+    <LinearLayout
+        android:id="@+id/linearProxCitas"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_below="@id/txtProximasCitas" />
+
+    <TextView
+        android:id="@+id/txtServicios"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/linearProxCitas"
+        android:layout_marginVertical="20dp"
+        android:text="Servicios"
+        android:fontFamily="@font/montserrat_bold"
+        android:textSize="20dp" />
+
+    <GridLayout
+        android:id="@+id/gridLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/txtServicios"
+        android:columnCount="3"
+        android:rowCount="2"
+        android:orientation="horizontal" />
+
+    <Button
+        android:id="@+id/btn_cerrarS"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/gridLayout"
+        android:text="Cerrar sesión"
+        android:layout_marginTop="16dp"/>
+</RelativeLayout>

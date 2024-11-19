@@ -47,6 +47,7 @@ dependencies {
     implementation("com.google.firebase:firebase-auth:version") // Usa la última versión estable
     implementation ("com.google.firebase:firebase-firestore:version")
     implementation ("com.google.android.gms:play-services-auth:version")
+    implementation ("com.google.firebase:firebase-storage:20.2.1")
     implementation(libs.appcompat)
     implementation(libs.material)
     implementation(libs.activity)
@@ -60,6 +61,7 @@ dependencies {
     implementation(libs.annotations)
     implementation(libs.annotations)
     implementation(libs.recyclerview)
+    implementation(libs.firebase.storage)
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)

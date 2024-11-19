@@ -18,8 +18,15 @@
         tools:layout="@layout/fragment_horarios" />
 
     <fragment
+        android:id="@+id/navigation_expedientes"
+        android:name="com.example.consultapp.ui.expedientes.ExpedientesFragment"
+        android:label="@string/title_expedientes"
+        tools:layout="@layout/fragment_expedientes" />
+
+    <fragment
         android:id="@+id/navigation_notifications"
         android:name="com.example.consultapp.ui.notifications.NotificationsFragment"
         android:label="@string/title_notifications"
         tools:layout="@layout/fragment_notifications" />
+
 </navigation>

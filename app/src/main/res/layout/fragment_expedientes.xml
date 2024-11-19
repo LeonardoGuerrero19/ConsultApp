@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_marginHorizontal="20dp"
+    tools:context=".ui.expedientes.ExpedientesFragment">
+
+    <TextView
+        android:id="@+id/text"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginVertical="20dp"
+        android:fontFamily="@font/montserrat_bold"
+        android:text="Expedientes clínicos"
+        android:textColor="@color/black"
+        android:textSize="26dp" />
+
+    <FrameLayout
+        android:id="@+id/frame"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/text" >
+
+        <EditText
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/etNumeroCuenta"
+            android:padding="15dp"
+            android:backgroundTint="@color/gray"
+            android:background="@drawable/rounded"
+            android:fontFamily="@font/montserrat_medium"
+            android:textColor="@color/black"
+            android:hint="Ingrese número de cuenta"
+            android:inputType="number" />
+
+        <ImageButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/btnBuscar"
+            android:text="Buscar"
+            android:src="@drawable/round_search_24"
+            android:backgroundTint="@color/aqua"
+            android:padding="10dp"
+            android:fontFamily="@font/montserrat_medium"
+            android:background="@drawable/rounded_button"
+            android:layout_gravity="end|center_vertical"
+            android:layout_marginEnd="10dp" />
+    </FrameLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginVertical="20dp"
+        android:orientation="vertical"
+        android:padding="15dp"
+        android:backgroundTint="@color/gray"
+        android:background="@drawable/rounded"
+        android:id="@+id/tvResultado"
+        android:layout_below="@id/frame">
+
+        <TextView
+            android:id="@+id/tvNumeroCuenta"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/montserrat_bold"
+            android:textSize="20dp" />
+
+        <TextView
+            android:id="@+id/tvNombre"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:fontFamily="@font/montserrat_medium"
+            android:textSize="20dp" />
+    </LinearLayout>
+
+</RelativeLayout>
