@@ -30,8 +30,12 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="Proximas"
-            android:layout_marginEnd="8dp" />
+            android:text="Próximas"
+            android:layout_marginEnd="8dp"
+            android:backgroundTint="@color/gray"
+            android:fontFamily="@font/montserrat_bold"
+            android:textColor="@color/black"
+            app:cornerRadius="18dp"/>
 
         <Button
             android:id="@+id/btn_realizadas"
@@ -39,7 +43,12 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="Realizadas"
-            android:layout_marginEnd="8dp" />
+            android:paddingHorizontal="0dp"
+            android:layout_marginEnd="8dp"
+            android:backgroundTint="@color/gray"
+            android:fontFamily="@font/montserrat_bold"
+            android:textColor="@color/black"
+            app:cornerRadius="18dp" />
 
         <Button
             android:id="@+id/btn_canceladas"
@@ -47,7 +56,11 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:paddingHorizontal="0dp"
-            android:text="Canceladas" />
+            android:text="Canceladas"
+            android:backgroundTint="@color/gray"
+            android:fontFamily="@font/montserrat_bold"
+            android:textColor="@color/black"
+            app:cornerRadius="18dp"/>
     </LinearLayout>
 
     <androidx.recyclerview.widget.RecyclerView

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Button xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/btnService"
+    android:layout_width="0dp"
+    android:layout_height="wrap_content"
+    android:layout_columnWeight="1"
+    android:fontFamily="@font/montserrat_medium"
+    android:textSize="12dp"
+    android:backgroundTint="@color/gray"
+    app:cornerRadius="18dp"
+    android:textColor="@color/black"
+    android:padding="12dp"
+    android:layout_margin="4dp" />
+

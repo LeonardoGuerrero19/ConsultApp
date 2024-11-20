@@ -12,6 +12,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
@@ -25,7 +26,11 @@ import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 public class InicioFragment extends Fragment {
 
@@ -115,11 +120,12 @@ public class InicioFragment extends Fragment {
                             String estado = document.getString("estado");
                             if ("proxima".equalsIgnoreCase(estado)) { // Verificar si el estado es "próxima"
                                 String servicio = document.getString("servicio");
+                                String doctor = document.getString("doctor");
                                 String fecha = document.getString("fecha");
                                 String horario = document.getString("horario");
 
                                 // Crear y agregar un TextView para cada cita válida
-                                agregarTextoCita(servicio, fecha, horario);
+                                agregarTextoCita(servicio, doctor, fecha, horario);
                             }
                         }
                     } else {
@@ -131,59 +137,85 @@ public class InicioFragment extends Fragment {
                 });
     }
 
-    private void agregarTextoCita(String servicio, String fecha, String horario) {
-        TextView textView = new TextView(getContext());
-        textView.setText(String.format("Servicio: %s\nFecha: %s\nHorario: %s", servicio, fecha, horario));
-        textView.setTextSize(16);
-        textView.setPadding(16, 16, 16, 16);
-        textView.setLayoutParams(new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT,
-                LinearLayout.LayoutParams.WRAP_CONTENT
-        ));
+    private void agregarTextoCita(String servicio, String doctor, String fecha, String horario) {
+        // Inflar el diseño XML de la cita
+        View citaView = LayoutInflater.from(getContext()).inflate(R.layout.item_prox_citas, linearProxCitas, false);
 
-        // Agregar el TextView al LinearLayout
-        linearProxCitas.addView(textView);
+        // Referenciar los TextView dentro del diseño inflado
+        TextView tvServicio = citaView.findViewById(R.id.tvServicio);
+        TextView tvDoctor = citaView.findViewById(R.id.tvDoctor);
+        TextView tvFecha = citaView.findViewById(R.id.tvFecha);
+        TextView tvHorario = citaView.findViewById(R.id.tvHorario);
+
+        // Convertir la fecha al formato deseado
+        String fechaFormateada = formatearFecha(fecha);
+
+        // Establecer los valores
+        tvServicio.setText(servicio);
+        tvDoctor.setText("Dr. " + doctor);
+        tvFecha.setText(fechaFormateada); // Usar la fecha formateada
+        tvHorario.setText(horario);
+
+        // Agregar el diseño inflado al LinearLayout
+        linearProxCitas.addView(citaView);
+    }
+
+    private String formatearFecha(String fechaOriginal) {
+        // Formato de la fecha que recibes (por ejemplo: "21/11/2024")
+        SimpleDateFormat formatoEntrada = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
+        // Formato al que quieres convertir (por ejemplo: "21 de Noviembre de 2024")
+        SimpleDateFormat formatoSalida = new SimpleDateFormat("d 'de' MMMM", new Locale("es", "ES"));
+
+        try {
+            Date fecha = formatoEntrada.parse(fechaOriginal); // Parsear la fecha original
+            return formatoSalida.format(fecha); // Convertir al formato deseado
+        } catch (ParseException e) {
+            e.printStackTrace();
+            return fechaOriginal; // En caso de error, devolver la fecha original
+        }
     }
 
     private void obtenerServicios() {
-        // Referencia al documento que contiene los servicios
         DocumentReference serviciosRef = db.collection("Servicios").document("Todos los servicios");
 
-        // Obtener el documento
         serviciosRef.get().addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
                 DocumentSnapshot document = task.getResult();
                 if (document != null && document.exists()) {
-                    // Obtiene el array de servicios
                     List<String> servicios = (List<String>) document.get("Servicios");
 
                     if (servicios != null) {
-                        // Recorrer la lista de servicios y agregar los botones al GridLayout
                         for (String servicio : servicios) {
-                            Button button = new Button(getContext());
-                            button.setText(servicio);
-                            button.setLayoutParams(new GridLayout.LayoutParams(
-                                    GridLayout.spec(GridLayout.UNDEFINED),
-                                    GridLayout.spec(GridLayout.UNDEFINED)
-                            ));
-                            button.setPadding(20, 20, 20, 20);
+                            // Inflar el diseño del botón
+                            View servicioView = LayoutInflater.from(getContext()).inflate(R.layout.item_button_service, gridLayout, false);
 
-                            // Acción cuando se hace clic en el botón
-                            button.setOnClickListener(v -> {
-                                // Crear un Intent para redirigir a AgendaActivity
+                            // Referenciar el botón dentro del diseño inflado
+                            Button btnService = servicioView.findViewById(R.id.btnService);
+                            btnService.setText(servicio);
+
+                            // Configurar el layoutParams para respetar el ancho del GridLayout
+                            GridLayout.LayoutParams params = new GridLayout.LayoutParams();
+                            params.width = 0; // Ancho dinámico
+                            params.height = ViewGroup.LayoutParams.WRAP_CONTENT;
+                            params.columnSpec = GridLayout.spec(GridLayout.UNDEFINED, 1f); // Peso igual para las columnas
+                            params.setMargins(8, 8, 8, 8); // Márgenes opcionales
+                            servicioView.setLayoutParams(params);
+
+                            // Configurar acción del botón
+                            btnService.setOnClickListener(v -> {
                                 Intent intent = new Intent(getContext(), AgendaActivity.class);
-                                // Pasar el nombre del servicio como extra
                                 intent.putExtra("nombreServicio", servicio);
                                 startActivity(intent);
                             });
 
-                            // Agrega el botón al GridLayout
-                            gridLayout.addView(button);
+                            // Agregar la vista inflada al GridLayout
+                            gridLayout.addView(servicioView);
                         }
+
                     }
+                } else {
+                    Toast.makeText(getContext(), "Error al cargar los servicios", Toast.LENGTH_SHORT).show();
                 }
-            } else {
-                Toast.makeText(getContext(), "Error al cargar los servicios", Toast.LENGTH_SHORT).show();
             }
         });
     }

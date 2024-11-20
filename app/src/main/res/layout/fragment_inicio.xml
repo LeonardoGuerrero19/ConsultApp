@@ -49,18 +49,25 @@
         android:fontFamily="@font/montserrat_bold"
         android:textSize="20dp" />
 
-    <LinearLayout
-        android:id="@+id/linearProxCitas"
+    <HorizontalScrollView
+        android:id="@+id/scrollView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:layout_below="@id/txtProximasCitas" />
+        android:scrollbars="horizontal"
+        android:layout_below="@id/txtProximasCitas">
+
+        <LinearLayout
+            android:id="@+id/linearProxCitas"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal" />
+    </HorizontalScrollView>
 
     <TextView
         android:id="@+id/txtServicios"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/linearProxCitas"
+        android:layout_below="@id/scrollView"
         android:layout_marginVertical="20dp"
         android:text="Servicios"
         android:fontFamily="@font/montserrat_bold"

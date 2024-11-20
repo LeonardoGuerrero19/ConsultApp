@@ -26,6 +26,7 @@
             android:layout_height="wrap_content"
             android:backgroundTint="@color/gray"
             android:layout_below="@id/text"
+            android:weekDayTextAppearance="@style/CalendarWeekDayTextAppearance"
             android:layout_centerHorizontal="true"
             android:background="@drawable/rounded"
             android:dateTextAppearance="@style/CustomCalendarTextAppearance"/>

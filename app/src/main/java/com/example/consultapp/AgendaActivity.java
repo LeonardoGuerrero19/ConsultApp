@@ -1,9 +1,11 @@
 package com.example.consultapp;
 
 import android.os.Bundle;
+import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CalendarView;
+import android.widget.GridLayout;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -27,6 +29,7 @@ public class AgendaActivity extends AppCompatActivity {
     private CalendarView calendarView;
     private LinearLayout linearHorarios;
     private Button btnGuardarCita;
+    private Button botonSeleccionado = null; // Botón seleccionado actualmente
     FirebaseFirestore mFirestore;
     FirebaseAuth mAuth;
 
@@ -90,27 +93,72 @@ public class AgendaActivity extends AppCompatActivity {
     }
 
     private void actualizarBotonesHorarios(List<String> horarios) {
-        linearHorarios.removeAllViews(); // Limpiar los botones existentes
+        linearHorarios.removeAllViews(); // Limpiar las vistas existentes
+        LinearLayout currentRow = null;
+        int count = 0;
 
         for (String horario : horarios) {
             // Crear un nuevo botón
             Button button = new Button(this);
             button.setText(horario);
-            button.setLayoutParams(new LinearLayout.LayoutParams(
-                    LinearLayout.LayoutParams.MATCH_PARENT,
-                    LinearLayout.LayoutParams.WRAP_CONTENT
-            ));
+            button.setBackgroundResource(R.drawable.boton_selector); // Diseño inicial
+
+            // Configurar el tamaño del botón
+            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+                    0, // Ancho dinámico
+                    LinearLayout.LayoutParams.WRAP_CONTENT, // Altura automática
+                    1f // Peso para distribuir uniformemente
+            );
+            params.setMargins(20, 20, 20, 20); // Márgenes
+            button.setLayoutParams(params);
 
             // Configurar el evento de clic para el botón
             button.setOnClickListener(v -> {
+                // Cambiar diseño del botón seleccionado
+                if (botonSeleccionado != null) {
+                    botonSeleccionado.setBackgroundResource(R.drawable.boton_no_seleccionado);
+                }
+                botonSeleccionado = button; // Actualizar el botón seleccionado
+                button.setBackgroundResource(R.drawable.boton_seleccionado);
                 horarioSeleccionado = horario; // Guardar el horario seleccionado
                 Toast.makeText(AgendaActivity.this, "Horario seleccionado: " + horario, Toast.LENGTH_SHORT).show();
             });
 
-            // Agregar el botón al LinearLayout
-            linearHorarios.addView(button);
+            // Crear una nueva fila si es necesario
+            if (count % 3 == 0) {
+                currentRow = new LinearLayout(this);
+                currentRow.setOrientation(LinearLayout.HORIZONTAL);
+                currentRow.setLayoutParams(new LinearLayout.LayoutParams(
+                        LinearLayout.LayoutParams.MATCH_PARENT,
+                        LinearLayout.LayoutParams.WRAP_CONTENT
+                ));
+                linearHorarios.addView(currentRow); // Agregar la nueva fila al contenedor principal
+            }
+
+            // Agregar el botón a la fila actual
+            if (currentRow != null) {
+                currentRow.addView(button);
+            }
+
+            count++;
+        }
+
+        // Completar la última fila si tiene menos de 3 botones
+        if (count % 3 != 0 && currentRow != null) {
+            int emptyViews = 3 - (count % 3); // Calcular cuántos espacios faltan
+            for (int i = 0; i < emptyViews; i++) {
+                View emptyView = new View(this);
+                LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+                        0, // Ancho dinámico
+                        LinearLayout.LayoutParams.WRAP_CONTENT, // Altura automática
+                        1f // Peso para distribuir uniformemente
+                );
+                emptyView.setLayoutParams(params);
+                currentRow.addView(emptyView); // Agregar vistas vacías para completar la fila
+            }
         }
     }
+
 
 
     private void guardarCita(String nombreServicio, String fecha) {
