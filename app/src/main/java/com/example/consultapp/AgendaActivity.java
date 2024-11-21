@@ -1,5 +1,6 @@
 package com.example.consultapp;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ArrayAdapter;
@@ -29,13 +30,13 @@ public class AgendaActivity extends AppCompatActivity {
     private CalendarView calendarView;
     private LinearLayout linearHorarios;
     private Button btnGuardarCita;
+    private Button btnRegresar; // New button
     private Button botonSeleccionado = null; // Botón seleccionado actualmente
     FirebaseFirestore mFirestore;
     FirebaseAuth mAuth;
 
     private String fechaSeleccionada; // Variable global
     private String horarioSeleccionado; // Variable para almacenar el horario seleccionado
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,6 +51,7 @@ public class AgendaActivity extends AppCompatActivity {
         linearHorarios = findViewById(R.id.linearHorarios); // Inicializar el LinearLayout
         calendarView = findViewById(R.id.calendarView);
         btnGuardarCita = findViewById(R.id.btnGuardarCita);
+        btnRegresar = findViewById(R.id.btnRegresar); // Initialize new button
 
         // Obtener el nombre del servicio desde el Intent
         String servicioSeleccionado = getIntent().getStringExtra("nombreServicio");
@@ -69,6 +71,13 @@ public class AgendaActivity extends AppCompatActivity {
 
         // Configurar el botón para guardar la cita
         btnGuardarCita.setOnClickListener(view -> guardarCita(servicioSeleccionado, fechaSeleccionada));
+
+        btnRegresar.setOnClickListener(view -> {
+            Intent intent = new Intent(AgendaActivity.this, UserActivity.class);
+            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+            startActivity(intent);
+            finish();
+        });
     }
 
     private void cargarHorariosParaFecha(String nombreServicio, String fecha) {
