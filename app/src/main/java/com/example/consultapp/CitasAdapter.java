@@ -28,10 +28,33 @@ public class CitasAdapter extends RecyclerView.Adapter<CitasAdapter.CitaViewHold
     @Override
     public void onBindViewHolder(@NonNull CitaViewHolder holder, int position) {
         Cita cita = citasList.get(position);
-        holder.textServicio.setText("Servicio: " + cita.getServicio());
-        holder.textFecha.setText("Fecha: " + cita.getFecha());
-        holder.textHorario.setText("Horario: " + cita.getHorario());
+
+        // Extraer el día y el mes de la fecha
+        String[] fechaPartes = cita.getFecha().split("/");
+        if (fechaPartes.length == 3) {
+            String dia = fechaPartes[0];
+            String mes = getNombreMes(Integer.parseInt(fechaPartes[1]));
+
+            // Asignar valores a los TextView correspondientes
+            holder.textDia.setText(dia);
+            holder.textMes.setText(mes);
+        }
+
+        // Otros datos
+        holder.textServicio.setText(cita.getServicio());
+        holder.textHorario.setText(cita.getHorario());
+        holder.textDoctor.setText("Dr. " + cita.getDoctor());
     }
+
+    // Método para obtener el nombre del mes
+    private String getNombreMes(int numeroMes) {
+        String[] meses = {
+                "ENE", "FEB", "MAR", "ABR", "MAY", "JUN",
+                "JUL", "AGO", "SEPT", "OCT", "NOV", "DIC"
+        };
+        return meses[numeroMes - 1]; // Restar 1 porque los meses empiezan en 0 en el array
+    }
+
 
     @Override
     public int getItemCount() {
@@ -39,13 +62,15 @@ public class CitasAdapter extends RecyclerView.Adapter<CitasAdapter.CitaViewHold
     }
 
     public static class CitaViewHolder extends RecyclerView.ViewHolder {
-        TextView textServicio, textFecha, textHorario;
+        TextView textServicio, textDia, textMes, textHorario, textDoctor;
 
         public CitaViewHolder(@NonNull View itemView) {
             super(itemView);
             textServicio = itemView.findViewById(R.id.textServicio);
-            textFecha = itemView.findViewById(R.id.textFecha);
+            textDia = itemView.findViewById(R.id.textDia);
+            textMes = itemView.findViewById(R.id.textMes);
             textHorario = itemView.findViewById(R.id.textHorario);
+            textDoctor = itemView.findViewById(R.id.textDoctor);
         }
     }
 }

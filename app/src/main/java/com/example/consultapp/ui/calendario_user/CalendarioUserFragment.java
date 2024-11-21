@@ -32,6 +32,9 @@ public class CalendarioUserFragment extends Fragment {
     private CitasAdapter adapter;
     private List<Cita> citasList;
 
+    // Referencia al botón seleccionado
+    private Button selectedButton;
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -50,19 +53,45 @@ public class CalendarioUserFragment extends Fragment {
         adapter = new CitasAdapter(citasList);
         recyclerViewCitas.setAdapter(adapter);
 
-        // Configurar botón Proximas
+        // Referencias a los botones
         Button btnProximas = root.findViewById(R.id.btn_proximas);
-        btnProximas.setOnClickListener(v -> cargarCitasProximas());
-
-        // Configurar botón Realizadas
         Button btnRealizadas = root.findViewById(R.id.btn_realizadas);
-        btnRealizadas.setOnClickListener(v -> cargarCitasRealizadas());
-
-        // Configurar botón Realizadas
         Button btnCanceladas = root.findViewById(R.id.btn_canceladas);
-        btnCanceladas.setOnClickListener(v -> cargarCitasCanceladas());
+
+        // Configurar botones con cambio de color
+        btnProximas.setOnClickListener(v -> {
+            cargarCitasProximas();
+            updateSelectedButton(btnProximas);
+        });
+
+        btnRealizadas.setOnClickListener(v -> {
+            cargarCitasRealizadas();
+            updateSelectedButton(btnRealizadas);
+        });
+
+        btnCanceladas.setOnClickListener(v -> {
+            cargarCitasCanceladas();
+            updateSelectedButton(btnCanceladas);
+        });
+
+        // Establecer un botón predeterminado seleccionado y cargar citas
+        updateSelectedButton(btnProximas);
+        cargarCitasProximas(); // Cargar citas automáticamente al inicio
 
         return root;
+    }
+
+    private void updateSelectedButton(Button button) {
+        // Restablecer el color del botón previamente seleccionado
+        if (selectedButton != null) {
+            selectedButton.setBackgroundTintList(getContext().getColorStateList(R.color.gray));
+            selectedButton.setTextColor(getContext().getColor(R.color.black));
+        }
+
+        // Cambiar el color del nuevo botón seleccionado
+        selectedButton = button;
+        selectedButton.setBackgroundTintList(getContext().getColorStateList(R.color.aqua)); // Color seleccionado
+        selectedButton.setTextColor(getContext().getColor(R.color.white));
     }
 
     private void cargarCitasProximas() {
@@ -70,14 +99,13 @@ public class CalendarioUserFragment extends Fragment {
         if (currentUser != null) {
             String userId = currentUser.getUid();
 
-            // Filtrar citas con estado "proxima"
             db.collection("citas")
                     .whereEqualTo("usuario_id", userId)
                     .whereEqualTo("estado", "proxima")
                     .get()
                     .addOnCompleteListener(task -> {
                         if (task.isSuccessful()) {
-                            citasList.clear(); // Limpiar la lista antes de agregar nuevos elementos
+                            citasList.clear();
                             for (DocumentSnapshot document : task.getResult()) {
                                 Cita cita = document.toObject(Cita.class);
                                 citasList.add(cita);
@@ -95,14 +123,13 @@ public class CalendarioUserFragment extends Fragment {
         if (currentUser != null) {
             String userId = currentUser.getUid();
 
-            // Filtrar citas con estado "realizada"
             db.collection("citas")
                     .whereEqualTo("usuario_id", userId)
                     .whereEqualTo("estado", "realizada")
                     .get()
                     .addOnCompleteListener(task -> {
                         if (task.isSuccessful()) {
-                            citasList.clear(); // Limpiar la lista antes de agregar nuevos elementos
+                            citasList.clear();
                             for (DocumentSnapshot document : task.getResult()) {
                                 Cita cita = document.toObject(Cita.class);
                                 citasList.add(cita);
@@ -120,14 +147,13 @@ public class CalendarioUserFragment extends Fragment {
         if (currentUser != null) {
             String userId = currentUser.getUid();
 
-            // Filtrar citas con estado "realizada"
             db.collection("citas")
                     .whereEqualTo("usuario_id", userId)
                     .whereEqualTo("estado", "cancelada")
                     .get()
                     .addOnCompleteListener(task -> {
                         if (task.isSuccessful()) {
-                            citasList.clear(); // Limpiar la lista antes de agregar nuevos elementos
+                            citasList.clear();
                             for (DocumentSnapshot document : task.getResult()) {
                                 Cita cita = document.toObject(Cita.class);
                                 citasList.add(cita);

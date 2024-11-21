@@ -14,4 +14,5 @@
     <string name="title_activity_user">UserActivity</string>
     <string name="title_inicio">Inicio</string>
     <string name="title_calendario_user">Calendario</string>
+    <string name="title_expediente_user">Expediente</string>
 </resources>

@@ -47,9 +47,9 @@
         android:backgroundTint="@color/gray"
         android:layout_marginTop="20dp"
         android:layout_centerHorizontal="true"
-        android:weekDayTextAppearance="@style/CalendarWeekDayTextAppearance"
         android:background="@drawable/rounded"
-        android:dateTextAppearance="@style/CustomCalendarTextAppearance"/>
+        android:theme="@style/CalenderViewCustom"
+        android:weekDayTextAppearance="@style/CalenderViewWeekCustomText" />
 
     <TextView
         android:id="@+id/text"
@@ -57,15 +57,15 @@
         android:layout_height="wrap_content"
         android:layout_marginVertical="20dp"
         android:layout_below="@id/calendarView"
+        android:textColor="@color/black"
         android:fontFamily="@font/montserrat_bold"
         android:text="Citas del día"
-        android:textSize="26dp" />
+        android:textSize="24dp" />
 
     <LinearLayout
         android:id="@+id/linear_citas"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:layout_below="@id/text"
-        android:layout_marginTop="20dp" />
+        android:layout_below="@id/text" />
 </RelativeLayout>

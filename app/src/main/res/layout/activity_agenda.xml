@@ -38,10 +38,13 @@
             android:id="@+id/calendarView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_below="@id/nombreServicio"
+            android:layout_marginTop="20dp"
             android:background="@drawable/rounded"
             android:backgroundTint="@color/gray"
-            android:layout_below="@id/nombreServicio"
-            android:layout_marginTop="20dp"/>
+            android:theme="@style/CalenderViewCustom"
+            android:weekDayTextAppearance="@style/CalenderViewWeekCustomText"
+            android:clickable="false" />
 
         <TextView
             android:id="@+id/text1"

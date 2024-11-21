@@ -1,19 +1,11 @@
 <resources>
-    <style name="CustomCalendarTextAppearance" parent="android:TextAppearance.Small">
-        <item name="android:textColor">@color/black</item>
-        <item name="android:fontFamily">@font/montserrat_medium</item>
-        <item name="android:background">@drawable/selected_date_background</item>
+    <style name="CalenderViewCustom" parent="Theme.AppCompat">
+        <item name="colorAccent">@color/aqua</item>
+        <item name="colorPrimary">@color/white</item>
+        <item name="android:textColorPrimary">@color/black</item>
     </style>
 
-    <!-- Estilo para el texto de los días -->
-    <style name="CalendarDateTextAppearance" parent="TextAppearance.AppCompat">
-        <item name="android:textColor">#000000</item> <!-- Color del texto para las fechas -->
-        <item name="android:textSize">14sp</item>
-    </style>
-
-    <!-- Estilo para el texto de los días de la semana -->
-    <style name="CalendarWeekDayTextAppearance" parent="TextAppearance.AppCompat">
-        <item name="android:textColor">#009688</item> <!-- Color del texto para los días de la semana -->
-        <item name="android:textSize">12sp</item>
+    <style name="CalenderViewWeekCustomText" parent="android:TextAppearance.DeviceDefault.Small">
+        <item name="android:textColor">@color/aqua</item>
     </style>
 </resources>

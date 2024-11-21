@@ -1,30 +1,91 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="vertical"
+    android:orientation="horizontal"
     android:backgroundTint="@color/gray"
     android:background="@drawable/rounded"
-    android:padding="16dp">
+    android:padding="15dp"
+    android:layout_marginBottom="20dp">
 
-    <TextView
-        android:id="@+id/textServicio"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Servicio"
-        android:textStyle="bold"
-        android:textSize="16sp" />
+        <!-- Primer LinearLayout -->
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:backgroundTint="@color/aqua"
+            android:background="@drawable/rounded"
+            android:layout_marginEnd="20dp"
+            android:gravity="center_vertical|center_horizontal"
+            android:padding="15dp" >
 
-    <TextView
-        android:id="@+id/textFecha"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Fecha" />
+            <TextView
+                android:id="@+id/textDia"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Día"
+                android:fontFamily="@font/montserrat_bold"
+                android:textColor="@color/black"
+                android:textSize="30dp" />
 
-    <TextView
-        android:id="@+id/textHorario"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Horario" />
+            <TextView
+                android:id="@+id/textMes"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Mes"
+                android:fontFamily="@font/montserrat_bold"
+                android:textColor="@color/black"
+                android:textSize="20dp" />
+        </LinearLayout>
+
+        <!-- Segundo LinearLayout -->
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:orientation="vertical">
+            <TextView
+                android:id="@+id/textServicio"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/montserrat_bold"
+                android:text="Servicio"
+                android:textSize="20dp"
+                android:textColor="@color/black"
+                android:layout_marginBottom="5dp" />
+
+            <TextView
+                android:id="@+id/textDoctor"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/montserrat_medium"
+                android:text="Doctor"
+                android:textSize="16dp"
+                android:textColor="@color/black"
+                android:layout_marginBottom="5dp" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/round_access_time_24"
+                    android:layout_marginEnd="10dp"
+                    app:tint="@color/black" />
+
+                <TextView
+                    android:id="@+id/textHorario"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Horario"
+                    android:textColor="@color/black"
+                    android:fontFamily="@font/montserrat_medium"
+                    android:textSize="16dp" />
+            </LinearLayout>
+        </LinearLayout>
 </LinearLayout>

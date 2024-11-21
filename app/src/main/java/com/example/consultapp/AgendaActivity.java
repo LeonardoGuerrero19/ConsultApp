@@ -182,12 +182,25 @@ public class AgendaActivity extends AppCompatActivity {
         mFirestore.collection("citas")
                 .add(citas)
                 .addOnSuccessListener(documentReference -> {
-                    Toast.makeText(AgendaActivity.this, "Cita guardada exitosamente", Toast.LENGTH_SHORT).show();
-                    finish(); // Cerrar la actividad actual
+                    // Obtener el ID de la cita generada
+                    String citaId = documentReference.getId();
+
+                    // Actualizar la cita con el cita_id
+                    Map<String, Object> updateData = new HashMap<>();
+                    updateData.put("cita_id", citaId);
+
+                    // Actualizar el documento de la cita con el cita_id
+                    documentReference.update(updateData)
+                            .addOnSuccessListener(aVoid -> {
+                                Toast.makeText(AgendaActivity.this, "Cita guardada exitosamente", Toast.LENGTH_SHORT).show();
+                                finish(); // Cerrar la actividad actual
+                            })
+                            .addOnFailureListener(e -> {
+                                Toast.makeText(AgendaActivity.this, "Error al guardar el cita_id", Toast.LENGTH_SHORT).show();
+                            });
                 })
                 .addOnFailureListener(e -> {
                     Toast.makeText(AgendaActivity.this, "Error al guardar la cita", Toast.LENGTH_SHORT).show();
                 });
     }
-
 }

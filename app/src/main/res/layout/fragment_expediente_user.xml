@@ -1,18 +1,26 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:tools="http://schemas.android.com/tools"
     android:orientation="vertical"
-    tools:context=".PerfilDoc">
+    tools:context=".ui.expediente_user.ExpedienteUserFragment" >
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@drawable/header_profile_doctor"
         android:orientation="vertical">
+
+        <ImageButton
+            android:id="@+id/btn_editar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/round_edit_24"
+            android:backgroundTint="@color/aqua"
+            android:background="@drawable/rounded"
+            android:layout_gravity="end"
+            android:padding="10dp" />
 
         <TextView
             android:id="@+id/nombre"
@@ -24,17 +32,6 @@
             android:textSize="22dp"
             android:fontFamily="@font/montserrat_bold"
             android:textColor="@color/black" />
-
-        <TextView
-            android:id="@+id/especializacion"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginHorizontal="20dp"
-            android:textSize="20dp"
-            android:layout_marginBottom="20dp"
-            android:fontFamily="@font/montserrat_medium"
-            android:textColor="@color/black" />
-
     </LinearLayout>
 
     <TextView
@@ -46,21 +43,17 @@
         android:textSize="20dp"
         android:fontFamily="@font/montserrat_bold"
         android:textColor="@color/black"
-        android:text="Sobre mi:" />
+        android:text="Edad:" />
 
-    <Button
-        android:id="@+id/btn_descripcion"
+    <TextView
+        android:id="@+id/edad"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="20dp"
-        android:fontFamily="@font/montserrat_medium"
-        android:textColor="@color/black"
-        android:padding="0dp"
-        android:backgroundTint="#0000"
-        android:textAlignment="textStart"
         android:textSize="20dp"
-        android:text="Añade una descripcion"
-        android:drawableEnd="@drawable/round_navigate_next_24" />
+        android:text="Edad no especificada"
+        android:fontFamily="@font/montserrat_medium"
+        android:textColor="@color/black" />
 
     <TextView
         android:layout_width="match_parent"
@@ -70,14 +63,35 @@
         android:textSize="20dp"
         android:fontFamily="@font/montserrat_bold"
         android:textColor="@color/black"
-        android:text="Horario de servicio:" />
+        android:text="Fecha de nacimiento:" />
 
     <TextView
-        android:id="@+id/horario"
+        android:id="@+id/fechaNacimiento"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="20dp"
         android:textSize="20dp"
+        android:text="Fecha de nacimiento no registrada"
+        android:fontFamily="@font/montserrat_medium"
+        android:textColor="@color/black" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="20dp"
+        android:layout_marginVertical="10dp"
+        android:textSize="20dp"
+        android:fontFamily="@font/montserrat_bold"
+        android:textColor="@color/black"
+        android:text="Género:" />
+
+    <TextView
+        android:id="@+id/genero"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="20dp"
+        android:textSize="20dp"
+        android:text="Género no especificado"
         android:fontFamily="@font/montserrat_medium"
         android:textColor="@color/black" />
 
@@ -97,16 +111,15 @@
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="20dp"
         android:textSize="20dp"
+        android:text="Teléfono no registrado"
         android:fontFamily="@font/montserrat_medium"
         android:textColor="@color/black" />
 
-    <Button
-        android:id="@+id/btn_cerrarS"
+    <View
+        android:id="@+id/divider"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Cerrar sesión"
-        android:layout_marginTop="16dp"/>
-
-
-
+        android:layout_height="2dp"
+        android:layout_margin="20dp"
+        android:layout_below="@id/linear"
+        android:background="@color/aqua" />
 </LinearLayout>

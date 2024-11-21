@@ -38,6 +38,7 @@
         app:menu="@menu/bottom_nav_menu2"
         android:outlineSpotShadowColor="@color/aqua"
         app:itemIconTint="@color/aqua"
-        app:itemTextColor="@color/aqua" />
+        app:itemTextColor="@color/aqua"
+        app:itemActiveIndicatorStyle="@style/App.Custom.Indicator"/>
 
 </RelativeLayout>

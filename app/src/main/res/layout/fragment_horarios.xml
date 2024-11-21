@@ -1,6 +1,7 @@
 <ScrollView android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:paddingBottom="80dp"
     xmlns:android="http://schemas.android.com/apk/res/android"> <!-- Añadir padding inferior -->
 
@@ -26,10 +27,10 @@
             android:layout_height="wrap_content"
             android:backgroundTint="@color/gray"
             android:layout_below="@id/text"
-            android:weekDayTextAppearance="@style/CalendarWeekDayTextAppearance"
             android:layout_centerHorizontal="true"
             android:background="@drawable/rounded"
-            android:dateTextAppearance="@style/CustomCalendarTextAppearance"/>
+            android:theme="@style/CalenderViewCustom"
+            android:weekDayTextAppearance="@style/CalenderViewWeekCustomText" />
 
 
         <TextView
@@ -53,9 +54,10 @@
             android:id="@+id/btnGuardarHorario"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:padding="15dp"
+            android:padding="10dp"
             android:layout_below="@id/linearLayoutHorarios"
             android:backgroundTint="@color/aqua"
+            app:cornerRadius="18dp"
             android:fontFamily="@font/montserrat_bold"
             android:textSize="22dp"
             android:text="GUARDAR"
