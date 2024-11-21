@@ -10,7 +10,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 public class InicioAdminActivity extends AppCompatActivity {
-    Button btnCerrarS, btn_registrarMedico, btn_AgregarServicio;
+    Button btnCerrarS, btn_registrarMedico, btn_AgregarServicio, btn_buscarUsuario;
     Intent i;
     private FirebaseAuth mAuth;
     private FirebaseFirestore db;
@@ -25,6 +25,7 @@ public class InicioAdminActivity extends AppCompatActivity {
 
         btn_registrarMedico = findViewById(R.id.btn_registrarMedico);
         btn_AgregarServicio = findViewById(R.id.btn_AgregarServicio);
+        btn_buscarUsuario = findViewById(R.id.btn_buscarUsuario);
         btnCerrarS = findViewById(R.id.btn_cerrarS);
 
         btn_AgregarServicio.setOnClickListener(view -> {
@@ -38,6 +39,13 @@ public class InicioAdminActivity extends AppCompatActivity {
             startActivity(intent);
             finish();
         });
+
+        btn_buscarUsuario.setOnClickListener(view -> {
+            Intent intent = new Intent(InicioAdminActivity.this, BuscarUsuarioActivity.class);
+            startActivity(intent);
+            finish();
+        });
+
         btnCerrarS.setOnClickListener(view -> {
             mAuth.signOut();
             Intent intent = new Intent(InicioAdminActivity.this, LoginActivity.class);

@@ -20,6 +20,7 @@
         android:layout_below="@+id/texto"
         android:id="@+id/btn_registrarMedico"
         android:hint="Registrar un nuevo médico"/>
+
     <Button
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -27,11 +28,20 @@
         android:layout_below="@+id/btn_registrarMedico"
         android:text="Agregar nuevo servicio"
         android:layout_marginTop="16dp"/>
+
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/btn_buscarUsuario"
+        android:layout_below="@id/btn_AgregarServicio"
+        android:text="Buscar usuario "
+        android:layout_marginTop="16dp"/>
+
     <Button
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/btn_cerrarS"
-        android:layout_below="@+id/btn_AgregarServicio"
+        android:layout_below="@+id/btn_buscarUsuario"
         android:text="Cerrar sesión"
         android:layout_marginTop="16dp"/>
 

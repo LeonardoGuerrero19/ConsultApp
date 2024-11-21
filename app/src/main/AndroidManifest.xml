@@ -1,8 +1,13 @@
-<?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+
+    <!-- Permisos de almacenamiento según versión de Android --><!-- A partir de Android 13 -->
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.MANAGE_EXTERNAL_STORAGE" /> <!-- Necesario solo si se solicita acceso completo al almacenamiento -->
 
     <application
         android:allowBackup="true"
@@ -14,6 +19,9 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.FuncionLoginRegistro"
         tools:targetApi="31">
+        <activity
+            android:name=".BuscarUsuarioActivity"
+            android:exported="false" />
         <activity
             android:name=".AgregarServicioActivity"
             android:exported="false" />

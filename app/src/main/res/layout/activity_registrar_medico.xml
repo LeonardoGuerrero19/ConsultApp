@@ -1,83 +1,113 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:id="@+id/main"
     tools:context=".RegistrarMedicoActivity">
 
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/texto"
-        android:text="Registrar Médico"
-        android:textSize="30dp"
         android:layout_marginTop="20dp"
-        android:gravity="center"/>
+        android:gravity="center"
+        android:text="Registrar Médico"
+        android:textSize="30dp" />
+
+    <!-- Botón para seleccionar imagen -->
+    <Button
+        android:id="@+id/btn_seleccionar_imagen"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/texto"
+        android:layout_marginTop="16dp"
+        android:text="Seleccionar Imagen" />
+
+    <!-- Vista previa de la imagen -->
+    <ImageView
+        android:id="@+id/imagen_preview"
+        android:layout_width="120dp"
+        android:layout_height="120dp"
+        android:layout_below="@id/btn_seleccionar_imagen"
+        android:layout_marginTop="16dp"
+        android:layout_centerHorizontal="true"
+        android:contentDescription="Vista previa de la imagen"
+        android:scaleType="centerCrop"
+        android:background="#E0E0E0" />
 
     <!-- Nombre del médico -->
     <EditText
-        android:id="@+id/nombreMedico"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/texto"
-        android:hint="Nombre del Médico"
-        android:layout_marginTop="16dp"/>
+        android:id="@+id/nombreMedico"
+        android:layout_below="@id/imagen_preview"
+        android:layout_marginTop="16dp"
+        android:hint="Nombre del Médico" />
 
     <!-- Correo del médico -->
     <EditText
-        android:id="@+id/correoMedico"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/nombreMedico"
-        android:hint="Correo del Médico"
+        android:id="@+id/correoMedico"
+        android:layout_below="@id/nombreMedico"
         android:layout_marginTop="16dp"
-        android:inputType="textEmailAddress"/>
+        android:hint="Correo del Médico"
+        android:inputType="textEmailAddress" />
 
     <!-- Contraseña -->
     <EditText
-        android:id="@+id/contrasenaMedico"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/correoMedico"
-        android:hint="Contraseña"
+        android:id="@+id/contrasenaMedico"
+        android:layout_below="@id/correoMedico"
         android:layout_marginTop="16dp"
-        android:inputType="textPassword"/>
+        android:hint="Contraseña"
+        android:inputType="textPassword" />
 
     <!-- Teléfono -->
     <EditText
-        android:id="@+id/telefonoMedico"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:id="@+id/telefonoMedico"
+        android:layout_below="@id/contrasenaMedico"
         android:layout_marginTop="16dp"
-        android:layout_below="@+id/contrasenaMedico"
-        android:hint="Teléfono del Médico" />
+        android:hint="Teléfono del Médico"
+        android:inputType="phone" />
 
     <!-- Spinner de especialización -->
     <Spinner
-        android:id="@+id/spinner_especializacion"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/telefonoMedico"
+        android:id="@+id/spinner_especializacion"
+        android:layout_below="@id/telefonoMedico"
+        android:layout_marginTop="16dp" />
+
+    <!-- Botón para consultar cédula -->
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/btn_ConsultarCedula"
+        android:layout_below="@id/spinner_especializacion"
         android:layout_marginTop="16dp"
-        android:hint="Selecciona Especialización"/>
+        android:text="Agregar nuevo servicio" />
 
     <!-- Botón para registrar médico -->
     <Button
-        android:id="@+id/btn_registrarMedico"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/spinner_especializacion"
-        android:text="Registrar Médico"
-        android:layout_marginTop="16dp"/>
+        android:id="@+id/btn_registrarMedico"
+        android:layout_below="@id/btn_ConsultarCedula"
+        android:layout_marginTop="16dp"
+        android:text="Registrar Médico" />
 
     <!-- Botón para cerrar sesión -->
     <Button
-        android:id="@+id/btn_cerrarS"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/btn_registrarMedico"
-        android:text="Cerrar sesión"
-        android:layout_marginTop="16dp"/>
+        android:id="@+id/btn_cerrarS"
+        android:layout_below="@id/btn_registrarMedico"
+        android:layout_marginTop="16dp"
+        android:text="Cerrar sesión" />
 
 </RelativeLayout>

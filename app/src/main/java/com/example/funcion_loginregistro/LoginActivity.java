@@ -34,6 +34,7 @@ public class LoginActivity extends AppCompatActivity {
     EditText correo, contrasena;
     Button btn_loguear, btn_registrar, btn_loguin_google;
     FirebaseAuth mAuth;
+    FirebaseFirestore mFirestore;
     private static final int RC_SIGN_IN = 9001; // Código de solicitud para Google Sign-In
     private GoogleSignInClient googleSignInClient;
 
@@ -43,6 +44,7 @@ public class LoginActivity extends AppCompatActivity {
         setContentView(R.layout.activity_login);
         FirebaseApp.initializeApp(this);
         mAuth = FirebaseAuth.getInstance();
+        mFirestore = FirebaseFirestore.getInstance();
 
         // Inicialización de Google Sign-In
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
@@ -60,13 +62,14 @@ public class LoginActivity extends AppCompatActivity {
         btn_loguear.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                String correoUser = correo.getText().toString().trim();
+                String usuarioInput = correo.getText().toString().trim();
                 String contraUser = contrasena.getText().toString().trim();
 
-                if (correoUser.isEmpty() || contraUser.isEmpty()) {
+                if (usuarioInput.isEmpty() || contraUser.isEmpty()) {
                     Toast.makeText(LoginActivity.this, "Ingrese todos los datos", Toast.LENGTH_SHORT).show();
                 } else {
-                    loginUser(correoUser, contraUser);
+                    // Llamada a loginUser si los campos no están vacíos
+                    loginUser(usuarioInput, contraUser);
                 }
             }
         });
@@ -100,13 +103,13 @@ public class LoginActivity extends AppCompatActivity {
                         checkUserRole(user.getUid()); // Verificar el rol
                     }
                 } else {
-                    Toast.makeText(LoginActivity.this, "Error al iniciar sesión 1", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(LoginActivity.this, "Error al iniciar sesión", Toast.LENGTH_SHORT).show();
                 }
             }
         }).addOnFailureListener(new OnFailureListener() {
             @Override
             public void onFailure(@NonNull Exception e) {
-                Toast.makeText(LoginActivity.this, "Error al iniciar sesión 2", Toast.LENGTH_SHORT).show();
+                Toast.makeText(LoginActivity.this, "Error al iniciar sesión", Toast.LENGTH_SHORT).show();
             }
         });
     }
