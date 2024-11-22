@@ -9,12 +9,8 @@ import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.TextView;
 
-import androidx.activity.EdgeToEdge;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
@@ -31,7 +27,8 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthUserCollisionException;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -39,15 +36,13 @@ import org.json.JSONObject;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Random;
-import java.util.UUID;
 
 public class registro extends AppCompatActivity {
 
     EditText nombre, correo, contrasena;
     Button btnRegistro;
-    FirebaseFirestore mFirestore;
     FirebaseAuth mAuth;
+    DatabaseReference databaseReference;
     RequestQueue requestQueue;
     TextView textIniciaSesion, textTerminosCondiciones;
     CheckBox checkBox;
@@ -56,8 +51,8 @@ public class registro extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_registro);
-        mFirestore = FirebaseFirestore.getInstance();
         mAuth = FirebaseAuth.getInstance();
+        databaseReference = FirebaseDatabase.getInstance().getReference();
 
         requestQueue = Volley.newRequestQueue(this);
 
@@ -77,25 +72,21 @@ public class registro extends AppCompatActivity {
                 String correoUser = correo.getText().toString().trim();
                 String contraUser = contrasena.getText().toString().trim();
 
-                // Validación de campos vacíos
                 if (nombreUser.isEmpty() || correoUser.isEmpty() || contraUser.isEmpty()) {
                     Snackbar.make(view, "Introduzca correctamente los datos", Snackbar.LENGTH_SHORT).show();
-                    return; // Detener el proceso si algún campo está vacío
+                    return;
                 }
 
-                // Validar que la contraseña tenga al menos 8 caracteres
                 if (contraUser.length() < 8) {
                     Snackbar.make(view, "La contraseña debe tener al menos 8 caracteres.", Snackbar.LENGTH_SHORT).show();
-                    return; // Detener el proceso de registro
+                    return;
                 }
 
-                // Verificación del CheckBox
                 if (!checkBox.isChecked()) {
                     Snackbar.make(view, "Debe aceptar los términos y condiciones.", Snackbar.LENGTH_SHORT).show();
-                    return; // Detener el proceso si no está marcado
+                    return;
                 }
 
-                // Verificar malas palabras usando la lista manual
                 if (containsBadWords(nombreUser)) {
                     Snackbar.make(view, "El nombre de usuario contiene palabras inapropiadas.", Snackbar.LENGTH_SHORT).show();
                     return;
@@ -111,11 +102,10 @@ public class registro extends AppCompatActivity {
                             JSONObject data = response.getJSONObject("data");
                             String estado = data.getString("status");
 
-                            // Verificar si el correo es 'valid' o 'webmail' (esto indica que es válido)
                             if (estado.equals("valid") || estado.equals("webmail")) {
-                                registerUser(nombreUser, correoUser, contraUser, view); // Registro si es válido
+                                registerUser(nombreUser, correoUser, contraUser, view);
                             } else {
-                                Snackbar.make(view, "El correo no existe o no es valido.", Snackbar.LENGTH_SHORT).show();
+                                Snackbar.make(view, "El correo no existe o no es válido.", Snackbar.LENGTH_SHORT).show();
                             }
                         } catch (JSONException e) {
                             Snackbar.make(view, "Error al verificar el correo.", Snackbar.LENGTH_SHORT).show();
@@ -149,9 +139,7 @@ public class registro extends AppCompatActivity {
         });
     }
 
-    // Método para verificar malas palabras usando una lista manual
     private boolean containsBadWords(String input) {
-        // Lista de malas palabras en español e inglés
         String[] palabrasBan = {
                 "mierda", "cabrón", "pendejo", "puto", "puta", "imbécil", "idiota",
                 "tarado", "estúpido", "culo", "tetas", "verga", "pito", "pene",
@@ -168,82 +156,55 @@ public class registro extends AppCompatActivity {
                 return true;
             }
         }
-        return false; // Si no contiene ninguna mala palabra
+        return false;
     }
 
-    // Método de registro de usuario en Firebase
     private void registerUser(String nombreUser, String correoUser, String contraUser, View view) {
-        // Validar la contraseña primero
         String passwordValidationMessage = validatePassword(contraUser);
         if (!passwordValidationMessage.isEmpty()) {
             Snackbar.make(view, passwordValidationMessage, Snackbar.LENGTH_SHORT).show();
-            return; // Salir si la contraseña no cumple los requisitos
+            return;
         }
 
-        // Registrar el usuario con Firebase Authentication
         mAuth.createUserWithEmailAndPassword(correoUser, contraUser)
                 .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if (task.isSuccessful()) {
-                            // Registro exitoso
                             FirebaseUser user = mAuth.getCurrentUser();
                             if (user != null) {
-                                // Enviar correo de verificación
                                 sendVerificationEmail(user, view);
-
-                                // Guardar en Firestore
-                                saveUserToFirestore(user.getUid(), nombreUser, correoUser, view);
+                                saveUserToRealtimeDB(user.getUid(), nombreUser, correoUser, view);
                             }
                         } else {
-                            // Capturar y manejar el error de colisión de correo (Correo ya registrado)
                             Exception exception = task.getException();
-                            if (exception != null) {
-                                if (exception instanceof FirebaseAuthUserCollisionException) {
-                                    Snackbar.make(view, "Este correo ya está registrado. Intenta con otro o recupéralo.", Snackbar.LENGTH_SHORT).show();
-                                } else {
-                                    Snackbar.make(view, "Error al registrar: Correo ya registrado ", Snackbar.LENGTH_SHORT).show();
-                                }
+                            if (exception instanceof FirebaseAuthUserCollisionException) {
+                                Snackbar.make(view, "Este correo ya está registrado.", Snackbar.LENGTH_SHORT).show();
                             } else {
-                                Snackbar.make(view, "Error desconocido al registrar.", Snackbar.LENGTH_SHORT).show();
+                                Snackbar.make(view, "Error al registrar: Correo ya registrado ", Snackbar.LENGTH_SHORT).show();
                             }
                         }
                     }
                 })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        // Capturar fallos generales
-                        Snackbar.make(view, "Error al registrar: Error general" , Snackbar.LENGTH_SHORT).show();
-                    }
-                });
+                .addOnFailureListener(e -> Snackbar.make(view, "Error al registrar: " + e.getMessage(), Snackbar.LENGTH_SHORT).show());
     }
 
-    // Método para enviar correo de verificación
     private void sendVerificationEmail(FirebaseUser user, View view) {
         user.sendEmailVerification()
-                .addOnCompleteListener(new OnCompleteListener<Void>() {
-                    @Override
-                    public void onComplete(@NonNull Task<Void> task) {
-                        if (task.isSuccessful()) {
-                            Snackbar.make(view, "Registro exitoso. Verifica tu correo para activar la cuenta.", Snackbar.LENGTH_SHORT).show();
-                        } else {
-                            Snackbar.make(view, "Error al enviar el correo de verificación.", Snackbar.LENGTH_SHORT).show();
-                        }
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        Snackbar.make(view, "Registro exitoso. Verifica tu correo para activar la cuenta.", Snackbar.LENGTH_SHORT).show();
+                    } else {
+                        Snackbar.make(view, "Error al enviar el correo de verificación.", Snackbar.LENGTH_SHORT).show();
                     }
                 });
     }
 
-    // Método para guardar al usuario en Firestore
-    private void saveUserToFirestore(String userId, String nombreUser, String correoUser, View view) {
-        FirebaseFirestore mFirestore = FirebaseFirestore.getInstance();
-
-        // Crear número de cuenta
+    private void saveUserToRealtimeDB(String userId, String nombreUser, String correoUser, View view) {
         int year = Calendar.getInstance().get(Calendar.YEAR);
         int randomNum = (int) (Math.random() * 9000) + 1000;
         String numeroCuenta = year + String.valueOf(randomNum);
 
-        // Crear el mapa de datos del usuario
         Map<String, Object> userMap = new HashMap<>();
         userMap.put("id", userId);
         userMap.put("nombre", nombreUser);
@@ -251,24 +212,14 @@ public class registro extends AppCompatActivity {
         userMap.put("rol", "usuario");
         userMap.put("numeroCuenta", numeroCuenta);
 
-        mFirestore.collection("user").document(userId).set(userMap)
-                .addOnSuccessListener(new OnSuccessListener<Void>() {
-                    @Override
-                    public void onSuccess(Void aVoid) {
-                        Snackbar.make(view, "Usuario registrado correctamente.", Snackbar.LENGTH_SHORT).show();
-                        // Redirige a la pantalla de login
-                        startActivity(new Intent(registro.this, login.class));
-                    }
+        databaseReference.child("users").child(userId).setValue(userMap)
+                .addOnSuccessListener(aVoid -> {
+                    Snackbar.make(view, "Usuario registrado correctamente.", Snackbar.LENGTH_SHORT).show();
+                    startActivity(new Intent(registro.this, login.class));
                 })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        Snackbar.make(view, "Error al guardar los datos en Firestore: " + e.getMessage(), Snackbar.LENGTH_SHORT).show();
-                    }
-                });
+                .addOnFailureListener(e -> Snackbar.make(view, "Error al guardar los datos en Realtime Database: " + e.getMessage(), Snackbar.LENGTH_SHORT).show());
     }
 
-    // Método para validar la contraseña
     private String validatePassword(String password) {
         if (password.length() < 6) {
             return "La contraseña debe tener al menos 6 caracteres.";
@@ -282,6 +233,6 @@ public class registro extends AppCompatActivity {
         if (!password.matches(".*\\d.*")) {
             return "La contraseña debe contener al menos un número.";
         }
-        return ""; // Si pasa todas las validaciones
+        return "";
     }
 }

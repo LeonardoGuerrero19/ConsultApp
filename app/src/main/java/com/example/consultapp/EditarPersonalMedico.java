@@ -8,14 +8,22 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.ValueEventListener;
+
+import java.util.Arrays;
+import java.util.List;
 
 public class EditarPersonalMedico extends AppCompatActivity {
 
     private TextView nombre;
     private EditText especializacion, telefono;
-    private Button horario, btn_guardar;
+    private Button btn_guardar, horario;
     private String medicoId;
+    private DatabaseReference databaseReference;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,20 +40,11 @@ public class EditarPersonalMedico extends AppCompatActivity {
         horario = findViewById(R.id.editHorario);
         btn_guardar = findViewById(R.id.btnGuardarCambios);
 
-        // Cargar los datos del médico desde la base de datos
-        FirebaseFirestore db = FirebaseFirestore.getInstance();
-        db.collection("user").document(medicoId).get()
-                .addOnSuccessListener(documentSnapshot -> {
-                    if (documentSnapshot.exists()) {
-                        Medico medico = documentSnapshot.toObject(Medico.class);
-                        if (medico != null) {
-                            nombre.setText(medico.getNombre());
-                            especializacion.setText(medico.getEspecializacion());
-                            telefono.setText(medico.getTelefono());
-                            horario.setText(medico.getHorario());
-                        }
-                    }
-                });
+        // Inicializar la referencia de la base de datos
+        databaseReference = FirebaseDatabase.getInstance().getReference();
+
+        // Cargar los datos del médico desde Realtime Database
+        cargarDatosMedico();
 
         // Acción para guardar los cambios
         btn_guardar.setOnClickListener(view -> {
@@ -59,20 +58,55 @@ public class EditarPersonalMedico extends AppCompatActivity {
                 return;
             }
 
-            // Actualizar los datos en Firestore
-            db.collection("user").document(medicoId)
-                    .update(
-                            "especializacion", nuevaEspecializacion,
-                            "telefono", nuevoTelefono,
-                            "horario", nuevoHorario
-                    )
-                    .addOnSuccessListener(aVoid -> {
-                        Toast.makeText(EditarPersonalMedico.this, "Datos actualizados correctamente", Toast.LENGTH_SHORT).show();
-                        finish();  // Cerrar la actividad después de guardar los cambios
-                    })
-                    .addOnFailureListener(e -> {
-                        Toast.makeText(EditarPersonalMedico.this, "Error al actualizar los datos", Toast.LENGTH_SHORT).show();
-                    });
+            // Actualizar los datos en Realtime Database
+            actualizarDatosMedico(nuevaEspecializacion, nuevoTelefono, Arrays.asList(nuevoHorario.split(",")));
         });
+    }
+
+    private void cargarDatosMedico() {
+        databaseReference.child("users").child(medicoId).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot snapshot) {
+                if (snapshot.exists()) {
+                    Medico medico = snapshot.getValue(Medico.class);
+                    if (medico != null) {
+                        nombre.setText(medico.getNombre());
+                        especializacion.setText(medico.getEspecializacion());
+                        telefono.setText(medico.getTelefono());
+                        horario.setText(medico.getHorarios() != null ? String.join(", ", medico.getHorarios()) : "");
+                    }
+                } else {
+                    Toast.makeText(EditarPersonalMedico.this, "Médico no encontrado", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError error) {
+                Toast.makeText(EditarPersonalMedico.this, "Error al cargar los datos", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private void actualizarDatosMedico(String nuevaEspecializacion, String nuevoTelefono, List<String> nuevoHorario) {
+        // Crear un mapa con los datos actualizados
+        Medico medicoActualizado = new Medico(
+                nombre.getText().toString(),
+                nuevaEspecializacion,
+                nuevoTelefono,
+                nuevoHorario
+        );
+
+        // Actualizar en ambas ramas: "users" y "Medicos"
+        DatabaseReference usersRef = databaseReference.child("users").child(medicoId);
+        DatabaseReference medicosRef = databaseReference.child("Medicos").child(medicoId);
+
+        usersRef.setValue(medicoActualizado)
+                .addOnSuccessListener(aVoid -> medicosRef.setValue(medicoActualizado)
+                        .addOnSuccessListener(aVoid1 -> {
+                            Toast.makeText(EditarPersonalMedico.this, "Datos actualizados correctamente en ambas ramas", Toast.LENGTH_SHORT).show();
+                            finish(); // Cerrar la actividad después de guardar los cambios
+                        })
+                        .addOnFailureListener(e -> Toast.makeText(EditarPersonalMedico.this, "Error al actualizar en la rama Medicos", Toast.LENGTH_SHORT).show()))
+                .addOnFailureListener(e -> Toast.makeText(EditarPersonalMedico.this, "Error al actualizar en la rama users", Toast.LENGTH_SHORT).show());
     }
 }

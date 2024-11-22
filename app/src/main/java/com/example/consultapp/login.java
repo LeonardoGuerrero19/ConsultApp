@@ -11,31 +11,31 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.google.android.gms.tasks.Task;
-import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.DocumentSnapshot;
-
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.auth.AuthResult;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.AuthResult;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 public class login extends AppCompatActivity {
 
     private EditText correo, contrasena;
     private Button btnIniciarSesion;
     private TextView txtRegistrate;
-    private FirebaseFirestore db;
     private FirebaseAuth auth;
+    private DatabaseReference databaseReference;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
-        auth = FirebaseAuth.getInstance(); // Para autenticación
-        db = FirebaseFirestore.getInstance(); // Para base de datos
+        auth = FirebaseAuth.getInstance();
+        databaseReference = FirebaseDatabase.getInstance().getReference();
 
         correo = findViewById(R.id.correo);
         contrasena = findViewById(R.id.contrasena);
@@ -56,80 +56,46 @@ public class login extends AppCompatActivity {
             }
         });
 
-        // Evento de clic para registrar
-        txtRegistrate.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startActivity(new Intent(login.this, registro.class));
-            }
-        });
+        txtRegistrate.setOnClickListener(v -> startActivity(new Intent(login.this, registro.class)));
     }
 
     private void loginUser(String correoUser, String contraUser) {
-        auth.signInWithEmailAndPassword(correoUser, contraUser).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
-            @Override
-            public void onComplete(@NonNull Task<AuthResult> task) {
-                if (task.isSuccessful()) {
-                    FirebaseUser user = auth.getCurrentUser();
-                    if (user != null && !user.isEmailVerified()) { // Verificar si el correo está verificado
-                        auth.signOut();
-                        Toast.makeText(login.this, "Por favor, verifica tu correo electrónico.", Toast.LENGTH_SHORT).show();
-                    } else {
-                        checkUserRole(user.getUid()); // Verificar el rol
-                    }
+        auth.signInWithEmailAndPassword(correoUser, contraUser).addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                FirebaseUser user = auth.getCurrentUser();
+                if (user != null && !user.isEmailVerified()) {
+                    auth.signOut();
+                    Toast.makeText(login.this, "Por favor, verifica tu correo electrónico.", Toast.LENGTH_SHORT).show();
                 } else {
-                    Toast.makeText(login.this, "Error al iniciar sesión 1", Toast.LENGTH_SHORT).show();
+                    checkUserRole(user.getUid());
                 }
+            } else {
+                Toast.makeText(login.this, "Error al iniciar sesión", Toast.LENGTH_SHORT).show();
             }
-        }).addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception e) {
-                Toast.makeText(login.this, "Error al iniciar sesión 2", Toast.LENGTH_SHORT).show();
-            }
-        });
+        }).addOnFailureListener(e -> Toast.makeText(login.this, "Error de autenticación", Toast.LENGTH_SHORT).show());
     }
 
     private void checkUserRole(String uid) {
-        FirebaseFirestore db = FirebaseFirestore.getInstance();
-
-        // Buscar primero en la colección "user"
-        db.collection("user").document(uid).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-            @Override
-            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                if (task.isSuccessful()) {
-                    DocumentSnapshot document = task.getResult();
-                    if (document.exists()) {
-                        // Usuario encontrado en "user"
-                        redirigirPorRol(document);
-                    } else {
-                        // Intentar buscar en la colección "medicos"
-                        db.collection("medicos").document(uid).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-                            @Override
-                            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                                if (task.isSuccessful()) {
-                                    DocumentSnapshot document = task.getResult();
-                                    if (document.exists()) {
-                                        // Usuario encontrado en "medicos"
-                                        redirigirPorRol(document);
-                                    } else {
-                                        Toast.makeText(login.this, "Usuario no encontrado", Toast.LENGTH_SHORT).show();
-                                    }
-                                } else {
-                                    Toast.makeText(login.this, "Error al buscar en 'medicos'", Toast.LENGTH_SHORT).show();
-                                }
-                            }
-                        });
-                    }
+        databaseReference.child("users").child(uid).get().addOnCompleteListener(task -> {
+            if (task.isSuccessful() && task.getResult().exists()) {
+                DataSnapshot snapshot = task.getResult();
+                String rol = snapshot.child("rol").getValue(String.class); // Extrae el valor correctamente
+                if (rol != null) {
+                    redirigirPorRol(rol); // Pasa el rol como String
                 } else {
-                    Toast.makeText(login.this, "Error al buscar en 'user'", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(login.this, "El rol del usuario no está definido.", Toast.LENGTH_SHORT).show();
                 }
+            } else {
+                Toast.makeText(login.this, "Usuario no encontrado en 'users'", Toast.LENGTH_SHORT).show();
             }
+        }).addOnFailureListener(e -> {
+            Toast.makeText(login.this, "Error al verificar usuario", Toast.LENGTH_SHORT).show();
         });
     }
 
-    // Método para redirigir basado en el rol
-    private void redirigirPorRol(DocumentSnapshot document) {
-        String rol = document.getString("rol");
+
+
+    private void redirigirPorRol(String rol) {
         if ("administrador".equals(rol)) {
             // Redirigir a AdminActivity
             Intent intent = new Intent(login.this, AdminActivity.class);
@@ -154,7 +120,6 @@ public class login extends AppCompatActivity {
         super.onStart();
         FirebaseUser user = auth.getCurrentUser();
         if (user != null) {
-            // Si el usuario esta logueado verificar y redirigir dependiendo su rol.
             checkUserRole(user.getUid());
         }
     }

@@ -37,6 +37,9 @@ android {
 }
 
 dependencies {
+
+    implementation("com.google.firebase:firebase-database:20.3.0")
+    implementation("com.google.firebase:firebase-auth:22.1.1")
     implementation("com.android.volley:volley:1.2.1")
     implementation("com.google.android.gms:play-services-auth:20.5.0") // Para la autenticación de Google
     implementation("com.google.firebase:firebase-analytics")

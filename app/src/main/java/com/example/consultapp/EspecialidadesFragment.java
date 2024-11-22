@@ -4,6 +4,8 @@ import android.app.Dialog;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
+import androidx.annotation.NonNull;
+
 
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.GridLayoutManager;
@@ -21,26 +23,34 @@ import android.widget.Toast;
 
 import com.example.consultapp.databinding.FragmentEspecialidadesBinding;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.google.firebase.firestore.FieldValue;
-import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class EspecialidadesFragment extends Fragment {
 
     private EditText agregarServicioEditText;
     private Button agregarServicioButton;
     private RecyclerView recyclerViewServicios;
-    private FragmentEspecialidadesBinding binding;  // Binding para acceder a las vistas
+    private FragmentEspecialidadesBinding binding; // Binding para acceder a las vistas
     private ServicioAdapter servicioAdapter;
-    private List<String> listaServicios = new ArrayList<>();  // Lista para almacenar los nombres de los servicios
+    private List<String> listaServicios = new ArrayList<>(); // Lista para almacenar los nombres de los servicios
+    private DatabaseReference databaseReference;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         // Inicializa el binding
         binding = FragmentEspecialidadesBinding.inflate(inflater, container, false);
+
+        // Inicializar la referencia de la base de datos
+        databaseReference = FirebaseDatabase.getInstance().getReference();
 
         // Configura el RecyclerView y el adaptador
         recyclerViewServicios = binding.recyclerViewServicios;
@@ -48,7 +58,7 @@ public class EspecialidadesFragment extends Fragment {
         servicioAdapter = new ServicioAdapter(listaServicios);
         recyclerViewServicios.setAdapter(servicioAdapter);
 
-        // Cargar los servicios existentes desde Firestore
+        // Cargar los servicios existentes desde Realtime Database
         cargarServicios();
 
         // Configura el FloatingActionButton y su clic
@@ -60,28 +70,27 @@ public class EspecialidadesFragment extends Fragment {
     }
 
     private void cargarServicios() {
-        FirebaseFirestore.getInstance().collection("Servicios")
-                .document("Todos los servicios")
-                .get()
-                .addOnSuccessListener(documentSnapshot -> {
-                    Object serviciosObject = documentSnapshot.get("Servicios");
+        // Obtener la lista de servicios desde Realtime Database
+        databaseReference.child("Servicios").child("TodosLosServicios").addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                listaServicios.clear(); // Limpiar la lista antes de cargar nuevos datos
 
-                    // Validar que el campo 'Servicios' sea una lista
-                    if (serviciosObject instanceof List) {
-                        List<String> nombresServicios = (List<String>) serviciosObject;
-
-                        if (nombresServicios != null) {
-                            listaServicios.clear();  // Limpiar la lista antes de cargar nuevos datos
-                            listaServicios.addAll(nombresServicios);
-                            servicioAdapter.notifyDataSetChanged();  // Notificar al adaptador para que actualice el RecyclerView
-                        }
-                    } else {
-                        Toast.makeText(getContext(), "Error: El campo 'Servicios' no es una lista válida", Toast.LENGTH_SHORT).show();
+                for (DataSnapshot servicioSnapshot : snapshot.getChildren()) {
+                    String servicioNombre = servicioSnapshot.getValue(String.class);
+                    if (servicioNombre != null) {
+                        listaServicios.add(servicioNombre);
                     }
-                })
-                .addOnFailureListener(e -> {
-                    Toast.makeText(getContext(), "Error al cargar servicios", Toast.LENGTH_SHORT).show();
-                });
+                }
+
+                servicioAdapter.notifyDataSetChanged(); // Notificar al adaptador para que actualice el RecyclerView
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                Toast.makeText(getContext(), "Error al cargar servicios", Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     private void showBottomDialog() {
@@ -100,7 +109,7 @@ public class EspecialidadesFragment extends Fragment {
             String servicioNombre = editarServicioModal.getText().toString().trim();
             String descripcion = descripcionServicioModal.getText().toString().trim(); // Obtener la descripción
             agregarServicioDesdeModal(servicioNombre, descripcion);
-            dialog.dismiss();  // Cerrar el modal después de agregar
+            dialog.dismiss(); // Cerrar el modal después de agregar
         });
 
         dialog.show();
@@ -121,18 +130,15 @@ public class EspecialidadesFragment extends Fragment {
             return;
         }
 
-        // Agregar el servicio al documento "Todos los servicios" (para mantener la lista completa)
-        FirebaseFirestore.getInstance().collection("Servicios")
-                .document("Todos los servicios")
-                .update("Servicios", FieldValue.arrayUnion(servicioNombre))
+        // Agregar el servicio a la lista "TodosLosServicios"
+        databaseReference.child("Servicios").child("TodosLosServicios").child(servicioNombre).setValue(servicioNombre)
                 .addOnSuccessListener(aVoid -> {
-                    // Después de actualizar la lista, crear un documento separado para el servicio
-                    FirebaseFirestore.getInstance().collection("Servicios")
-                            .document(servicioNombre) // Nombre del servicio como ID del documento individual
-                            .set(new HashMap<String, Object>() {{
-                                put("nombre", servicioNombre); // Campo nombre
-                                put("descripcion", descripcion); // Campo descripción
-                            }})
+                    // Crear un nodo separado para el servicio con su descripción
+                    Map<String, Object> servicioMap = new HashMap<>();
+                    servicioMap.put("nombre", servicioNombre);
+                    servicioMap.put("descripcion", descripcion);
+
+                    databaseReference.child("Servicios").child("DetalleServicios").child(servicioNombre).setValue(servicioMap)
                             .addOnSuccessListener(aVoid1 -> {
                                 cargarServicios(); // Refrescar la lista completa
                                 Toast.makeText(getContext(), "Servicio agregado", Toast.LENGTH_SHORT).show();
@@ -145,7 +151,6 @@ public class EspecialidadesFragment extends Fragment {
                     Toast.makeText(getContext(), "Error al agregar servicio a la lista", Toast.LENGTH_SHORT).show();
                 });
     }
-
 
     @Override
     public void onDestroyView() {

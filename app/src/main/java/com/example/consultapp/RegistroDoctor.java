@@ -15,14 +15,15 @@ import android.widget.Spinner;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -33,7 +34,7 @@ public class RegistroDoctor extends AppCompatActivity {
     private Spinner spinnerEspecializacion;
     private Button horarioButton, btnRegistrarMedico;
     private FirebaseAuth mAuth;
-    private FirebaseFirestore db;
+    private DatabaseReference databaseReference;
     private List<String> horarioSeleccionado;
 
     @Override
@@ -41,9 +42,9 @@ public class RegistroDoctor extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_registro_doctor);
 
-        // Inicializar FirebaseAuth y Firestore
+        // Inicializar FirebaseAuth y Realtime Database
         mAuth = FirebaseAuth.getInstance();
-        db = FirebaseFirestore.getInstance();
+        databaseReference = FirebaseDatabase.getInstance().getReference();
 
         // Referencias a los elementos en el layout
         etNombreMedico = findViewById(R.id.nombreMedico);
@@ -57,8 +58,8 @@ public class RegistroDoctor extends AppCompatActivity {
         // Listener para mostrar el diálogo para seleccionar el horario
         horarioButton.setOnClickListener(v -> showBottomDialog());
 
-        // Cargar especializaciones desde Firestore
-        cargarEspecializacionesDesdeFirestore();
+        // Cargar especializaciones desde Realtime Database
+        cargarEspecializacionesDesdeRealtime();
 
         // Registrar médico
         btnRegistrarMedico.setOnClickListener(v -> {
@@ -86,30 +87,25 @@ public class RegistroDoctor extends AppCompatActivity {
         TimePicker timePickerFin = dialog.findViewById(R.id.timePickerFin);
 
         // Acción para actualizar el horario cuando el usuario cierre el diálogo
-        Button btnAceptar = dialog.findViewById(R.id.btnAceptar); // Asumiendo que tienes un botón para aceptar el horario
+        Button btnAceptar = dialog.findViewById(R.id.btnAceptar);
         btnAceptar.setOnClickListener(v -> {
-            // Obtener los valores de los TimePicker
             int horaInicio = timePickerInicio.getHour();
             int minutoInicio = timePickerInicio.getMinute();
             int horaFin = timePickerFin.getHour();
             int minutoFin = timePickerFin.getMinute();
 
-            // Generar la lista de horarios
             List<String> horarios = generarHorarios(horaInicio, minutoInicio, horaFin, minutoFin);
 
-            // Verifica que la lista no esté vacía
             if (horarios.isEmpty()) {
                 Toast.makeText(this, "El rango de horario no es válido.", Toast.LENGTH_SHORT).show();
                 return;
             }
 
-            horarioSeleccionado = generarHorarios(horaInicio, minutoInicio, horaFin, minutoFin);
+            horarioSeleccionado = horarios;
 
             // Actualizar el texto del botón para mostrar el rango
             horarioButton.setText(String.format("%02d:%02d - %02d:%02d", horaInicio, minutoInicio, horaFin, minutoFin));
 
-
-            // Cerrar el diálogo
             dialog.dismiss();
         });
         dialog.show();
@@ -119,23 +115,27 @@ public class RegistroDoctor extends AppCompatActivity {
         dialog.getWindow().setGravity(Gravity.BOTTOM);
     }
 
-    private void cargarEspecializacionesDesdeFirestore() {
-        db.collection("Servicios").document("Todos los servicios")
-                .get()
-                .addOnCompleteListener(task -> {
-                    if (task.isSuccessful()) {
-                        List<String> especializaciones = (List<String>) task.getResult().get("Servicios");
-                        if (especializaciones != null) {
-                            ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, especializaciones);
-                            adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-                            spinnerEspecializacion.setAdapter(adapter);
-                        } else {
-                            Toast.makeText(RegistroDoctor.this, "No se encontraron especializaciones", Toast.LENGTH_SHORT).show();
-                        }
-                    } else {
-                        Toast.makeText(RegistroDoctor.this, "Error al cargar especializaciones", Toast.LENGTH_SHORT).show();
+    private void cargarEspecializacionesDesdeRealtime() {
+        databaseReference.child("Servicios").child("TodosLosServicios").addListenerForSingleValueEvent(new com.google.firebase.database.ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull com.google.firebase.database.DataSnapshot snapshot) {
+                List<String> especializaciones = new ArrayList<>();
+                for (com.google.firebase.database.DataSnapshot especialidadSnapshot : snapshot.getChildren()) {
+                    String especializacion = especialidadSnapshot.getValue(String.class);
+                    if (especializacion != null) {
+                        especializaciones.add(especializacion);
                     }
-                });
+                }
+                ArrayAdapter<String> adapter = new ArrayAdapter<>(RegistroDoctor.this, android.R.layout.simple_spinner_item, especializaciones);
+                adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                spinnerEspecializacion.setAdapter(adapter);
+            }
+
+            @Override
+            public void onCancelled(@NonNull com.google.firebase.database.DatabaseError error) {
+                Toast.makeText(RegistroDoctor.this, "Error al cargar especializaciones", Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     private void registrarMedico(String nombre, String especializacion, String correo, String contrasena, String telefono, List<String> horarios) {
@@ -143,7 +143,7 @@ public class RegistroDoctor extends AppCompatActivity {
             if (task.isSuccessful()) {
                 String uid = mAuth.getCurrentUser().getUid();
 
-                // Crear mapa de datos para Firestore
+                // Crear mapa de datos para Realtime Database
                 Map<String, Object> medico = new HashMap<>();
                 medico.put("id", uid);
                 medico.put("nombre", nombre);
@@ -151,15 +151,19 @@ public class RegistroDoctor extends AppCompatActivity {
                 medico.put("correo", correo);
                 medico.put("telefono", telefono);
                 medico.put("rol", "medico");
-                medico.put("horarios", horarios); // Guardar el ArrayList de horarios
+                medico.put("horarios", horarios);
 
-                // Guardar datos en Firestore
-                db.collection("medicos").document(uid).set(medico).addOnSuccessListener(aVoid -> {
-                    enviarCorreoVerificacion();
-                    Toast.makeText(RegistroDoctor.this, "Médico registrado con éxito", Toast.LENGTH_SHORT).show();
-                }).addOnFailureListener(e -> {
-                    Toast.makeText(RegistroDoctor.this, "Error al registrar médico", Toast.LENGTH_SHORT).show();
-                });
+                // Guardar datos en la rama "users"
+                databaseReference.child("users").child(uid).setValue(medico);
+
+                // Guardar datos en la rama "Medicos"
+                databaseReference.child("Medicos").child(uid).setValue(medico)
+                        .addOnSuccessListener(aVoid -> {
+                            enviarCorreoVerificacion();
+                            Toast.makeText(RegistroDoctor.this, "Médico registrado con éxito", Toast.LENGTH_SHORT).show();
+                            finish();
+                        })
+                        .addOnFailureListener(e -> Toast.makeText(RegistroDoctor.this, "Error al registrar médico", Toast.LENGTH_SHORT).show());
             } else {
                 Toast.makeText(RegistroDoctor.this, "Error en el registro", Toast.LENGTH_SHORT).show();
             }
@@ -182,21 +186,17 @@ public class RegistroDoctor extends AppCompatActivity {
     private List<String> generarHorarios(int horaInicio, int minutoInicio, int horaFin, int minutoFin) {
         List<String> horarios = new ArrayList<>();
 
-        // Convertir la hora inicial y final a minutos totales desde la medianoche
         int inicioEnMinutos = horaInicio * 60 + minutoInicio;
         int finEnMinutos = horaFin * 60 + minutoFin;
 
-        // Asegurarse de que el rango es válido
         if (inicioEnMinutos >= finEnMinutos) {
             return horarios; // Devuelve una lista vacía si el rango no es válido
         }
 
-        // Iterar desde el inicio hasta el final en intervalos de 30 minutos
         for (int tiempo = inicioEnMinutos; tiempo <= finEnMinutos; tiempo += 30) {
             int horas = tiempo / 60;
             int minutos = tiempo % 60;
 
-            // Formatear el tiempo en formato de 12 horas
             String periodo = (horas >= 12) ? "PM" : "AM";
             int horasFormato12 = (horas == 0 || horas == 12) ? 12 : horas % 12;
             horarios.add(String.format("%02d:%02d %s", horasFormato12, minutos, periodo));
