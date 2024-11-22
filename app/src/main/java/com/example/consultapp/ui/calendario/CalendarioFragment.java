@@ -16,6 +16,7 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.example.consultapp.AgendaActivity;
+import com.example.consultapp.FotoActivity;
 import com.example.consultapp.InformeMedicoActivity;
 import com.example.consultapp.PerfilDoc;
 import com.example.consultapp.R;
@@ -155,6 +156,15 @@ public class CalendarioFragment extends Fragment {
                         btnRealizada.setOnClickListener(v -> {
                             // Crear un intent para navegar al nuevo Activity
                             Intent intent = new Intent(getContext(), InformeMedicoActivity.class);
+
+                            // Pasar datos a través del intent
+                            intent.putExtra("usuarioId", usuarioId);  // ID del usuario asociado a la cita
+                            intent.putExtra("numeroCuenta", txtCuenta.getText().toString()); // Número de cuenta del paciente
+                            intent.putExtra("citaId", document.getId()); // ID único de la cita
+                            intent.putExtra("nombreDoctor", nombreDoctor); // Nombre del doctor
+                            intent.putExtra("nombre", txtNombre.getText().toString()); // Nombre del paciente
+
+
                             // Iniciar el nuevo Activity
                             startActivity(intent);
                         });

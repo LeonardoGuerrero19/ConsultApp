@@ -132,7 +132,7 @@ public class login extends AppCompatActivity {
         String rol = document.getString("rol");
         if ("administrador".equals(rol)) {
             // Redirigir a AdminActivity
-            Intent intent = new Intent(login.this, AdminActivity.class);
+            Intent intent = new Intent(login.this, AdministradorActivity.class);
             startActivity(intent);
             finish();
         } else if ("medico".equals(rol)) {

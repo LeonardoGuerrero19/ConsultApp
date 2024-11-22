@@ -11,7 +11,6 @@ import androidx.recyclerview.widget.RecyclerView;
 import java.util.List;
 
 public class CitasAdapter extends RecyclerView.Adapter<CitasAdapter.CitaViewHolder> {
-
     private List<Cita> citasList;
 
     public CitasAdapter(List<Cita> citasList) {
@@ -28,33 +27,25 @@ public class CitasAdapter extends RecyclerView.Adapter<CitasAdapter.CitaViewHold
     @Override
     public void onBindViewHolder(@NonNull CitaViewHolder holder, int position) {
         Cita cita = citasList.get(position);
-
-        // Extraer el día y el mes de la fecha
         String[] fechaPartes = cita.getFecha().split("/");
         if (fechaPartes.length == 3) {
             String dia = fechaPartes[0];
             String mes = getNombreMes(Integer.parseInt(fechaPartes[1]));
-
-            // Asignar valores a los TextView correspondientes
             holder.textDia.setText(dia);
             holder.textMes.setText(mes);
         }
-
-        // Otros datos
         holder.textServicio.setText(cita.getServicio());
         holder.textHorario.setText(cita.getHorario());
         holder.textDoctor.setText("Dr. " + cita.getDoctor());
     }
 
-    // Método para obtener el nombre del mes
     private String getNombreMes(int numeroMes) {
         String[] meses = {
                 "ENE", "FEB", "MAR", "ABR", "MAY", "JUN",
                 "JUL", "AGO", "SEPT", "OCT", "NOV", "DIC"
         };
-        return meses[numeroMes - 1]; // Restar 1 porque los meses empiezan en 0 en el array
+        return meses[numeroMes - 1];
     }
-
 
     @Override
     public int getItemCount() {

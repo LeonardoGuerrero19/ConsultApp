@@ -1,100 +1,119 @@
 package com.example.consultapp.ui.expedientes;
 
 import android.os.Bundle;
-
-import androidx.annotation.NonNull;
-import androidx.fragment.app.Fragment;
-
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.EditText;
-import android.widget.ImageButton;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
+
 import com.example.consultapp.R;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
-import com.google.firebase.firestore.CollectionReference;
-import com.google.firebase.firestore.DocumentSnapshot;
+import com.example.consultapp.databinding.FragmentExpedientesBinding;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.QuerySnapshot;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+
+import java.util.HashSet;
+import java.util.Set;
 
 public class ExpedientesFragment extends Fragment {
 
-    private EditText etNumeroCuenta;
-    private ImageButton btnBuscar;
-    private TextView tvNumeroCuenta, tvNombre;
+    private FragmentExpedientesBinding binding;
     private FirebaseFirestore db;
+    private FirebaseAuth mAuth;
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        // Inflar el diseño del fragmento
-        View view = inflater.inflate(R.layout.fragment_expedientes, container, false);
+    public View onCreateView(@NonNull LayoutInflater inflater,
+                             ViewGroup container, Bundle savedInstanceState) {
+        ExpedientesViewModel expedientesViewModel =
+                new ViewModelProvider(this).get(ExpedientesViewModel.class);
 
-        // Inicializar elementos de la interfaz
-        etNumeroCuenta = view.findViewById(R.id.etNumeroCuenta);
-        btnBuscar = view.findViewById(R.id.btnBuscar);
-        tvNumeroCuenta = view.findViewById(R.id.tvNumeroCuenta);
-        tvNombre = view.findViewById(R.id.tvNombre);
+        binding = FragmentExpedientesBinding.inflate(inflater, container, false);
+        View root = binding.getRoot();
 
-        // Inicializar Firestore
+        // Inicializar Firestore y Auth
         db = FirebaseFirestore.getInstance();
+        mAuth = FirebaseAuth.getInstance();
 
-        // Configurar botón de búsqueda
-        btnBuscar.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                buscarUsuario();
-            }
-        });
+        // Obtener referencia al LinearLayout donde mostrar los informes
+        LinearLayout linearExpedientes = binding.linearExpedientes;
 
-        return view;
-    }
+        FirebaseUser currentUser = mAuth.getCurrentUser();
 
-    private void buscarUsuario() {
-        // Obtener el número de cuenta ingresado por el usuario
-        String numeroCuenta = etNumeroCuenta.getText().toString().trim();
+        if (currentUser != null) {
+            String userId = currentUser.getUid();
 
-        // Verificar si el número de cuenta no está vacío
-        if (numeroCuenta.isEmpty()) {
-            Toast.makeText(getContext(), "Por favor ingrese un número de cuenta", Toast.LENGTH_SHORT).show();
-            return;
-        }
-
-        // Referencia a la colección de usuarios en Firestore
-        CollectionReference usuariosRef = db.collection("user");
-
-        // Buscar documentos donde el campo "numeroCuenta" coincida con el número ingresado
-        usuariosRef.whereEqualTo("numeroCuenta", numeroCuenta)
-                .get()
-                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                    @Override
-                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                        if (task.isSuccessful()) {
-                            QuerySnapshot querySnapshot = task.getResult();
-                            if (querySnapshot != null && !querySnapshot.isEmpty()) {
-                                // Mostrar los datos del usuario encontrado
-                                for (DocumentSnapshot document : querySnapshot.getDocuments()) {
-                                    String cuenta = document.getString("numeroCuenta");
-                                    String nombre = document.getString("nombre");
-
-                                    // Mostrar datos en los TextView
-                                    tvNumeroCuenta.setText(cuenta);
-                                    tvNombre.setText(nombre);
-                                }
+            // Referencia al documento del médico
+            db.collection("medicos").document(userId).get()
+                    .addOnSuccessListener(documentSnapshot -> {
+                        if (documentSnapshot.exists()) {
+                            String nombreDoctor = documentSnapshot.getString("nombre");
+                            if (nombreDoctor != null) {
+                                // Cargar los informes del doctor logueado
+                                cargarInformes(linearExpedientes, nombreDoctor);
                             } else {
-                                // No se encontró el usuario
-                                tvNumeroCuenta.setText("Número de cuenta: No disponible");
-                                tvNombre.setText("Nombre: No disponible");
+                                Toast.makeText(getContext(), "No se encontró el nombre del doctor", Toast.LENGTH_SHORT).show();
                             }
                         } else {
-                            // Error en la consulta
-                            Toast.makeText(getContext(), "Error al buscar usuario", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(getContext(), "No se encontró el usuario en la base de datos", Toast.LENGTH_SHORT).show();
+                        }
+                    })
+                    .addOnFailureListener(e -> {
+                        Toast.makeText(getContext(), "Error al obtener los datos del doctor", Toast.LENGTH_SHORT).show();
+                    });
+        } else {
+            Toast.makeText(getContext(), "Usuario no logueado", Toast.LENGTH_SHORT).show();
+        }
+
+        return root;
+    }
+
+    private void cargarInformes(LinearLayout linearExpedientes, String nombreDoctor) {
+        db.collection("informe")
+                .whereEqualTo("nombreDoctor", nombreDoctor) // Filtrar por nombreDoctor
+                .get()
+                .addOnSuccessListener(queryDocumentSnapshots -> {
+                    // Limpiar cualquier vista previa en linearExpedientes
+                    linearExpedientes.removeAllViews();
+
+                    // Crear un conjunto para almacenar los nombres de los pacientes ya mostrados
+                    Set<String> pacientesMostrados = new HashSet<>();
+
+                    // Obtener los informes
+                    for (QueryDocumentSnapshot document : queryDocumentSnapshots) {
+                        String nombrePaciente = document.getString("nombre");
+                        String numeroCuenta = document.getString("numeroCuenta");
+
+                        // Verificar si el paciente ya ha sido mostrado
+                        if (!pacientesMostrados.contains(nombrePaciente)) {
+                            // Inflar el layout para el primer informe de este paciente
+                            View expedienteView = getLayoutInflater().inflate(R.layout.item_expediente, linearExpedientes, false);
+
+                            // Obtener referencias a los elementos del layout inflado
+                            TextView txtNombrePaciente = expedienteView.findViewById(R.id.txtNombrePaciente);
+                            TextView txtNumeroCuenta = expedienteView.findViewById(R.id.txtNumeroCuenta);
+
+                            // Establecer los valores del informe
+                            txtNombrePaciente.setText(nombrePaciente);
+                            txtNumeroCuenta.setText(numeroCuenta);
+
+                            // Agregar el informe al LinearLayout
+                            linearExpedientes.addView(expedienteView);
+
+                            // Agregar el nombre del paciente al conjunto para evitar duplicados
+                            pacientesMostrados.add(nombrePaciente);
                         }
                     }
+                })
+                .addOnFailureListener(e -> {
+                    Toast.makeText(getContext(), "Error al cargar los informes", Toast.LENGTH_SHORT).show();
                 });
     }
+
 }
