@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:paddingVertical="15dp"
+    android:paddingHorizontal="20dp"    android:layout_marginBottom="20dp"
+    android:backgroundTint="@color/gray"
+    android:background="@drawable/rounded">
+
+    <TextView
+        android:id="@+id/txtNumeroCuenta"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:fontFamily="@font/montserrat_bold"
+        android:layout_marginBottom="10dp"
+        android:textColor="@color/black"
+        android:text="Número de cuenta"
+        android:textSize="20dp" />
+
+    <TextView
+        android:id="@+id/txtNombrePaciente"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Nombre del paciente"
+        android:textSize="18dp"
+        android:fontFamily="@font/montserrat_medium"
+        android:textColor="@color/black"/>
+
+</LinearLayout>
