@@ -1,8 +1,9 @@
 {
   "project_info": {
     "project_number": "715221679809",
+    "firebase_url": "https://consultapp-29bc9-default-rtdb.firebaseio.com",
     "project_id": "consultapp-29bc9",
-    "storage_bucket": "consultapp-29bc9.appspot.com"
+    "storage_bucket": "consultapp-29bc9.firebasestorage.app"
   },
   "client": [
     {

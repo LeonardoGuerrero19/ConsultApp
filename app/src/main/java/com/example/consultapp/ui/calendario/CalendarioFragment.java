@@ -15,6 +15,7 @@ import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
+import com.example.consultapp.FotoActivity;
 import com.example.consultapp.InformeMedicoActivity;
 import com.example.consultapp.PerfilDoc;
 import com.example.consultapp.R;
@@ -88,7 +89,7 @@ public class CalendarioFragment extends Fragment {
 
         // Listener del botón para ir al perfil del doctor
         imageButton.setOnClickListener(v -> {
-            Intent intent = new Intent(getActivity(), PerfilDoc.class);
+            Intent intent = new Intent(getActivity(), FotoActivity.class);
             startActivity(intent);
         });
 
