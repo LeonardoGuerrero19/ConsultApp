@@ -75,7 +75,7 @@ public class ExpedientesFragment extends Fragment {
     }
 
     private void cargarInformes(LinearLayout linearExpedientes, String nombreDoctor) {
-        dbRef.child("informe").orderByChild("nombreDoctor").equalTo(nombreDoctor)
+        dbRef.child("Informes").orderByChild("nombreDoctor").equalTo(nombreDoctor)
                 .addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot snapshot) {

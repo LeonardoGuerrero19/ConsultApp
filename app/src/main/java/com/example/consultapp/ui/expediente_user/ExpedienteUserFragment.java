@@ -19,12 +19,13 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import com.example.consultapp.R;
-import com.example.consultapp.databinding.FragmentEspecialidadesBinding;
-import com.example.consultapp.databinding.FragmentExpedienteUserBinding;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.firestore.DocumentReference;
-import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.ValueEventListener;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -33,8 +34,7 @@ public class ExpedienteUserFragment extends Fragment {
 
     private TextView nombreTextView;
     private FirebaseAuth auth;
-    private FragmentExpedienteUserBinding binding;  // Binding para acceder a las vistas
-    private FirebaseFirestore db;
+    private DatabaseReference dbRef; // Referencia a Realtime Database
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -46,7 +46,7 @@ public class ExpedienteUserFragment extends Fragment {
 
         // Inicializa Firebase
         auth = FirebaseAuth.getInstance();
-        db = FirebaseFirestore.getInstance();
+        dbRef = FirebaseDatabase.getInstance().getReference();
 
         // Carga el nombre del usuario
         loadUserName();
@@ -59,29 +59,35 @@ public class ExpedienteUserFragment extends Fragment {
 
     private void loadUserName() {
         String userId = auth.getCurrentUser().getUid();
-        DocumentReference userRef = db.collection("user").document(userId);
+        DatabaseReference userRef = dbRef.child("users").child(userId);
 
-        userRef.get().addOnSuccessListener(documentSnapshot -> {
-            if (documentSnapshot.exists()) {
-                String nombre = documentSnapshot.getString("nombre");
-                String edad = documentSnapshot.getString("edad");
-                String fechaNacimiento = documentSnapshot.getString("fecha_nacimiento");
-                String genero = documentSnapshot.getString("genero");
-                String telefono = documentSnapshot.getString("telefono");
+        userRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if (snapshot.exists()) {
+                    String nombre = snapshot.child("nombre").getValue(String.class);
+                    String edad = snapshot.child("edad").getValue(String.class);
+                    String fechaNacimiento = snapshot.child("fecha_nacimiento").getValue(String.class);
+                    String genero = snapshot.child("genero").getValue(String.class);
+                    String telefono = snapshot.child("telefono").getValue(String.class);
 
-                // Mostrar datos en los TextView
-                nombreTextView.setText(nombre != null ? nombre : "Nombre no disponible");
-                ((TextView) requireView().findViewById(R.id.edad))
-                        .setText(edad != null ? edad + " años" : "Edad no especificada");
-                ((TextView) requireView().findViewById(R.id.fechaNacimiento))
-                        .setText(fechaNacimiento != null ? fechaNacimiento : "Fecha de nacimiento no registrada");
-                ((TextView) requireView().findViewById(R.id.genero))
-                        .setText(genero != null ? genero : "Género no especificado");
-                ((TextView) requireView().findViewById(R.id.telefono))
-                        .setText(telefono != null ? telefono : "Teléfono no registrado");
+                    // Mostrar datos en los TextView
+                    nombreTextView.setText(nombre != null ? nombre : "Nombre no disponible");
+                    ((TextView) requireView().findViewById(R.id.edad))
+                            .setText(edad != null ? edad + " años" : "Edad no especificada");
+                    ((TextView) requireView().findViewById(R.id.fechaNacimiento))
+                            .setText(fechaNacimiento != null ? fechaNacimiento : "Fecha de nacimiento no registrada");
+                    ((TextView) requireView().findViewById(R.id.genero))
+                            .setText(genero != null ? genero : "Género no especificado");
+                    ((TextView) requireView().findViewById(R.id.telefono))
+                            .setText(telefono != null ? telefono : "Teléfono no registrado");
+                }
             }
-        }).addOnFailureListener(e -> {
-            Toast.makeText(requireContext(), "Error al cargar los datos", Toast.LENGTH_SHORT).show();
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                Toast.makeText(requireContext(), "Error al cargar los datos", Toast.LENGTH_SHORT).show();
+            }
         });
     }
 
@@ -99,21 +105,27 @@ public class ExpedienteUserFragment extends Fragment {
         EditText telefonoUser = dialog.findViewById(R.id.telefono_user);
         Button botonEditarPerfilModal = dialog.findViewById(R.id.btnEditar);
 
-        // Obtener los datos del usuario desde Firestore
+        // Obtener los datos del usuario desde Realtime Database
         String userId = auth.getCurrentUser().getUid();
-        DocumentReference userRef = db.collection("user").document(userId);
+        DatabaseReference userRef = dbRef.child("users").child(userId);
 
-        userRef.get().addOnSuccessListener(documentSnapshot -> {
-            if (documentSnapshot.exists()) {
-                // Cargar los datos actuales en los EditText
-                nombreUser.setText(documentSnapshot.getString("nombre"));
-                edadUser.setText(documentSnapshot.getString("edad"));
-                fechaNacimiento.setText(documentSnapshot.getString("fecha_nacimiento"));
-                generoUser.setText(documentSnapshot.getString("genero"));
-                telefonoUser.setText(documentSnapshot.getString("telefono"));
+        userRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if (snapshot.exists()) {
+                    // Cargar los datos actuales en los EditText
+                    nombreUser.setText(snapshot.child("nombre").getValue(String.class));
+                    edadUser.setText(snapshot.child("edad").getValue(String.class));
+                    fechaNacimiento.setText(snapshot.child("fecha_nacimiento").getValue(String.class));
+                    generoUser.setText(snapshot.child("genero").getValue(String.class));
+                    telefonoUser.setText(snapshot.child("telefono").getValue(String.class));
+                }
             }
-        }).addOnFailureListener(e -> {
-            Toast.makeText(requireContext(), "Error al cargar los datos: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                Toast.makeText(requireContext(), "Error al cargar los datos: " + error.getMessage(), Toast.LENGTH_SHORT).show();
+            }
         });
 
         // Configurar el clic en el botón del modal
@@ -137,7 +149,6 @@ public class ExpedienteUserFragment extends Fragment {
         }
     }
 
-
     private void editarPerfilDesdeModal(String nombre, String edad, String fechaNac, String genero, String telefono) {
         // Verificar que haya un usuario autenticado
         if (auth.getCurrentUser() == null) {
@@ -156,20 +167,16 @@ public class ExpedienteUserFragment extends Fragment {
         if (!genero.isEmpty()) datosActualizados.put("genero", genero);
         if (!telefono.isEmpty()) datosActualizados.put("telefono", telefono);
 
-        // Referencia al documento del usuario
-        DocumentReference userRef = db.collection("user").document(userId);
+        // Referencia al nodo del usuario
+        DatabaseReference userRef = dbRef.child("users").child(userId);
 
-        // Actualizar los datos en Firestore
-        userRef.update(datosActualizados)
-                .addOnSuccessListener(unused -> {
-                    Toast.makeText(requireContext(), "Perfil actualizado correctamente", Toast.LENGTH_SHORT).show();
-                    // Recargar el nombre o cualquier dato visible si es necesario
-                    loadUserName();
-                })
-                .addOnFailureListener(e -> {
-                    Toast.makeText(requireContext(), "Error al actualizar el perfil: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-                });
+        // Actualizar los datos en Realtime Database
+        userRef.updateChildren(datosActualizados).addOnSuccessListener(unused -> {
+            Toast.makeText(requireContext(), "Perfil actualizado correctamente", Toast.LENGTH_SHORT).show();
+            // Recargar el nombre o cualquier dato visible si es necesario
+            loadUserName();
+        }).addOnFailureListener(e -> {
+            Toast.makeText(requireContext(), "Error al actualizar el perfil: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+        });
     }
-
-
 }

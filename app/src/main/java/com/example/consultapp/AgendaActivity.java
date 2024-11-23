@@ -3,21 +3,21 @@ package com.example.consultapp;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CalendarView;
-import android.widget.GridLayout;
 import android.widget.LinearLayout;
-import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
+import androidx.annotation.NonNull;
 
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -30,10 +30,11 @@ public class AgendaActivity extends AppCompatActivity {
     private CalendarView calendarView;
     private LinearLayout linearHorarios;
     private Button btnGuardarCita;
-    private Button btnRegresar; // New button
+    private Button btnRegresar;
     private Button botonSeleccionado = null; // Botón seleccionado actualmente
-    FirebaseFirestore mFirestore;
-    FirebaseAuth mAuth;
+
+    private DatabaseReference dbRef;
+    private FirebaseAuth mAuth;
 
     private String fechaSeleccionada; // Variable global
     private String horarioSeleccionado; // Variable para almacenar el horario seleccionado
@@ -44,14 +45,14 @@ public class AgendaActivity extends AppCompatActivity {
         setContentView(R.layout.activity_agenda);
 
         mAuth = FirebaseAuth.getInstance();
-        mFirestore = FirebaseFirestore.getInstance();
+        dbRef = FirebaseDatabase.getInstance().getReference();
 
         // Inicializar vistas
         nombreServicio = findViewById(R.id.nombreServicio);
-        linearHorarios = findViewById(R.id.linearHorarios); // Inicializar el LinearLayout
+        linearHorarios = findViewById(R.id.linearHorarios);
         calendarView = findViewById(R.id.calendarView);
         btnGuardarCita = findViewById(R.id.btnGuardarCita);
-        btnRegresar = findViewById(R.id.btnRegresar); // Initialize new button
+        btnRegresar = findViewById(R.id.btnRegresar);
 
         // Obtener el nombre del servicio desde el Intent
         String servicioSeleccionado = getIntent().getStringExtra("nombreServicio");
@@ -81,21 +82,27 @@ public class AgendaActivity extends AppCompatActivity {
     }
 
     private void cargarHorariosParaFecha(String nombreServicio, String fecha) {
-        mFirestore.collection("horarios_medicos")
-                .whereEqualTo("especializacion", nombreServicio)
-                .whereEqualTo("fecha", fecha)
-                .get()
-                .addOnCompleteListener(task -> {
-                    if (task.isSuccessful()) {
+        dbRef.child("horarios_medicos")
+                .orderByChild("especializacion")
+                .equalTo(nombreServicio)
+                .addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
                         List<String> horariosDisponibles = new ArrayList<>();
-                        for (DocumentSnapshot document : task.getResult()) {
-                            List<String> horarios = (List<String>) document.get("horarios");
-                            if (horarios != null) {
-                                horariosDisponibles.addAll(horarios);
+                        for (DataSnapshot horarioSnapshot : snapshot.getChildren()) {
+                            String fechaHorario = horarioSnapshot.child("fecha").getValue(String.class);
+                            if (fechaHorario != null && fechaHorario.equals(fecha)) {
+                                List<String> horarios = (List<String>) horarioSnapshot.child("horarios").getValue();
+                                if (horarios != null) {
+                                    horariosDisponibles.addAll(horarios);
+                                }
                             }
                         }
                         actualizarBotonesHorarios(horariosDisponibles);
-                    } else {
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {
                         Toast.makeText(AgendaActivity.this, "Error al cargar horarios", Toast.LENGTH_SHORT).show();
                     }
                 });
@@ -107,12 +114,10 @@ public class AgendaActivity extends AppCompatActivity {
         int count = 0;
 
         for (String horario : horarios) {
-            // Crear un nuevo botón
             Button button = new Button(this);
             button.setText(horario);
             button.setBackgroundResource(R.drawable.boton_selector); // Diseño inicial
 
-            // Configurar el tamaño del botón
             LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
                     0, // Ancho dinámico
                     LinearLayout.LayoutParams.WRAP_CONTENT, // Altura automática
@@ -121,19 +126,16 @@ public class AgendaActivity extends AppCompatActivity {
             params.setMargins(20, 20, 20, 20); // Márgenes
             button.setLayoutParams(params);
 
-            // Configurar el evento de clic para el botón
             button.setOnClickListener(v -> {
-                // Cambiar diseño del botón seleccionado
                 if (botonSeleccionado != null) {
                     botonSeleccionado.setBackgroundResource(R.drawable.boton_no_seleccionado);
                 }
-                botonSeleccionado = button; // Actualizar el botón seleccionado
+                botonSeleccionado = button;
                 button.setBackgroundResource(R.drawable.boton_seleccionado);
-                horarioSeleccionado = horario; // Guardar el horario seleccionado
+                horarioSeleccionado = horario;
                 Toast.makeText(AgendaActivity.this, "Horario seleccionado: " + horario, Toast.LENGTH_SHORT).show();
             });
 
-            // Crear una nueva fila si es necesario
             if (count % 3 == 0) {
                 currentRow = new LinearLayout(this);
                 currentRow.setOrientation(LinearLayout.HORIZONTAL);
@@ -141,10 +143,9 @@ public class AgendaActivity extends AppCompatActivity {
                         LinearLayout.LayoutParams.MATCH_PARENT,
                         LinearLayout.LayoutParams.WRAP_CONTENT
                 ));
-                linearHorarios.addView(currentRow); // Agregar la nueva fila al contenedor principal
+                linearHorarios.addView(currentRow);
             }
 
-            // Agregar el botón a la fila actual
             if (currentRow != null) {
                 currentRow.addView(button);
             }
@@ -152,23 +153,20 @@ public class AgendaActivity extends AppCompatActivity {
             count++;
         }
 
-        // Completar la última fila si tiene menos de 3 botones
         if (count % 3 != 0 && currentRow != null) {
-            int emptyViews = 3 - (count % 3); // Calcular cuántos espacios faltan
+            int emptyViews = 3 - (count % 3);
             for (int i = 0; i < emptyViews; i++) {
                 View emptyView = new View(this);
                 LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
-                        0, // Ancho dinámico
-                        LinearLayout.LayoutParams.WRAP_CONTENT, // Altura automática
-                        1f // Peso para distribuir uniformemente
+                        0,
+                        LinearLayout.LayoutParams.WRAP_CONTENT,
+                        1f
                 );
                 emptyView.setLayoutParams(params);
-                currentRow.addView(emptyView); // Agregar vistas vacías para completar la fila
+                currentRow.addView(emptyView);
             }
         }
     }
-
-
 
     private void guardarCita(String nombreServicio, String fecha) {
         if (horarioSeleccionado == null) {
@@ -176,40 +174,65 @@ public class AgendaActivity extends AppCompatActivity {
             return;
         }
 
-        // Obtener el ID del usuario actual
         String userId = mAuth.getCurrentUser().getUid();
 
-        // Crear un mapa para los datos de la cita
-        Map<String, Object> citas = new HashMap<>();
-        citas.put("usuario_id", userId);
-        citas.put("servicio", nombreServicio);
-        citas.put("fecha", fecha);
-        citas.put("horario", horarioSeleccionado);
-        citas.put("estado", "proxima");
+        // Buscar el médico correspondiente a la especialización y horario
+        dbRef.child("horarios_medicos")
+                .orderByChild("especializacion")
+                .equalTo(nombreServicio)
+                .addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        String nombreMedico = null;
 
-        // Guardar la cita en Firestore en la colección 'citas'
-        mFirestore.collection("citas")
-                .add(citas)
-                .addOnSuccessListener(documentReference -> {
-                    // Obtener el ID de la cita generada
-                    String citaId = documentReference.getId();
+                        for (DataSnapshot horarioSnapshot : snapshot.getChildren()) {
+                            String fechaHorario = horarioSnapshot.child("fecha").getValue(String.class);
+                            List<String> horarios = (List<String>) horarioSnapshot.child("horarios").getValue();
 
-                    // Actualizar la cita con el cita_id
-                    Map<String, Object> updateData = new HashMap<>();
-                    updateData.put("cita_id", citaId);
+                            if (fechaHorario != null && fechaHorario.equals(fecha) && horarios != null && horarios.contains(horarioSeleccionado)) {
+                                nombreMedico = horarioSnapshot.child("nombre").getValue(String.class); // Suponiendo que "nombre" es el campo con el nombre del médico
+                                break;
+                            }
+                        }
 
-                    // Actualizar el documento de la cita con el cita_id
-                    documentReference.update(updateData)
-                            .addOnSuccessListener(aVoid -> {
-                                Toast.makeText(AgendaActivity.this, "Cita guardada exitosamente", Toast.LENGTH_SHORT).show();
-                                finish(); // Cerrar la actividad actual
-                            })
-                            .addOnFailureListener(e -> {
-                                Toast.makeText(AgendaActivity.this, "Error al guardar el cita_id", Toast.LENGTH_SHORT).show();
-                            });
-                })
-                .addOnFailureListener(e -> {
-                    Toast.makeText(AgendaActivity.this, "Error al guardar la cita", Toast.LENGTH_SHORT).show();
+                        if (nombreMedico == null) {
+                            Toast.makeText(AgendaActivity.this, "No se encontró un médico para esta cita", Toast.LENGTH_SHORT).show();
+                            return;
+                        }
+
+                        // Generar un nuevo ID único para la cita
+                        String citaId = dbRef.child("citas").push().getKey();
+                        if (citaId == null) {
+                            Toast.makeText(AgendaActivity.this, "Error al generar cita", Toast.LENGTH_SHORT).show();
+                            return;
+                        }
+
+                        // Crear datos de la cita
+                        Map<String, Object> citaData = new HashMap<>();
+                        citaData.put("cita_id", citaId);
+                        citaData.put("usuario_id", userId);
+                        citaData.put("servicio", nombreServicio);
+                        citaData.put("fecha", fecha);
+                        citaData.put("horario", horarioSeleccionado);
+                        citaData.put("estado", "proxima");
+                        citaData.put("doctor", nombreMedico); // Agregar el nombre del médico
+
+                        // Guardar en la base de datos
+                        dbRef.child("citas").child(citaId).setValue(citaData)
+                                .addOnSuccessListener(aVoid -> {
+                                    Toast.makeText(AgendaActivity.this, "Cita guardada exitosamente", Toast.LENGTH_SHORT).show();
+                                    finish();
+                                })
+                                .addOnFailureListener(e -> {
+                                    Toast.makeText(AgendaActivity.this, "Error al guardar la cita", Toast.LENGTH_SHORT).show();
+                                });
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {
+                        Toast.makeText(AgendaActivity.this, "Error al buscar el médico", Toast.LENGTH_SHORT).show();
+                    }
                 });
     }
+
 }

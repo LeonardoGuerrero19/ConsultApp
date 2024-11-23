@@ -89,7 +89,7 @@ public class CalendarioFragment extends Fragment {
 
         // Listener del botón para ir al perfil del doctor
         imageButton.setOnClickListener(v -> {
-            Intent intent = new Intent(getActivity(), FotoActivity.class);
+            Intent intent = new Intent(getActivity(), PerfilDoc.class);
             startActivity(intent);
         });
 

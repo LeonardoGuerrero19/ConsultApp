@@ -76,6 +76,7 @@ public class login extends AppCompatActivity {
     }
 
     private void checkUserRole(String uid) {
+        // Buscar en la rama "users"
         databaseReference.child("users").child(uid).get().addOnCompleteListener(task -> {
             if (task.isSuccessful() && task.getResult().exists()) {
                 DataSnapshot snapshot = task.getResult();
@@ -83,15 +84,35 @@ public class login extends AppCompatActivity {
                 if (rol != null) {
                     redirigirPorRol(rol); // Pasa el rol como String
                 } else {
-                    Toast.makeText(login.this, "El rol del usuario no está definido.", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(login.this, "El rol del usuario no está definido en 'users'.", Toast.LENGTH_SHORT).show();
                 }
             } else {
-                Toast.makeText(login.this, "Usuario no encontrado en 'users'", Toast.LENGTH_SHORT).show();
+                // Si no se encuentra en "users", buscar en "Medicos"
+                buscarEnMedicos(uid);
             }
         }).addOnFailureListener(e -> {
-            Toast.makeText(login.this, "Error al verificar usuario", Toast.LENGTH_SHORT).show();
+            Toast.makeText(login.this, "Error al verificar usuario en 'users'", Toast.LENGTH_SHORT).show();
         });
     }
+
+    private void buscarEnMedicos(String uid) {
+        databaseReference.child("Medicos").child(uid).get().addOnCompleteListener(task -> {
+            if (task.isSuccessful() && task.getResult().exists()) {
+                DataSnapshot snapshot = task.getResult();
+                String rol = snapshot.child("rol").getValue(String.class); // Extrae el valor correctamente
+                if (rol != null) {
+                    redirigirPorRol(rol); // Pasa el rol como String
+                } else {
+                    Toast.makeText(login.this, "El rol del usuario no está definido en 'Medicos'.", Toast.LENGTH_SHORT).show();
+                }
+            } else {
+                Toast.makeText(login.this, "Usuario no encontrado en 'Medicos'.", Toast.LENGTH_SHORT).show();
+            }
+        }).addOnFailureListener(e -> {
+            Toast.makeText(login.this, "Error al verificar usuario en 'Medicos'", Toast.LENGTH_SHORT).show();
+        });
+    }
+
 
 
 
