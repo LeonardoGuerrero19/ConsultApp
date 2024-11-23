@@ -8,6 +8,15 @@
     android:layout_marginBottom="20dp"
     android:orientation="vertical">
 
+    <!-- Imagen del servicio -->
+    <ImageView
+        android:id="@+id/imagen_servicio"
+        android:layout_width="match_parent"
+        android:layout_height="200dp"
+        android:scaleType="centerCrop"
+        android:layout_marginBottom="10dp" />
+
+    <!-- Nombre del servicio -->
     <TextView
         android:id="@+id/nombre_servicio"
         android:layout_width="wrap_content"
