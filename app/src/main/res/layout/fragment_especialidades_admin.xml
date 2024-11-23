@@ -5,7 +5,6 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:layout_marginTop="20dp"
-    android:layout_marginHorizontal="20dp"
     tools:context=".ui.especialidades.EspecialidadesFragment">
 
     <TextView
@@ -15,6 +14,7 @@
         android:layout_marginBottom="20dp"
         android:fontFamily="@font/montserrat_bold"
         android:text="Especialidades"
+        android:layout_marginHorizontal="20dp"
         android:textColor="@color/black"
         android:textSize="26dp" />
 
@@ -23,14 +23,16 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/text"
+        android:layout_marginHorizontal="20dp"
         android:clipToPadding="false">
 
         <!-- RecyclerView maneja el scroll de la lista -->
-    <LinearLayout
-        android:id="@+id/linearServicios"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical" />
+        <LinearLayout
+            android:id="@+id/linearServicios"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical" />
+
     </androidx.core.widget.NestedScrollView>
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
