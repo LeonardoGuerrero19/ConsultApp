@@ -23,8 +23,11 @@ import com.example.consultapp.R;
 import com.example.consultapp.databinding.FragmentCitasBinding;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -32,7 +35,7 @@ import java.util.List;
 public class CitasFragment extends Fragment {
 
     private FragmentCitasBinding binding;
-    private FirebaseFirestore db;
+    private DatabaseReference databaseReference;
     private FirebaseAuth mAuth;
 
     private Spinner spinnerEspecializacion;
@@ -53,8 +56,8 @@ public class CitasFragment extends Fragment {
         binding = FragmentCitasBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
 
-        // Inicializar Firestore y Auth
-        db = FirebaseFirestore.getInstance();
+        // Inicializar Realtime Database y Auth
+        databaseReference = FirebaseDatabase.getInstance().getReference();
         mAuth = FirebaseAuth.getInstance();
 
         // Obtener referencias de vistas
@@ -99,25 +102,29 @@ public class CitasFragment extends Fragment {
         if (currentUser != null) {
             String userId = currentUser.getUid();
 
-            // Referencia al documento del médico
-            db.collection("user").document(userId).get()
-                    .addOnSuccessListener(documentSnapshot -> {
-                        if (documentSnapshot.exists()) {
-                            String nombreAdmin = documentSnapshot.getString("nombre");
-                            if (nombreAdmin != null) {
-                                textSaludo.setText("Hola, " + nombreAdmin);
-                            } else {
-                                textSaludo.setText("Hola, Usuario");
-                            }
+            // Referencia al nodo del usuario
+            databaseReference.child("users").child(userId).addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                    if (snapshot.exists()) {
+                        String nombreAdmin = snapshot.child("nombre").getValue(String.class);
+                        if (nombreAdmin != null) {
+                            textSaludo.setText("Hola, " + nombreAdmin);
                         } else {
                             textSaludo.setText("Hola, Usuario");
-                            Toast.makeText(getContext(), "No se encontró el usuario en la base de datos", Toast.LENGTH_SHORT).show();
                         }
-                    })
-                    .addOnFailureListener(e -> {
+                    } else {
                         textSaludo.setText("Hola, Usuario");
-                        Toast.makeText(getContext(), "Error al obtener el nombre del usuario", Toast.LENGTH_SHORT).show();
-                    });
+                        Toast.makeText(getContext(), "No se encontró el usuario en la base de datos", Toast.LENGTH_SHORT).show();
+                    }
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError error) {
+                    textSaludo.setText("Hola, Usuario");
+                    Toast.makeText(getContext(), "Error al obtener el nombre del usuario", Toast.LENGTH_SHORT).show();
+                }
+            });
         } else {
             textSaludo.setText("Hola, Usuario");
             Toast.makeText(getContext(), "Usuario no logueado", Toast.LENGTH_SHORT).show();
@@ -127,60 +134,65 @@ public class CitasFragment extends Fragment {
     }
 
     private void cargarEspecializaciones() {
-        db.collection("Servicios").document("Todos los servicios").get()
-                .addOnSuccessListener(documentSnapshot -> {
-                    if (documentSnapshot.exists()) {
-                        List<String> especializaciones = (List<String>) documentSnapshot.get("Servicios");
-                        if (especializaciones != null && !especializaciones.isEmpty()) {
-                            ArrayAdapter<String> adapter = new ArrayAdapter<>(
-                                    getContext(),
-                                    R.layout.item_spinner,
-                                    especializaciones
-                            );
-                            adapter.setDropDownViewResource(R.layout.spinner_dropdown_item);
-                            spinnerEspecializacion.setAdapter(adapter);
-
-                            spinnerEspecializacion.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-                                @Override
-                                public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                                    servicioSeleccionado = especializaciones.get(position);
-
-                                    // Cargar citas de tipo "Próximas" al cambiar servicio
-                                    cargarCitas("proxima");
-                                    updateSelectedButton(btnProximas); // Asegurar que "Próximas" esté seleccionado
-                                }
-
-                                @Override
-                                public void onNothingSelected(AdapterView<?> parent) {
-                                }
-                            });
-                        } else {
-                            Toast.makeText(getContext(), "No hay especializaciones disponibles", Toast.LENGTH_SHORT).show();
-                        }
-                    } else {
-                        Toast.makeText(getContext(), "No se encontró el documento de servicios", Toast.LENGTH_SHORT).show();
+        databaseReference.child("Servicios").child("TodosLosServicios").addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                List<String> especializaciones = new ArrayList<>();
+                for (DataSnapshot especialidadSnapshot : snapshot.getChildren()) {
+                    String especializacion = especialidadSnapshot.getValue(String.class);
+                    if (especializacion != null) {
+                        especializaciones.add(especializacion);
                     }
-                })
-                .addOnFailureListener(e -> {
-                    Toast.makeText(getContext(), "Error al cargar especializaciones", Toast.LENGTH_SHORT).show();
-                });
+                }
+
+                if (!especializaciones.isEmpty()) {
+                    ArrayAdapter<String> adapter = new ArrayAdapter<>(
+                            getContext(),
+                            R.layout.item_spinner,
+                            especializaciones
+                    );
+                    adapter.setDropDownViewResource(R.layout.spinner_dropdown_item);
+                    spinnerEspecializacion.setAdapter(adapter);
+
+                    spinnerEspecializacion.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                        @Override
+                        public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                            servicioSeleccionado = especializaciones.get(position);
+
+                            // Cargar citas de tipo "Próximas" al cambiar servicio
+                            cargarCitas("proxima");
+                            updateSelectedButton(btnProximas); // Asegurar que "Próximas" esté seleccionado
+                        }
+
+                        @Override
+                        public void onNothingSelected(AdapterView<?> parent) {
+                        }
+                    });
+                } else {
+                    Toast.makeText(getContext(), "No hay especializaciones disponibles", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                Toast.makeText(getContext(), "Error al cargar especializaciones", Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     private void cargarCitas(String estado) {
         FirebaseUser currentUser = mAuth.getCurrentUser();
         if (currentUser != null) {
-            String userId = currentUser.getUid();
-
-            db.collection("citas")
-                    .whereEqualTo("estado", estado)
-                    .whereEqualTo("servicio", servicioSeleccionado)
-                    .get()
-                    .addOnCompleteListener(task -> {
-                        if (task.isSuccessful()) {
+            databaseReference.child("citas").orderByChild("estado").equalTo(estado)
+                    .addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot snapshot) {
                             citasList.clear();
-                            for (DocumentSnapshot document : task.getResult()) {
-                                Cita cita = document.toObject(Cita.class);
-                                citasList.add(cita);
+                            for (DataSnapshot citaSnapshot : snapshot.getChildren()) {
+                                Cita cita = citaSnapshot.getValue(Cita.class);
+                                if (cita != null && servicioSeleccionado.equals(cita.getServicio())) {
+                                    citasList.add(cita);
+                                }
                             }
                             adapter.notifyDataSetChanged();
 
@@ -188,7 +200,10 @@ public class CitasFragment extends Fragment {
                             if (citasList.isEmpty()) {
                                 Toast.makeText(getContext(), "No hay citas para el estado seleccionado", Toast.LENGTH_SHORT).show();
                             }
-                        } else {
+                        }
+
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError error) {
                             Toast.makeText(getContext(), "Error al cargar citas", Toast.LENGTH_SHORT).show();
                         }
                     });

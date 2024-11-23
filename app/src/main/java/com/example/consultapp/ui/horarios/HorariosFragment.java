@@ -16,9 +16,11 @@ import androidx.lifecycle.ViewModelProvider;
 import com.example.consultapp.R;
 import com.example.consultapp.databinding.FragmentHorariosBinding;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.firestore.DocumentReference;
-import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -28,7 +30,7 @@ import java.util.Map;
 public class HorariosFragment extends Fragment {
 
     private FragmentHorariosBinding binding;
-    private FirebaseFirestore db;
+    private DatabaseReference dbRef;
     private FirebaseAuth mAuth;
     private LinearLayout linearLayoutHorarios;
     private String fechaSeleccionada;
@@ -47,9 +49,9 @@ public class HorariosFragment extends Fragment {
         Button btnGuardarHorario = binding.btnGuardarHorario;
         CalendarView calendarView = binding.calendarView;
 
-        // Inicializar Firebase Auth y Firestore
+        // Inicializar Firebase Auth y Database
         mAuth = FirebaseAuth.getInstance();
-        db = FirebaseFirestore.getInstance();
+        dbRef = FirebaseDatabase.getInstance().getReference();
 
         // Inicializar el LinearLayout para los botones
         linearLayoutHorarios = binding.linearLayoutHorarios;
@@ -70,7 +72,7 @@ public class HorariosFragment extends Fragment {
         // Listener para el botón de guardar
         btnGuardarHorario.setOnClickListener(v -> {
             if (fechaSeleccionada != null && !horariosSeleccionados.isEmpty()) {
-                guardarHorariosEnFirestore();
+                guardarHorariosEnRealtime(medicoId);
             } else {
                 Toast.makeText(getContext(), "Seleccione una fecha y horarios", Toast.LENGTH_SHORT).show();
             }
@@ -80,110 +82,116 @@ public class HorariosFragment extends Fragment {
     }
 
     private void getMedicoDataFromDatabase(String medicoId) {
-        DocumentReference medicoDocRef = db.collection("medicos").document(medicoId);
+        dbRef.child("Medicos").child(medicoId).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if (snapshot.exists()) {
+                    List<String> horarios = (List<String>) snapshot.child("horarios").getValue();
 
-        medicoDocRef.get().addOnSuccessListener(documentSnapshot -> {
-            if (documentSnapshot.exists()) {
-                List<String> horarios = (List<String>) documentSnapshot.get("horarios");
+                    if (horarios != null && !horarios.isEmpty()) {
+                        linearLayoutHorarios.removeAllViews();
+                        botonesHorarios.clear(); // Limpiar lista de botones
 
-                if (horarios != null && !horarios.isEmpty()) {
-                    linearLayoutHorarios.removeAllViews();
-                    botonesHorarios.clear(); // Limpiar lista de botones
+                        LinearLayout horizontalLayout = new LinearLayout(getContext());
+                        horizontalLayout.setOrientation(LinearLayout.HORIZONTAL);
+                        horizontalLayout.setLayoutParams(new LinearLayout.LayoutParams(
+                                LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT));
 
-                    LinearLayout horizontalLayout = new LinearLayout(getContext());
-                    horizontalLayout.setOrientation(LinearLayout.HORIZONTAL);
-                    horizontalLayout.setLayoutParams(new LinearLayout.LayoutParams(
-                            LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT));
+                        int count = 0;
 
-                    int count = 0;
+                        for (String horario : horarios) {
+                            Button horarioButton = new Button(getContext());
+                            horarioButton.setText(horario);
 
-                    for (String horario : horarios) {
-                        Button horarioButton = new Button(getContext());
-                        horarioButton.setText(horario);
-
-                        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
-                                0, LinearLayout.LayoutParams.WRAP_CONTENT, 1);
-                        params.setMargins(20, 20, 20, 20);
-                        horarioButton.setLayoutParams(params);
-
-                        horarioButton.setBackgroundResource(R.drawable.boton_selector);
-
-                        horarioButton.setOnClickListener(v -> {
-                            if (horarioButton.isSelected()) {
-                                horarioButton.setSelected(false);
-                                horariosSeleccionados.remove(horario);
-                            } else {
-                                horarioButton.setSelected(true);
-                                horariosSeleccionados.add(horario);
-                            }
-                        });
-
-                        // Guardar referencia del botón en la lista
-                        botonesHorarios.add(horarioButton);
-
-                        horizontalLayout.addView(horarioButton);
-                        count++;
-
-                        if (count % 3 == 0) {
-                            linearLayoutHorarios.addView(horizontalLayout);
-                            horizontalLayout = new LinearLayout(getContext());
-                            horizontalLayout.setOrientation(LinearLayout.HORIZONTAL);
-                            horizontalLayout.setLayoutParams(new LinearLayout.LayoutParams(
-                                    LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT));
-                        }
-                    }
-
-                    if (count % 3 != 0) {
-                        int remainingButtons = 3 - (count % 3);
-
-                        for (int i = 0; i < remainingButtons; i++) {
-                            View emptyView = new View(getContext());
-                            LinearLayout.LayoutParams emptyParams = new LinearLayout.LayoutParams(
+                            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
                                     0, LinearLayout.LayoutParams.WRAP_CONTENT, 1);
-                            emptyView.setLayoutParams(emptyParams);
-                            horizontalLayout.addView(emptyView);
+                            params.setMargins(20, 20, 20, 20);
+                            horarioButton.setLayoutParams(params);
+
+                            horarioButton.setBackgroundResource(R.drawable.boton_selector);
+
+                            horarioButton.setOnClickListener(v -> {
+                                if (horarioButton.isSelected()) {
+                                    horarioButton.setSelected(false);
+                                    horariosSeleccionados.remove(horario);
+                                } else {
+                                    horarioButton.setSelected(true);
+                                    horariosSeleccionados.add(horario);
+                                }
+                            });
+
+                            // Guardar referencia del botón en la lista
+                            botonesHorarios.add(horarioButton);
+
+                            horizontalLayout.addView(horarioButton);
+                            count++;
+
+                            if (count % 3 == 0) {
+                                linearLayoutHorarios.addView(horizontalLayout);
+                                horizontalLayout = new LinearLayout(getContext());
+                                horizontalLayout.setOrientation(LinearLayout.HORIZONTAL);
+                                horizontalLayout.setLayoutParams(new LinearLayout.LayoutParams(
+                                        LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT));
+                            }
                         }
 
-                        linearLayoutHorarios.addView(horizontalLayout);
+                        if (count % 3 != 0) {
+                            int remainingButtons = 3 - (count % 3);
+
+                            for (int i = 0; i < remainingButtons; i++) {
+                                View emptyView = new View(getContext());
+                                LinearLayout.LayoutParams emptyParams = new LinearLayout.LayoutParams(
+                                        0, LinearLayout.LayoutParams.WRAP_CONTENT, 1);
+                                emptyView.setLayoutParams(emptyParams);
+                                horizontalLayout.addView(emptyView);
+                            }
+
+                            linearLayoutHorarios.addView(horizontalLayout);
+                        }
+                    } else {
+                        Toast.makeText(getContext(), "No se encontraron horarios disponibles", Toast.LENGTH_SHORT).show();
                     }
-                } else {
-                    Toast.makeText(getContext(), "No se encontraron horarios disponibles", Toast.LENGTH_SHORT).show();
                 }
             }
-        }).addOnFailureListener(e -> {
-            Toast.makeText(getContext(), "Error al cargar los datos del médico", Toast.LENGTH_SHORT).show();
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                Toast.makeText(getContext(), "Error al cargar los datos del médico", Toast.LENGTH_SHORT).show();
+            }
         });
     }
 
-    private void guardarHorariosEnFirestore() {
+    private void guardarHorariosEnRealtime(String medicoId) {
         Map<String, Object> data = new HashMap<>();
         data.put("fecha", fechaSeleccionada);
         data.put("horarios", horariosSeleccionados);
 
-        String uid = mAuth.getCurrentUser().getUid();
-        db.collection("medicos").document(uid)
-                .get()
-                .addOnCompleteListener(task -> {
-                    if (task.isSuccessful()) {
-                        DocumentSnapshot document = task.getResult();
-                        if (document.exists()) {
-                            String nombre = document.getString("nombre");
-                            String especializacion = document.getString("especializacion");
+        dbRef.child("Medicos").child(medicoId).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if (snapshot.exists()) {
+                    String nombre = snapshot.child("nombre").getValue(String.class);
+                    String especializacion = snapshot.child("especializacion").getValue(String.class);
 
-                            data.put("nombre", nombre);
-                            data.put("especializacion", especializacion);
+                    data.put("nombre", nombre);
+                    data.put("especializacion", especializacion);
 
-                            db.collection("horarios_medicos").add(data)
-                                    .addOnSuccessListener(documentReference -> {
-                                        Toast.makeText(getContext(), "Horarios guardados con éxito", Toast.LENGTH_SHORT).show();
-                                        limpiarSelecciones(); // Llamar a método para deseleccionar botones
-                                    })
-                                    .addOnFailureListener(e -> {
-                                        Toast.makeText(getContext(), "Error al guardar horarios: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-                                    });
-                        }
-                    }
-                });
+                    dbRef.child("horarios_medicos").push().setValue(data)
+                            .addOnSuccessListener(aVoid -> {
+                                Toast.makeText(getContext(), "Horarios guardados con éxito", Toast.LENGTH_SHORT).show();
+                                limpiarSelecciones(); // Llamar a método para deseleccionar botones
+                            })
+                            .addOnFailureListener(e -> {
+                                Toast.makeText(getContext(), "Error al guardar horarios: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                            });
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                Toast.makeText(getContext(), "Error al cargar datos del médico", Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     private void limpiarSelecciones() {

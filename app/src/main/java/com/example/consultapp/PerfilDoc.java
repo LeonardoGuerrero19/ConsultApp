@@ -13,12 +13,17 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
+import androidx.annotation.NonNull;
+
 
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.firestore.DocumentReference;
-import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import java.util.List;
 
@@ -27,7 +32,7 @@ public class PerfilDoc extends AppCompatActivity {
     private TextView nombreTextView, especializacionTextView, horarioTextView, telefonoTextView;
     private ImageView imageViewPerfil;
     private FirebaseAuth mAuth;
-    private FirebaseFirestore db;
+    private DatabaseReference databaseReference;
     private Button btnDescripcion;
     private Button btn_cerrarS;
 
@@ -36,8 +41,8 @@ public class PerfilDoc extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_perfil_doc);
 
-        mAuth = FirebaseAuth.getInstance();  // Inicializa FirebaseAuth
-        db = FirebaseFirestore.getInstance();  // Inicializa Firestore
+        mAuth = FirebaseAuth.getInstance(); // Inicializa FirebaseAuth
+        databaseReference = FirebaseDatabase.getInstance().getReference(); // Inicializa Realtime Database
 
         // Referencias a los TextView y Button
         nombreTextView = findViewById(R.id.nombre);
@@ -63,56 +68,50 @@ public class PerfilDoc extends AppCompatActivity {
     }
 
     private void cargarDatosUsuario() {
-        FirebaseAuth auth = FirebaseAuth.getInstance();
-        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        String userId = mAuth.getCurrentUser().getUid();
 
-        // Obtén el UID del usuario actual
-        String userId = auth.getCurrentUser().getUid();
+        // Referencia al nodo del usuario en Realtime Database
+        databaseReference.child("Medicos").child(userId).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if (snapshot.exists()) {
+                    // Extraer los datos del snapshot
+                    String nombre = snapshot.child("nombre").getValue(String.class);
+                    String especializacion = snapshot.child("especializacion").getValue(String.class);
+                    String descripcion = snapshot.child("descripcion").getValue(String.class);
+                    String telefono = snapshot.child("telefono").getValue(String.class);
+                    List<String> horarios = (List<String>) snapshot.child("horarios").getValue();
 
-        // Referencia al documento del usuario en Firestore
-        DocumentReference userRef = db.collection("medicos").document(userId);
+                    // Mostrar los datos en los TextView
+                    nombreTextView.setText(nombre);
+                    especializacionTextView.setText(especializacion);
+                    telefonoTextView.setText(telefono);
 
-        // Obtén los datos del usuario desde Firestore
-        userRef.get()
-                .addOnSuccessListener(documentSnapshot -> {
-                    if (documentSnapshot.exists()) {
-                        // Extrae los datos del documento
-                        String nombre = documentSnapshot.getString("nombre");
-                        String especializacion = documentSnapshot.getString("especializacion");
-                        String descripcion = documentSnapshot.getString("descripcion");
-                        String telefono = documentSnapshot.getString("telefono");
-                        List<String> horarios = (List<String>) documentSnapshot.get("horarios");
-
-                        // Muestra los datos en los TextView
-                        nombreTextView.setText(nombre);
-                        especializacionTextView.setText(especializacion);
-                        telefonoTextView.setText(telefono);
-
-                        // Si el array de horarios no es nulo y tiene elementos
-                        if (horarios != null && horarios.size() > 0) {
-                            // Usa el primer y último elemento del array
-                            String horarioInicio = horarios.get(0);
-                            String horarioSalida = horarios.get(horarios.size() - 1);
-
-                            // Muestra el rango de horarios
-                            horarioTextView.setText(horarioInicio + " - " + horarioSalida);
-                        } else {
-                            horarioTextView.setText("Horario no disponible");
-                        }
-
-                        // Si la descripción está disponible, actualiza el texto del botón
-                        if (descripcion != null && !descripcion.isEmpty()) {
-                            btnDescripcion.setText(descripcion);  // Cambia el texto del botón
-                        } else {
-                            btnDescripcion.setText("Añade una descripción");  // Texto por defecto si no hay descripción
-                        }
+                    if (horarios != null && !horarios.isEmpty()) {
+                        // Usa el primer y último elemento de los horarios
+                        String horarioInicio = horarios.get(0);
+                        String horarioSalida = horarios.get(horarios.size() - 1);
+                        horarioTextView.setText(horarioInicio + " - " + horarioSalida);
                     } else {
-                        Toast.makeText(this, "Datos del usuario no encontrados", Toast.LENGTH_SHORT).show();
+                        horarioTextView.setText("Horario no disponible");
                     }
-                })
-                .addOnFailureListener(e -> {
-                    Toast.makeText(this, "Error al cargar datos del usuario", Toast.LENGTH_SHORT).show();
-                });
+
+                    // Actualiza el texto del botón con la descripción
+                    if (descripcion != null && !descripcion.isEmpty()) {
+                        btnDescripcion.setText(descripcion);
+                    } else {
+                        btnDescripcion.setText("Añade una descripción");
+                    }
+                } else {
+                    Toast.makeText(PerfilDoc.this, "Datos del usuario no encontrados", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                Toast.makeText(PerfilDoc.this, "Error al cargar datos del usuario", Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     private void showBottomDialog() {
@@ -137,32 +136,21 @@ public class PerfilDoc extends AppCompatActivity {
             String descripcion = descripcionEditText.getText().toString().trim();
 
             if (!descripcion.isEmpty()) {
-                // Obtener el ID del usuario actual
-                String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
-                FirebaseFirestore db = FirebaseFirestore.getInstance();
-                DocumentReference userRef = db.collection("medicos").document(userId);
+                String userId = mAuth.getCurrentUser().getUid();
 
-                // Actualizar la descripción en Firestore
-                userRef.update("descripcion", descripcion)
+                // Actualizar la descripción en Realtime Database
+                databaseReference.child("medicos").child(userId).child("descripcion").setValue(descripcion)
                         .addOnSuccessListener(aVoid -> {
-                            // Mostrar un mensaje de éxito
-                            Toast.makeText(this, "Descripción guardada con éxito", Toast.LENGTH_SHORT).show();
-
-                            // Actualiza el texto del botón con la nueva descripción
+                            Toast.makeText(PerfilDoc.this, "Descripción guardada con éxito", Toast.LENGTH_SHORT).show();
                             btnDescripcion.setText(descripcion);
-
-                            // Cerrar el diálogo
                             dialog.dismiss();
                         })
                         .addOnFailureListener(e -> {
-                            // Mostrar un mensaje de error
-                            Toast.makeText(this, "Error al guardar la descripción", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(PerfilDoc.this, "Error al guardar la descripción", Toast.LENGTH_SHORT).show();
                         });
             } else {
-                // Si la descripción está vacía
                 Toast.makeText(this, "Por favor, ingresa una descripción", Toast.LENGTH_SHORT).show();
             }
         });
     }
-
 }

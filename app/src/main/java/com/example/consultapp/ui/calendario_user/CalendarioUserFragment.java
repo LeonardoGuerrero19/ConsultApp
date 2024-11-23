@@ -18,16 +18,19 @@ import com.example.consultapp.CitasAdapter;
 import com.example.consultapp.R;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class CalendarioUserFragment extends Fragment {
 
-    private FirebaseFirestore db;
     private FirebaseAuth mAuth;
+    private DatabaseReference databaseReference;
     private RecyclerView recyclerViewCitas;
     private CitasAdapter adapter;
     private List<Cita> citasList;
@@ -40,9 +43,9 @@ public class CalendarioUserFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View root = inflater.inflate(R.layout.fragment_calendario_user, container, false);
 
-        // Inicializar Firestore y Auth
-        db = FirebaseFirestore.getInstance();
+        // Inicializar FirebaseAuth y Realtime Database
         mAuth = FirebaseAuth.getInstance();
+        databaseReference = FirebaseDatabase.getInstance().getReference();
 
         // Inicializar RecyclerView
         recyclerViewCitas = root.findViewById(R.id.recyclerView_citas);
@@ -60,23 +63,23 @@ public class CalendarioUserFragment extends Fragment {
 
         // Configurar botones con cambio de color
         btnProximas.setOnClickListener(v -> {
-            cargarCitasProximas();
+            cargarCitas("proxima");
             updateSelectedButton(btnProximas);
         });
 
         btnRealizadas.setOnClickListener(v -> {
-            cargarCitasRealizadas();
+            cargarCitas("realizada");
             updateSelectedButton(btnRealizadas);
         });
 
         btnCanceladas.setOnClickListener(v -> {
-            cargarCitasCanceladas();
+            cargarCitas("cancelada");
             updateSelectedButton(btnCanceladas);
         });
 
         // Establecer un botón predeterminado seleccionado y cargar citas
         updateSelectedButton(btnProximas);
-        cargarCitasProximas(); // Cargar citas automáticamente al inicio
+        cargarCitas("proxima"); // Cargar citas automáticamente al inicio
 
         return root;
     }
@@ -94,72 +97,31 @@ public class CalendarioUserFragment extends Fragment {
         selectedButton.setTextColor(getContext().getColor(R.color.white));
     }
 
-    private void cargarCitasProximas() {
+    private void cargarCitas(String estado) {
         FirebaseUser currentUser = mAuth.getCurrentUser();
         if (currentUser != null) {
             String userId = currentUser.getUid();
 
-            db.collection("citas")
-                    .whereEqualTo("usuario_id", userId)
-                    .whereEqualTo("estado", "proxima")
-                    .get()
-                    .addOnCompleteListener(task -> {
-                        if (task.isSuccessful()) {
+            databaseReference.child("citas").orderByChild("usuario_id").equalTo(userId)
+                    .addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot snapshot) {
                             citasList.clear();
-                            for (DocumentSnapshot document : task.getResult()) {
-                                Cita cita = document.toObject(Cita.class);
-                                citasList.add(cita);
+                            for (DataSnapshot citaSnapshot : snapshot.getChildren()) {
+                                Cita cita = citaSnapshot.getValue(Cita.class);
+                                if (cita != null && cita.getEstado().equals(estado)) {
+                                    citasList.add(cita);
+                                }
                             }
                             adapter.notifyDataSetChanged();
-                        } else {
-                            Toast.makeText(getContext(), "Error al cargar citas", Toast.LENGTH_SHORT).show();
+
+                            if (citasList.isEmpty()) {
+                                Toast.makeText(getContext(), "No hay citas para el estado seleccionado", Toast.LENGTH_SHORT).show();
+                            }
                         }
-                    });
-        }
-    }
 
-    private void cargarCitasRealizadas() {
-        FirebaseUser currentUser = mAuth.getCurrentUser();
-        if (currentUser != null) {
-            String userId = currentUser.getUid();
-
-            db.collection("citas")
-                    .whereEqualTo("usuario_id", userId)
-                    .whereEqualTo("estado", "realizada")
-                    .get()
-                    .addOnCompleteListener(task -> {
-                        if (task.isSuccessful()) {
-                            citasList.clear();
-                            for (DocumentSnapshot document : task.getResult()) {
-                                Cita cita = document.toObject(Cita.class);
-                                citasList.add(cita);
-                            }
-                            adapter.notifyDataSetChanged();
-                        } else {
-                            Toast.makeText(getContext(), "Error al cargar citas", Toast.LENGTH_SHORT).show();
-                        }
-                    });
-        }
-    }
-
-    private void cargarCitasCanceladas() {
-        FirebaseUser currentUser = mAuth.getCurrentUser();
-        if (currentUser != null) {
-            String userId = currentUser.getUid();
-
-            db.collection("citas")
-                    .whereEqualTo("usuario_id", userId)
-                    .whereEqualTo("estado", "cancelada")
-                    .get()
-                    .addOnCompleteListener(task -> {
-                        if (task.isSuccessful()) {
-                            citasList.clear();
-                            for (DocumentSnapshot document : task.getResult()) {
-                                Cita cita = document.toObject(Cita.class);
-                                citasList.add(cita);
-                            }
-                            adapter.notifyDataSetChanged();
-                        } else {
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError error) {
                             Toast.makeText(getContext(), "Error al cargar citas", Toast.LENGTH_SHORT).show();
                         }
                     });

@@ -15,31 +15,22 @@ import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
-import com.example.consultapp.AgendaActivity;
-import com.example.consultapp.FotoActivity;
 import com.example.consultapp.InformeMedicoActivity;
 import com.example.consultapp.PerfilDoc;
 import com.example.consultapp.R;
 import com.example.consultapp.databinding.FragmentCalendarioBinding;
-import com.example.consultapp.ui.calendario.CalendarioViewModel;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.firestore.DocumentReference;
-import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.Query;
-import com.google.firebase.firestore.QueryDocumentSnapshot;
-
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 public class CalendarioFragment extends Fragment {
 
     private FragmentCalendarioBinding binding;
-    private FirebaseFirestore db;
+    private DatabaseReference dbRef;
     private FirebaseAuth mAuth;
 
     @Override
@@ -51,8 +42,8 @@ public class CalendarioFragment extends Fragment {
         binding = FragmentCalendarioBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
 
-        // Inicializar Firestore y Auth
-        db = FirebaseFirestore.getInstance();
+        // Inicializar Realtime Database y Auth
+        dbRef = FirebaseDatabase.getInstance().getReference();
         mAuth = FirebaseAuth.getInstance();
 
         // Obtener referencias de vistas
@@ -65,27 +56,31 @@ public class CalendarioFragment extends Fragment {
         if (currentUser != null) {
             String userId = currentUser.getUid();
 
-            // Referencia al documento del médico
-            db.collection("medicos").document(userId).get()
-                    .addOnSuccessListener(documentSnapshot -> {
-                        if (documentSnapshot.exists()) {
-                            String nombreDoctor = documentSnapshot.getString("nombre");
-                            if (nombreDoctor != null) {
-                                textSaludo.setText("Hola, " + nombreDoctor);
-                                // Cargar las citas próximas del doctor logueado
-                                cargarCitasProximas(linearCitas, nombreDoctor);
-                            } else {
-                                textSaludo.setText("Hola, Usuario");
-                            }
+            // Referencia al nodo del médico
+            dbRef.child("Medicos").child(userId).addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                    if (snapshot.exists()) {
+                        String nombreDoctor = snapshot.child("nombre").getValue(String.class);
+                        if (nombreDoctor != null) {
+                            textSaludo.setText("Hola, " + nombreDoctor);
+                            // Cargar las citas próximas del doctor logueado
+                            cargarCitasProximas(linearCitas, nombreDoctor);
                         } else {
                             textSaludo.setText("Hola, Usuario");
-                            Toast.makeText(getContext(), "No se encontró el usuario en la base de datos", Toast.LENGTH_SHORT).show();
                         }
-                    })
-                    .addOnFailureListener(e -> {
+                    } else {
                         textSaludo.setText("Hola, Usuario");
-                        Toast.makeText(getContext(), "Error al obtener el nombre del usuario", Toast.LENGTH_SHORT).show();
-                    });
+                        Toast.makeText(getContext(), "No se encontró el usuario en la base de datos", Toast.LENGTH_SHORT).show();
+                    }
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError error) {
+                    textSaludo.setText("Hola, Usuario");
+                    Toast.makeText(getContext(), "Error al obtener el nombre del usuario", Toast.LENGTH_SHORT).show();
+                }
+            });
         } else {
             textSaludo.setText("Hola, Usuario");
             Toast.makeText(getContext(), "Usuario no logueado", Toast.LENGTH_SHORT).show();
@@ -101,118 +96,90 @@ public class CalendarioFragment extends Fragment {
     }
 
     private void cargarCitasProximas(LinearLayout linearCitas, String nombreDoctor) {
-        db.collection("citas")
-                .whereEqualTo("estado", "proxima")
-                .whereEqualTo("doctor", nombreDoctor) // Filtrar por doctor
-                .get()
-                .addOnSuccessListener(queryDocumentSnapshots -> {
-                    // Limpiar cualquier vista previa en linearCitas
-                    linearCitas.removeAllViews();
+        dbRef.child("citas").orderByChild("estado").equalTo("proxima")
+                .addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        // Limpiar cualquier vista previa en linearCitas
+                        linearCitas.removeAllViews();
 
-                    List<Cita> citas = new ArrayList<>();
+                        for (DataSnapshot citaSnapshot : snapshot.getChildren()) {
+                            String doctor = citaSnapshot.child("doctor").getValue(String.class);
+                            if (nombreDoctor.equals(doctor)) {
+                                // Obtener datos de la cita
+                                String horario = citaSnapshot.child("horario").getValue(String.class);
+                                String usuarioId = citaSnapshot.child("usuario_id").getValue(String.class);
+                                String citaId = citaSnapshot.getKey();
 
-                    // Obtener las citas
-                    // Dentro de la función cargarCitasProximas()
+                                // Inflar el layout de la cita
+                                View citaView = getLayoutInflater().inflate(R.layout.item_cita_dia, linearCitas, false);
 
-                    // Inflar las citas ordenadas en el LinearLayout
-                    for (QueryDocumentSnapshot document : queryDocumentSnapshots) {
-                        String horario = document.getString("horario");
-                        String usuarioId = document.getString("usuario_id");
+                                // Obtener referencias de los elementos del layout inflado
+                                TextView txtCuenta = citaView.findViewById(R.id.txtCuenta);
+                                TextView txtNombre = citaView.findViewById(R.id.txtNombre);
+                                TextView txtHorario = citaView.findViewById(R.id.txtHorario);
+                                ImageButton btnRealizada = citaView.findViewById(R.id.btn_realizada);
+                                ImageButton btnCancelada = citaView.findViewById(R.id.btn_cancelada);
 
-                        // Inflar el layout de la cita
-                        View citaView = getLayoutInflater().inflate(R.layout.item_cita_dia, linearCitas, false);
+                                // Establecer el horario
+                                txtHorario.setText(horario);
 
-                        // Obtener referencias de los elementos del layout inflado
-                        TextView txtCuenta = citaView.findViewById(R.id.txtCuenta);
-                        TextView txtNombre = citaView.findViewById(R.id.txtNombre);
-                        TextView txtHorario = citaView.findViewById(R.id.txtHorario);
-                        ImageButton btnRealizada = citaView.findViewById(R.id.btn_realizada);
-                        ImageButton btnCancelada = citaView.findViewById(R.id.btn_cancelada);
+                                // Consultar información del paciente
+                                dbRef.child("users").child(usuarioId).addListenerForSingleValueEvent(new ValueEventListener() {
+                                    @Override
+                                    public void onDataChange(@NonNull DataSnapshot userSnapshot) {
+                                        if (userSnapshot.exists()) {
+                                            String nombrePaciente = userSnapshot.child("nombre").getValue(String.class);
+                                            String numeroCuenta = userSnapshot.child("numeroCuenta").getValue(String.class);
 
-                        // Establecer los valores de la cita
-                        txtHorario.setText(horario);
-
-                        // Consultar la información del paciente usando el usuarioId
-                        db.collection("user").document(usuarioId).get()
-                                .addOnSuccessListener(userDoc -> {
-                                    if (userDoc.exists()) {
-                                        String nombrePaciente = userDoc.getString("nombre");
-                                        String numeroCuenta = userDoc.getString("numeroCuenta");
-
-                                        // Actualizar la vista con los datos del paciente
-                                        txtCuenta.setText(numeroCuenta);
-                                        txtNombre.setText(nombrePaciente);
-                                    } else {
-                                        // En caso de que no se encuentre el paciente
-                                        txtNombre.setText("Paciente no encontrado");
-                                        txtCuenta.setText("Cuenta no disponible");
+                                            // Actualizar vista
+                                            txtCuenta.setText(numeroCuenta != null ? numeroCuenta : "Cuenta no disponible");
+                                            txtNombre.setText(nombrePaciente != null ? nombrePaciente : "Paciente no encontrado");
+                                        } else {
+                                            txtNombre.setText("Paciente no encontrado");
+                                            txtCuenta.setText("Cuenta no disponible");
+                                        }
                                     }
-                                })
-                                .addOnFailureListener(e -> {
-                                    Toast.makeText(getContext(), "Error al obtener los datos del paciente", Toast.LENGTH_SHORT).show();
+
+                                    @Override
+                                    public void onCancelled(@NonNull DatabaseError error) {
+                                        Toast.makeText(getContext(), "Error al obtener datos del paciente", Toast.LENGTH_SHORT).show();
+                                    }
                                 });
 
-                        // Agregar funcionalidad a los botones
-                        btnRealizada.setOnClickListener(v -> {
-                            // Crear un intent para navegar al nuevo Activity
-                            Intent intent = new Intent(getContext(), InformeMedicoActivity.class);
+                                // Configurar botones
+                                btnRealizada.setOnClickListener(v -> {
+                                    Intent intent = new Intent(getContext(), InformeMedicoActivity.class);
+                                    intent.putExtra("usuarioId", usuarioId);
+                                    intent.putExtra("numeroCuenta", txtCuenta.getText().toString());
+                                    intent.putExtra("citaId", citaId);
+                                    intent.putExtra("nombreDoctor", nombreDoctor);
+                                    intent.putExtra("nombre", txtNombre.getText().toString());
+                                    startActivity(intent);
+                                });
 
-                            // Pasar datos a través del intent
-                            intent.putExtra("usuarioId", usuarioId);  // ID del usuario asociado a la cita
-                            intent.putExtra("numeroCuenta", txtCuenta.getText().toString()); // Número de cuenta del paciente
-                            intent.putExtra("citaId", document.getId()); // ID único de la cita
-                            intent.putExtra("nombreDoctor", nombreDoctor); // Nombre del doctor
-                            intent.putExtra("nombre", txtNombre.getText().toString()); // Nombre del paciente
+                                btnCancelada.setOnClickListener(v -> {
+                                    dbRef.child("citas").child(citaId).child("estado").setValue("cancelada")
+                                            .addOnSuccessListener(aVoid -> {
+                                                Toast.makeText(getContext(), "Cita cancelada", Toast.LENGTH_SHORT).show();
+                                                cargarCitasProximas(linearCitas, nombreDoctor);
+                                            })
+                                            .addOnFailureListener(e -> {
+                                                Toast.makeText(getContext(), "Error al cancelar la cita", Toast.LENGTH_SHORT).show();
+                                            });
+                                });
 
-
-                            // Iniciar el nuevo Activity
-                            startActivity(intent);
-                        });
-
-                        // Agregar funcionalidad al botón de cancelación
-                        btnCancelada.setOnClickListener(v -> {
-                            // Obtener el ID de la cita (document)
-                            String citaId = document.getId();  // Aquí obtenemos el ID correcto
-
-                            // Actualizar el estado de la cita a "cancelada"
-                            db.collection("citas").document(citaId)
-                                    .update("estado", "cancelada")
-                                    .addOnSuccessListener(aVoid -> {
-                                        Toast.makeText(getContext(), "Cita cancelada", Toast.LENGTH_SHORT).show();
-                                        // Recargar las citas para reflejar el cambio
-                                        cargarCitasProximas(linearCitas, nombreDoctor);
-                                    })
-                                    .addOnFailureListener(e -> {
-                                        Toast.makeText(getContext(), "Error al cancelar la cita", Toast.LENGTH_SHORT).show();
-                                    });
-                        });
-
-                        // Agregar la vista inflada al LinearLayout
-                        linearCitas.addView(citaView);
+                                // Agregar vista inflada al LinearLayout
+                                linearCitas.addView(citaView);
+                            }
+                        }
                     }
-                })
-                .addOnFailureListener(e -> {
-                    Toast.makeText(getContext(), "Error al cargar citas", Toast.LENGTH_SHORT).show();
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {
+                        Toast.makeText(getContext(), "Error al cargar citas", Toast.LENGTH_SHORT).show();
+                    }
                 });
-    }
-
-    // Clase Cita para almacenar los datos de cada cita
-    class Cita {
-        private String horario;
-        private String usuarioId;
-
-        public Cita(String horario, String usuarioId) {
-            this.horario = horario;
-            this.usuarioId = usuarioId;
-        }
-
-        public String getHorario() {
-            return horario;
-        }
-
-        public String getUsuarioId() {
-            return usuarioId;
-        }
     }
 
     @Override
