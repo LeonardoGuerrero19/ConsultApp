@@ -32,7 +32,7 @@ public class AdministradorActivity extends AppCompatActivity {
         // Passing each menu ID as a set of Ids because each
         // menu should be considered as top level destinations.
         AppBarConfiguration appBarConfiguration = new AppBarConfiguration.Builder(
-                R.id.navigation_citas, R.id.navigation_especialidades, R.id.navigation_notifications)
+                R.id.navigation_citas, R.id.navigation_especialidades, R.id.navigation_medicos, R.id.navigation_notifications)
                 .build();
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_activity_administrador);
         NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);

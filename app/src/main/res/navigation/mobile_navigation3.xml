@@ -18,6 +18,12 @@
         tools:layout="@layout/fragment_especialidades_admin" />
 
     <fragment
+        android:id="@+id/navigation_medicos"
+        android:name="com.example.consultapp.ui.medicos.MedicosFragment"
+        android:label="@string/title_medicos"
+        tools:layout="@layout/fragment_medicos" />
+
+    <fragment
         android:id="@+id/navigation_notifications"
         android:name="com.example.consultapp.ui.notifications.NotificationsFragment"
         android:label="@string/title_notifications"

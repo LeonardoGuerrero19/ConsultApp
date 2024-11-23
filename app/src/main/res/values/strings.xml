@@ -18,4 +18,5 @@
     <string name="title_activity_administrador">AdministradorActivity</string>
     <string name="title_citas">Citas</string>
     <string name="title_especialidades">Especialidades</string>
+    <string name="title_medicos">Medicos</string>
 </resources>
