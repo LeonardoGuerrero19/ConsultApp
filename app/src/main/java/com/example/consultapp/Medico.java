@@ -1,20 +1,23 @@
 package com.example.consultapp;
 
+import java.util.List;
+
 public class Medico {
     private String id;
     private String nombre;
     private String especializacion;
     private String telefono;
-    private String horario;
+    private List<String> horarios; // Cambiar a lista de horarios
 
-    // Constructor vacío para Firestore
+    // Constructor vacío requerido por Firebase
     public Medico() {}
 
-    public Medico(String nombre, String especializacion, String telefono, String horario) {
+    // Constructor completo
+    public Medico(String nombre, String especializacion, String telefono, List<String> horarios) {
         this.nombre = nombre;
         this.especializacion = especializacion;
         this.telefono = telefono;
-        this.horario = horario;
+        this.horarios = horarios;
     }
 
     // Getter y Setter para id
@@ -42,11 +45,11 @@ public class Medico {
         this.telefono = telefono;
     }
 
-    public String getHorario() {
-        return horario;
+    public List<String> getHorarios() {
+        return horarios;
     }
 
-    public void setHorario(String horario) {
-        this.horario = horario;
+    public void setHorarios(List<String> horarios) {
+        this.horarios = horarios;
     }
 }

@@ -34,7 +34,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:layout_marginTop="10dp"
+            android:layout_marginHorizontal="20dp"
+            android:layout_marginTop="15dp"
             android:gravity="center">
 
             <ImageButton
@@ -44,8 +45,7 @@
                 android:layout_weight="1"
                 android:padding="10dp"
                 android:background="@drawable/button_border"
-                android:src="@drawable/round_remove_red_eye_24"
-                android:layout_marginEnd="5dp" />
+                android:src="@drawable/round_remove_red_eye_24" />
 
             <ImageButton
                 android:id="@+id/btn_editar"
@@ -53,10 +53,10 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:padding="10dp"
+                android:layout_marginHorizontal="5dp"
                 android:background="@drawable/rounded"
                 android:backgroundTint="@color/aqua"
-                android:src="@drawable/round_edit_24"
-                android:layout_marginEnd="5dp" />
+                android:src="@drawable/round_edit_24" />
 
             <ImageButton
                 android:id="@+id/btn_eliminar"
@@ -65,8 +65,7 @@
                 android:layout_weight="1"
                 android:padding="10dp"
                 android:background="@drawable/button_border"
-                android:src="@drawable/round_delete_24"
-                android:layout_marginStart="5dp" />
+                android:src="@drawable/round_delete_24"/>
 
         </LinearLayout>
     </LinearLayout>

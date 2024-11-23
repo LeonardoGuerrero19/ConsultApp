@@ -190,7 +190,7 @@ public class InicioFragment extends Fragment {
                             View servicioView = LayoutInflater.from(getContext()).inflate(R.layout.item_button_service, gridLayout, false);
 
                             // Referenciar el botón dentro del diseño inflado
-                            Button btnService = servicioView.findViewById(R.id.btnService);
+                            Button btnService = servicioView.findViewById(R.id.servicioButton);
                             btnService.setText(servicio);
 
                             // Configurar el layoutParams para respetar el ancho del GridLayout

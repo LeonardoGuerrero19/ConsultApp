@@ -13,9 +13,9 @@ import java.util.List;
 
 public class ServicioAdapter extends RecyclerView.Adapter<ServicioAdapter.ServicioViewHolder> {
 
-    private List<String> listaServicios;
+    private List<Servicio> listaServicios;
 
-    public ServicioAdapter(List<String> listaServicios) {
+    public ServicioAdapter(List<Servicio> listaServicios) {
         this.listaServicios = listaServicios;
     }
 
@@ -28,15 +28,15 @@ public class ServicioAdapter extends RecyclerView.Adapter<ServicioAdapter.Servic
 
     @Override
     public void onBindViewHolder(@NonNull ServicioViewHolder holder, int position) {
-        String servicio = listaServicios.get(position);
-        holder.servicioButton.setText(servicio);
+        Servicio servicio = listaServicios.get(position);
+        holder.servicioButton.setText(servicio.getNombre());
 
-        // Establece un listener de clic para cada botón de servicio
         holder.servicioButton.setOnClickListener(v -> {
-            // Crea un Intent para abrir la ServicioDetalle
             Intent intent = new Intent(v.getContext(), ServicioDetalle.class);
-            intent.putExtra("NOMBRE_SERVICIO", servicio); // Pasa el nombre del servicio
-            v.getContext().startActivity(intent); // Inicia la actividad
+            intent.putExtra("NOMBRE_SERVICIO", servicio.getNombre());
+            intent.putExtra("DESCRIPCION_SERVICIO", servicio.getDescripcion());
+            intent.putExtra("IMAGEN_URL", servicio.getImagenUrl());
+            v.getContext().startActivity(intent);
         });
     }
 

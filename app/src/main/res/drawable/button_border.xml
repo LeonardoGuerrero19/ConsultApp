@@ -4,5 +4,5 @@
     <stroke
         android:color="@color/aqua"
         android:width="2dp" />
-    <corners android:radius="180dp" />  <!-- Radio de las esquinas (borde redondeado) -->
+    <corners android:radius="18dp" />  <!-- Radio de las esquinas (borde redondeado) -->
 </shape>

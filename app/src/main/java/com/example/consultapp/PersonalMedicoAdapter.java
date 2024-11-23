@@ -11,7 +11,8 @@ import android.widget.Toast;
 
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 import java.util.List;
 
@@ -20,17 +21,15 @@ public class PersonalMedicoAdapter extends RecyclerView.Adapter<PersonalMedicoAd
     private List<Medico> medicoList;
     private Context context;
 
-
     public PersonalMedicoAdapter(List<Medico> medicoList, Context context) {
         this.medicoList = medicoList;
         this.context = context;
-
     }
 
     @Override
     public PersonalMedicoViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.item_personal_medico, parent, false); // Cambia el layout según tu diseño
+                .inflate(R.layout.item_personal_medico, parent, false);
         return new PersonalMedicoViewHolder(view);
     }
 
@@ -38,28 +37,24 @@ public class PersonalMedicoAdapter extends RecyclerView.Adapter<PersonalMedicoAd
     public void onBindViewHolder(PersonalMedicoViewHolder holder, int position) {
         Medico medico = medicoList.get(position);
         holder.doctorNameTextView.setText(medico.getNombre());
-        holder.doctorServiceTextView.setText(medico.getEspecializacion()); // Enlazar especialización
+        holder.doctorServiceTextView.setText(medico.getEspecializacion());
 
         // Funcionalidad para el botón de ver
         holder.btnVer.setOnClickListener(v -> {
             Intent intent = new Intent(context, PerfilPersonalMedico.class);
-            intent.putExtra("medicoId", medico.getId()); // Ahora debería funcionar sin error
+            intent.putExtra("medicoId", medico.getId());
             context.startActivity(intent);
         });
 
         // Funcionalidad para el botón de editar
         holder.btnEditar.setOnClickListener(v -> {
             Intent intent = new Intent(context, EditarPersonalMedico.class);
-            intent.putExtra("medicoId", medico.getId()); // Ahora debería funcionar sin error
+            intent.putExtra("medicoId", medico.getId());
             context.startActivity(intent);
         });
 
-
         // Funcionalidad para el botón de eliminar
-        holder.btnEliminar.setOnClickListener(v -> {
-            // Llamamos al método para eliminar al médico
-            eliminarMedico(medico.getId());
-        });
+        holder.btnEliminar.setOnClickListener(v -> eliminarMedico(medico.getId(), position));
     }
 
     @Override
@@ -67,29 +62,21 @@ public class PersonalMedicoAdapter extends RecyclerView.Adapter<PersonalMedicoAd
         return medicoList.size();
     }
 
-    private void eliminarMedico(String medicoId) {
-        // Referencia a la colección 'user' donde están los médicos
-        FirebaseFirestore db = FirebaseFirestore.getInstance();
+    private void eliminarMedico(String medicoId, int position) {
+        // Referencias a las ramas "users" y "Medicos"
+        DatabaseReference medicosRef = FirebaseDatabase.getInstance().getReference().child("Medicos").child(medicoId);
 
-        // Eliminar el médico de la base de datos por su ID
-        db.collection("user").document(medicoId)
-                .delete()
-                .addOnSuccessListener(aVoid -> {
-                    // Notificamos que se eliminó el médico y actualizamos el RecyclerView
-                    // Si necesitas actualizar la lista, puedes eliminar el objeto de la lista y notificar al adaptador
-                    for (Medico medico : medicoList) {
-                        if (medico.getId().equals(medicoId)) {
-                            medicoList.remove(medico);
-                            notifyDataSetChanged();
-                            break;
-                        }
-                    }
-                    Toast.makeText(context, "Médico eliminado", Toast.LENGTH_SHORT).show();
-                })
-                .addOnFailureListener(e -> {
-                    // Manejo de errores
-                    Toast.makeText(context, "Error al eliminar médico", Toast.LENGTH_SHORT).show();
-                });
+        // Eliminar el médico de ambas ramas
+        medicosRef.removeValue()
+                .addOnSuccessListener(aVoid -> medicosRef.removeValue()
+                        .addOnSuccessListener(aVoid1 -> {
+                            // Remover al médico de la lista local y notificar al adaptador
+                            medicoList.remove(position);
+                            notifyItemRemoved(position);
+                            Toast.makeText(context, "Médico eliminado de ambas ramas", Toast.LENGTH_SHORT).show();
+                        })
+                        .addOnFailureListener(e -> Toast.makeText(context, "Error al eliminar médico de la rama Medicos", Toast.LENGTH_SHORT).show()))
+                .addOnFailureListener(e -> Toast.makeText(context, "Error al eliminar médico de la rama users", Toast.LENGTH_SHORT).show());
     }
 
     public static class PersonalMedicoViewHolder extends RecyclerView.ViewHolder {

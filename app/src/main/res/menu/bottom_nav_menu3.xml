@@ -10,7 +10,7 @@
         android:title="@string/title_especialidades" />
     <item
         android:id="@+id/navigation_medicos"
-        android:icon="@drawable/round_medical_services_24"
+        android:icon="@drawable/stethoscope_24dp_68b0ab_fill0_wght400_grad0_opsz24"
         android:title="@string/title_medicos" />
     <item
         android:id="@+id/navigation_notifications"

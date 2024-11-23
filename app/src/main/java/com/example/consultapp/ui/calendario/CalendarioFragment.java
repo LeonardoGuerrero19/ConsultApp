@@ -2,7 +2,6 @@ package com.example.consultapp.ui.calendario;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,25 +14,16 @@ import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
-import com.example.consultapp.AgendaActivity;
-import com.example.consultapp.FotoActivity;
 import com.example.consultapp.InformeMedicoActivity;
 import com.example.consultapp.PerfilDoc;
 import com.example.consultapp.R;
 import com.example.consultapp.databinding.FragmentCalendarioBinding;
-import com.example.consultapp.ui.calendario.CalendarioViewModel;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
 import java.util.List;
 
 public class CalendarioFragment extends Fragment {
