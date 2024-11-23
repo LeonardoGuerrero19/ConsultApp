@@ -1,5 +1,6 @@
 package com.example.consultapp.ui.citas;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -7,6 +8,7 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -19,6 +21,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.consultapp.Cita;
 import com.example.consultapp.CitasAdapter;
+import com.example.consultapp.PerfilDoc;
 import com.example.consultapp.R;
 import com.example.consultapp.databinding.FragmentCitasBinding;
 import com.google.firebase.auth.FirebaseAuth;
@@ -62,6 +65,7 @@ public class CitasFragment extends Fragment {
 
         // Obtener referencias de vistas
         TextView textSaludo = binding.textSaludo;
+        ImageButton imageButton = binding.image;
 
         FirebaseUser currentUser = mAuth.getCurrentUser();
 
@@ -129,6 +133,12 @@ public class CitasFragment extends Fragment {
             textSaludo.setText("Hola, Usuario");
             Toast.makeText(getContext(), "Usuario no logueado", Toast.LENGTH_SHORT).show();
         }
+
+        // Listener del botón para ir al perfil del doctor
+        imageButton.setOnClickListener(v -> {
+            Intent intent = new Intent(getActivity(), PerfilDoc.class);
+            startActivity(intent);
+        });
 
         return root;
     }

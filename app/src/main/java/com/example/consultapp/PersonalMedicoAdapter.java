@@ -64,11 +64,10 @@ public class PersonalMedicoAdapter extends RecyclerView.Adapter<PersonalMedicoAd
 
     private void eliminarMedico(String medicoId, int position) {
         // Referencias a las ramas "users" y "Medicos"
-        DatabaseReference usersRef = FirebaseDatabase.getInstance().getReference().child("users").child(medicoId);
         DatabaseReference medicosRef = FirebaseDatabase.getInstance().getReference().child("Medicos").child(medicoId);
 
         // Eliminar el médico de ambas ramas
-        usersRef.removeValue()
+        medicosRef.removeValue()
                 .addOnSuccessListener(aVoid -> medicosRef.removeValue()
                         .addOnSuccessListener(aVoid1 -> {
                             // Remover al médico de la lista local y notificar al adaptador

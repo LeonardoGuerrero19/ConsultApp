@@ -22,8 +22,10 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -126,8 +128,8 @@ public class RegistroDoctor extends AppCompatActivity {
                         especializaciones.add(especializacion);
                     }
                 }
-                ArrayAdapter<String> adapter = new ArrayAdapter<>(RegistroDoctor.this, android.R.layout.simple_spinner_item, especializaciones);
-                adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                ArrayAdapter<String> adapter = new ArrayAdapter<>(RegistroDoctor.this, R.layout.item_spinner2, especializaciones);
+                adapter.setDropDownViewResource(R.layout.spinner_dropdown_item);
                 spinnerEspecializacion.setAdapter(adapter);
             }
 
@@ -152,9 +154,6 @@ public class RegistroDoctor extends AppCompatActivity {
                 medico.put("telefono", telefono);
                 medico.put("rol", "medico");
                 medico.put("horarios", horarios);
-
-                // Guardar datos en la rama "users"
-                databaseReference.child("users").child(uid).setValue(medico);
 
                 // Guardar datos en la rama "Medicos"
                 databaseReference.child("Medicos").child(uid).setValue(medico)

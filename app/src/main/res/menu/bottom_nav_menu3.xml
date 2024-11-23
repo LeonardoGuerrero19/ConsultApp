@@ -6,8 +6,12 @@
         android:title="@string/title_citas" />
     <item
         android:id="@+id/navigation_especialidades"
-        android:icon="@drawable/round_calendar_month_24"
+        android:icon="@drawable/round_medical_services_24"
         android:title="@string/title_especialidades" />
+    <item
+        android:id="@+id/navigation_medicos"
+        android:icon="@drawable/stethoscope_24dp_68b0ab_fill0_wght400_grad0_opsz24"
+        android:title="@string/title_medicos" />
     <item
         android:id="@+id/navigation_notifications"
         android:icon="@drawable/ic_notifications_black_24dp"

@@ -17,5 +17,5 @@
         android:textColor="@color/black"
         android:gravity="start"
         app:cornerRadius="20dp"
-        android:backgroundTint="@color/gray"/>
+        android:backgroundTint="@color/aqua"/>
 </RelativeLayout>
