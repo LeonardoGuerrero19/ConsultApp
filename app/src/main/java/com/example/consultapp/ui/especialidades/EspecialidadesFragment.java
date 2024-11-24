@@ -16,6 +16,7 @@ import android.view.ViewGroup;
 import android.view.Window;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -45,6 +46,8 @@ public class EspecialidadesFragment extends Fragment {
     private Uri imageUri = null; // URI de la imagen seleccionada
     private String servicioNombre;  // Declarar como variable de clase
     private String descripcion;     // Declarar como variable de clase
+    private Dialog dialog; // Declarar como variable de instancia
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -67,15 +70,17 @@ public class EspecialidadesFragment extends Fragment {
 
     private void showBottomDialog() {
         // Crear y mostrar el modal para agregar un nuevo servicio
-        final Dialog dialog = new Dialog(requireContext());
+        dialog = new Dialog(requireContext());  // Asignar a la variable de instancia
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
         dialog.setContentView(R.layout.bottomsheet_layout);
 
         // Referencias a los elementos del modal
         EditText editarServicioModal = dialog.findViewById(R.id.nombre_especialidad);
         Button botonAgregarServicioModal = dialog.findViewById(R.id.btnAgregarEspecialidad);
-        Button selectImageButton = dialog.findViewById(R.id.selectImageButton); // Botón para seleccionar imagen
+        ImageButton selectImageButton = dialog.findViewById(R.id.selectImageButton); // Botón para seleccionar imagen
         EditText descripcionServicioModal = dialog.findViewById(R.id.descripcion_especialidad);
+
+        ImageView imageViewPreview = dialog.findViewById(R.id.imageView); // O el ID adecuado del ImageView en tu layout
 
         // Configura el clic en el botón de seleccionar imagen
         selectImageButton.setOnClickListener(v -> openImageSelector());
@@ -100,7 +105,6 @@ public class EspecialidadesFragment extends Fragment {
             dialog.dismiss(); // Cerrar el modal después de agregar
         });
 
-
         // Mostrar el dialog
         dialog.show();
         dialog.getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
@@ -108,6 +112,7 @@ public class EspecialidadesFragment extends Fragment {
         dialog.getWindow().getAttributes().windowAnimations = R.style.DialogAnimation;
         dialog.getWindow().setGravity(Gravity.BOTTOM);
     }
+
 
     private void openImageSelector() {
         Intent intent = new Intent(Intent.ACTION_PICK);
@@ -229,7 +234,14 @@ public class EspecialidadesFragment extends Fragment {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == PICK_IMAGE_REQUEST && resultCode == getActivity().RESULT_OK && data != null && data.getData() != null) {
             imageUri = data.getData(); // Obtén la URI de la imagen seleccionada
-            // Asegúrate de que servicioNombre y descripcion son accesibles
+
+            // Aquí actualizas el ImageView con la imagen seleccionada
+            ImageView imageViewPreview = dialog.findViewById(R.id.imageView); // Usar el dialog de la instancia
+            Glide.with(requireContext())
+                    .load(imageUri) // Carga la URI de la imagen
+                    .into(imageViewPreview); // Muestra la imagen en el ImageView
+
+            // También puedes llamar al método uploadImageToFirebaseStorage si deseas subir la imagen
             if (!TextUtils.isEmpty(servicioNombre) && !TextUtils.isEmpty(descripcion)) {
                 uploadImageToFirebaseStorage(servicioNombre, descripcion); // Pasa estos valores para completar la subida
             } else {
@@ -237,7 +249,6 @@ public class EspecialidadesFragment extends Fragment {
             }
         }
     }
-
 
     private void uploadImageToFirebaseStorage(String servicioNombre, String descripcion) {
         if (imageUri != null) {
@@ -256,9 +267,6 @@ public class EspecialidadesFragment extends Fragment {
                             servicioMap.put("imagenUrl", imageUrl); // Guardar la URL de la imagen
 
                             databaseReference.child("Servicios").child("DetalleServicios").child(servicioNombre).setValue(servicioMap)
-                                    .addOnSuccessListener(aVoid -> {
-                                        Toast.makeText(getContext(), "Servicio agregado", Toast.LENGTH_SHORT).show();
-                                    })
                                     .addOnFailureListener(e -> {
                                         Toast.makeText(getContext(), "Error al agregar servicio", Toast.LENGTH_SHORT).show();
                                     });

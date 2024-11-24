@@ -162,37 +162,72 @@ public class HorariosFragment extends Fragment {
     }
 
     private void guardarHorariosEnRealtime(String medicoId) {
-        Map<String, Object> data = new HashMap<>();
-        data.put("fecha", fechaSeleccionada);
-        data.put("horarios", horariosSeleccionados);
+        if (fechaSeleccionada == null || horariosSeleccionados.isEmpty()) {
+            Toast.makeText(getContext(), "Seleccione una fecha y horarios válidos", Toast.LENGTH_SHORT).show();
+            return;
+        }
 
-        dbRef.child("Medicos").child(medicoId).addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                if (snapshot.exists()) {
-                    String nombre = snapshot.child("nombre").getValue(String.class);
-                    String especializacion = snapshot.child("especializacion").getValue(String.class);
+        dbRef.child("horarios_medicos")
+                .orderByChild("fecha")
+                .equalTo(fechaSeleccionada)
+                .addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        boolean horarioDuplicado = false;
 
-                    data.put("nombre", nombre);
-                    data.put("especializacion", especializacion);
+                        for (DataSnapshot horarioSnapshot : snapshot.getChildren()) {
+                            List<String> horariosExistentes = (List<String>) horarioSnapshot.child("horarios").getValue();
 
-                    dbRef.child("horarios_medicos").push().setValue(data)
-                            .addOnSuccessListener(aVoid -> {
-                                Toast.makeText(getContext(), "Horarios guardados con éxito", Toast.LENGTH_SHORT).show();
-                                limpiarSelecciones(); // Llamar a método para deseleccionar botones
-                            })
-                            .addOnFailureListener(e -> {
-                                Toast.makeText(getContext(), "Error al guardar horarios: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                            if (horariosExistentes != null && horariosExistentes.containsAll(horariosSeleccionados)) {
+                                horarioDuplicado = true;
+                                break;
+                            }
+                        }
+
+                        if (horarioDuplicado) {
+                            Toast.makeText(getContext(), "Ya existen estos horarios para la fecha seleccionada", Toast.LENGTH_SHORT).show();
+                        } else {
+                            // Procede a guardar si no hay duplicados
+                            Map<String, Object> data = new HashMap<>();
+                            data.put("fecha", fechaSeleccionada);
+                            data.put("horarios", horariosSeleccionados);
+
+                            dbRef.child("Medicos").child(medicoId).addListenerForSingleValueEvent(new ValueEventListener() {
+                                @Override
+                                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                    if (snapshot.exists()) {
+                                        String nombre = snapshot.child("nombre").getValue(String.class);
+                                        String especializacion = snapshot.child("especializacion").getValue(String.class);
+
+                                        data.put("nombre", nombre);
+                                        data.put("especializacion", especializacion);
+
+                                        dbRef.child("horarios_medicos").push().setValue(data)
+                                                .addOnSuccessListener(aVoid -> {
+                                                    Toast.makeText(getContext(), "Horarios guardados con éxito", Toast.LENGTH_SHORT).show();
+                                                    limpiarSelecciones(); // Llamar a método para deseleccionar botones
+                                                })
+                                                .addOnFailureListener(e -> {
+                                                    Toast.makeText(getContext(), "Error al guardar horarios: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                                                });
+                                    }
+                                }
+
+                                @Override
+                                public void onCancelled(@NonNull DatabaseError error) {
+                                    Toast.makeText(getContext(), "Error al cargar datos del médico", Toast.LENGTH_SHORT).show();
+                                }
                             });
-                }
-            }
+                        }
+                    }
 
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-                Toast.makeText(getContext(), "Error al cargar datos del médico", Toast.LENGTH_SHORT).show();
-            }
-        });
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {
+                        Toast.makeText(getContext(), "Error al verificar duplicados", Toast.LENGTH_SHORT).show();
+                    }
+                });
     }
+
 
     private void limpiarSelecciones() {
         fechaSeleccionada = null;

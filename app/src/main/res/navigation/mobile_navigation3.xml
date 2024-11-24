@@ -24,8 +24,8 @@
         tools:layout="@layout/fragment_medicos" />
 
     <fragment
-        android:id="@+id/navigation_notifications"
-        android:name="com.example.consultapp.ui.notifications.NotificationsFragment"
-        android:label="@string/title_notifications"
-        tools:layout="@layout/fragment_notifications" />
+        android:id="@+id/navigation_pacientes"
+        android:name="com.example.consultapp.ui.pacientes.PacientesFragment"
+        android:label="@string/title_pacientes"
+        tools:layout="@layout/fragment_pacientes" />
 </navigation>

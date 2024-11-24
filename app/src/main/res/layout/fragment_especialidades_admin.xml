@@ -24,6 +24,7 @@
         android:layout_height="wrap_content"
         android:layout_below="@id/text"
         android:layout_marginHorizontal="20dp"
+        android:paddingBottom="80dp"
         android:clipToPadding="false">
 
         <!-- RecyclerView maneja el scroll de la lista -->

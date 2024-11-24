@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:backgroundTint="@color/gray"
+    android:background="@drawable/rounded"
+    android:paddingVertical="15dp"
+    android:paddingHorizontal="20dp"
+    android:layout_marginBottom="20dp" >
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical"
+        android:orientation="vertical"
+        android:layout_weight="1"> <!-- Distribuir el espacio -->
+
+        <TextView
+            android:id="@+id/tvNumeroCuenta"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Número de cuenta"
+            android:textSize="20dp"
+            android:fontFamily="@font/montserrat_bold"
+            android:textColor="@color/black" />
+
+        <TextView
+            android:id="@+id/tvNombre"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Nombre"
+            android:textSize="18dp"
+            android:fontFamily="@font/montserrat_medium"
+            android:textColor="@color/black" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="50dp"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_gravity="center_vertical|end"> <!-- Alineado al final del contenedor -->
+
+        <ImageButton
+            android:id="@+id/btn_mas"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:src="@drawable/round_arrow_forward_ios_24"
+            android:background="@drawable/rounded" />
+    </LinearLayout>
+</LinearLayout>
