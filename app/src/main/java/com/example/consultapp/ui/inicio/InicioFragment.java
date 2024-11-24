@@ -12,7 +12,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
-import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
@@ -22,21 +21,22 @@ import com.example.consultapp.databinding.FragmentInicioBinding;
 import com.example.consultapp.login;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.firestore.DocumentReference;
-import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.List;
 import java.util.Locale;
 
 public class InicioFragment extends Fragment {
 
     private FragmentInicioBinding binding;
-    private FirebaseFirestore db;
     private FirebaseAuth mAuth;
+    private DatabaseReference databaseReference;
     private GridLayout gridLayout;
     private LinearLayout linearProxCitas;
     private Button btn_cerrarS;
@@ -49,9 +49,9 @@ public class InicioFragment extends Fragment {
         binding = FragmentInicioBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
 
-        // Inicializar Firestore y Auth
-        db = FirebaseFirestore.getInstance();
+        // Inicializar FirebaseAuth y Realtime Database
         mAuth = FirebaseAuth.getInstance();
+        databaseReference = FirebaseDatabase.getInstance().getReference();
 
         // Inicializar vistas
         TextView textSaludo = binding.textSaludo;
@@ -64,25 +64,28 @@ public class InicioFragment extends Fragment {
         if (currentUser != null) {
             String userId = currentUser.getUid();
 
-            // Referencia al documento del usuario en Firestore
-            DocumentReference userRef = db.collection("user").document(userId);
-
-            userRef.get().addOnSuccessListener(documentSnapshot -> {
-                if (documentSnapshot.exists()) {
-                    // Obtener el nombre del campo "nombre"
-                    String nombreUsuario = documentSnapshot.getString("nombre");
-                    if (nombreUsuario != null) {
-                        textSaludo.setText("Hola, " + nombreUsuario);
+            // Referencia al nodo del usuario en Realtime Database
+            databaseReference.child("users").child(userId).addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                    if (snapshot.exists()) {
+                        String nombreUsuario = snapshot.child("nombre").getValue(String.class);
+                        if (nombreUsuario != null) {
+                            textSaludo.setText("Hola, " + nombreUsuario);
+                        } else {
+                            textSaludo.setText("Hola, Usuario");
+                        }
                     } else {
                         textSaludo.setText("Hola, Usuario");
+                        Toast.makeText(getContext(), "No se encontró el usuario en la base de datos", Toast.LENGTH_SHORT).show();
                     }
-                } else {
-                    textSaludo.setText("Hola, Usuario");
-                    Toast.makeText(getContext(), "No se encontró el usuario en la base de datos", Toast.LENGTH_SHORT).show();
                 }
-            }).addOnFailureListener(e -> {
-                textSaludo.setText("Hola, Usuario");
-                Toast.makeText(getContext(), "Error al obtener el nombre del usuario", Toast.LENGTH_SHORT).show();
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError error) {
+                    textSaludo.setText("Hola, Usuario");
+                    Toast.makeText(getContext(), "Error al obtener el nombre del usuario", Toast.LENGTH_SHORT).show();
+                }
             });
 
             // Cargar próximas citas del usuario
@@ -111,111 +114,104 @@ public class InicioFragment extends Fragment {
     }
 
     private void cargarProximasCitas(String userId) {
-        db.collection("citas")
-                .whereEqualTo("usuario_id", userId)
-                .get()
-                .addOnCompleteListener(task -> {
-                    if (task.isSuccessful() && !task.getResult().isEmpty()) {
-                        for (DocumentSnapshot document : task.getResult()) {
-                            String estado = document.getString("estado");
-                            if ("proxima".equalsIgnoreCase(estado)) { // Verificar si el estado es "próxima"
-                                String servicio = document.getString("servicio");
-                                String doctor = document.getString("doctor");
-                                String fecha = document.getString("fecha");
-                                String horario = document.getString("horario");
+        databaseReference.child("citas").orderByChild("usuario_id").equalTo(userId)
+                .addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        if (snapshot.exists()) {
+                            for (DataSnapshot citaSnapshot : snapshot.getChildren()) {
+                                String estado = citaSnapshot.child("estado").getValue(String.class);
+                                if ("proxima".equalsIgnoreCase(estado)) { // Verificar si el estado es "próxima"
+                                    String servicio = citaSnapshot.child("servicio").getValue(String.class);
+                                    String doctor = citaSnapshot.child("doctor").getValue(String.class);
+                                    String fecha = citaSnapshot.child("fecha").getValue(String.class);
+                                    String horario = citaSnapshot.child("horario").getValue(String.class);
 
-                                // Crear y agregar un TextView para cada cita válida
-                                agregarTextoCita(servicio, doctor, fecha, horario);
+                                    // Crear y agregar un TextView para cada cita válida
+                                    agregarTextoCita(servicio, doctor, fecha, horario);
+                                }
                             }
+                        } else {
+                            Toast.makeText(getContext(), "No tienes citas próximas.", Toast.LENGTH_SHORT).show();
                         }
-                    } else {
-                        Toast.makeText(getContext(), "No tienes citas próximas.", Toast.LENGTH_SHORT).show();
                     }
-                })
-                .addOnFailureListener(e -> {
-                    Toast.makeText(getContext(), "Error al cargar las citas.", Toast.LENGTH_SHORT).show();
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {
+                        Toast.makeText(getContext(), "Error al cargar las citas.", Toast.LENGTH_SHORT).show();
+                    }
                 });
     }
 
     private void agregarTextoCita(String servicio, String doctor, String fecha, String horario) {
-        // Inflar el diseño XML de la cita
         View citaView = LayoutInflater.from(getContext()).inflate(R.layout.item_prox_citas, linearProxCitas, false);
 
-        // Referenciar los TextView dentro del diseño inflado
         TextView tvServicio = citaView.findViewById(R.id.tvServicio);
         TextView tvDoctor = citaView.findViewById(R.id.tvDoctor);
         TextView tvFecha = citaView.findViewById(R.id.tvFecha);
         TextView tvHorario = citaView.findViewById(R.id.tvHorario);
 
-        // Convertir la fecha al formato deseado
         String fechaFormateada = formatearFecha(fecha);
 
-        // Establecer los valores
         tvServicio.setText(servicio);
         tvDoctor.setText("Dr. " + doctor);
-        tvFecha.setText(fechaFormateada); // Usar la fecha formateada
+        tvFecha.setText(fechaFormateada);
         tvHorario.setText(horario);
 
-        // Agregar el diseño inflado al LinearLayout
         linearProxCitas.addView(citaView);
     }
 
     private String formatearFecha(String fechaOriginal) {
-        // Formato de la fecha que recibes (por ejemplo: "21/11/2024")
         SimpleDateFormat formatoEntrada = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
-        // Formato al que quieres convertir (por ejemplo: "21 de Noviembre de 2024")
         SimpleDateFormat formatoSalida = new SimpleDateFormat("d 'de' MMMM", new Locale("es", "ES"));
 
         try {
-            Date fecha = formatoEntrada.parse(fechaOriginal); // Parsear la fecha original
-            return formatoSalida.format(fecha); // Convertir al formato deseado
+            Date fecha = formatoEntrada.parse(fechaOriginal);
+            return formatoSalida.format(fecha);
         } catch (ParseException e) {
             e.printStackTrace();
-            return fechaOriginal; // En caso de error, devolver la fecha original
+            return fechaOriginal;
         }
     }
 
     private void obtenerServicios() {
-        DocumentReference serviciosRef = db.collection("Servicios").document("Todos los servicios");
+        databaseReference.child("Servicios").child("TodosLosServicios").addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if (snapshot.exists()) {
+                    for (DataSnapshot servicioSnapshot : snapshot.getChildren()) {
+                        String servicio = servicioSnapshot.getValue(String.class);
 
-        serviciosRef.get().addOnCompleteListener(task -> {
-            if (task.isSuccessful()) {
-                DocumentSnapshot document = task.getResult();
-                if (document != null && document.exists()) {
-                    List<String> servicios = (List<String>) document.get("Servicios");
-
-                    if (servicios != null) {
-                        for (String servicio : servicios) {
-                            // Inflar el diseño del botón
+                        if (servicio != null) {
                             View servicioView = LayoutInflater.from(getContext()).inflate(R.layout.item_button_service, gridLayout, false);
 
-                            // Referenciar el botón dentro del diseño inflado
                             Button btnService = servicioView.findViewById(R.id.servicioButton);
                             btnService.setText(servicio);
 
-                            // Configurar el layoutParams para respetar el ancho del GridLayout
                             GridLayout.LayoutParams params = new GridLayout.LayoutParams();
-                            params.width = 0; // Ancho dinámico
+                            params.width = 0;
                             params.height = ViewGroup.LayoutParams.WRAP_CONTENT;
-                            params.columnSpec = GridLayout.spec(GridLayout.UNDEFINED, 1f); // Peso igual para las columnas
-                            params.setMargins(8, 8, 8, 8); // Márgenes opcionales
+                            params.columnSpec = GridLayout.spec(GridLayout.UNDEFINED, 1f);
+                            params.setMargins(8, 8, 8, 8);
                             servicioView.setLayoutParams(params);
 
-                            // Configurar acción del botón
                             btnService.setOnClickListener(v -> {
                                 Intent intent = new Intent(getContext(), AgendaActivity.class);
                                 intent.putExtra("nombreServicio", servicio);
                                 startActivity(intent);
                             });
 
-                            // Agregar la vista inflada al GridLayout
                             gridLayout.addView(servicioView);
                         }
-
                     }
                 } else {
                     Toast.makeText(getContext(), "Error al cargar los servicios", Toast.LENGTH_SHORT).show();
                 }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                Toast.makeText(getContext(), "Error al cargar los servicios.", Toast.LENGTH_SHORT).show();
             }
         });
     }
