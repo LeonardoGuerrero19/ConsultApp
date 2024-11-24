@@ -11,8 +11,8 @@
     <!-- Imagen del servicio -->
     <ImageView
         android:id="@+id/imagen_servicio"
-        android:layout_width="match_parent"
-        android:layout_height="200dp"
+        android:layout_width="80dp"
+        android:layout_height="80dp"
         android:scaleType="centerCrop"
         android:layout_marginBottom="10dp" />
 

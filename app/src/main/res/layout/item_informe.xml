@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:paddingVertical="15dp"
+    android:paddingHorizontal="20dp"
+    android:layout_marginBottom="20dp"
+    android:backgroundTint="@color/gray"
+    android:background="@drawable/rounded" >
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Motivo: "
+        android:textColor="@color/black"
+        android:fontFamily="@font/montserrat_bold"
+        android:textSize="20dp"
+        android:layout_marginBottom="5dp" />
+
+    <TextView
+       android:id="@+id/tvMotivoInforme"
+       android:layout_width="wrap_content"
+       android:layout_height="wrap_content"
+       android:text="Motivo del informe"
+       android:fontFamily="@font/montserrat_medium"
+       android:textColor="@color/black"
+       android:textSize="18dp"
+       android:layout_marginBottom="5dp" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Padecimiento: "
+        android:textColor="@color/black"
+        android:fontFamily="@font/montserrat_bold"
+        android:textSize="20dp"
+        android:layout_marginBottom="5dp" />
+    <TextView
+        android:id="@+id/tvPadecimientoInforme"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Padecimiento"
+        android:fontFamily="@font/montserrat_medium"
+        android:textColor="@color/black"
+        android:textSize="18dp"
+        android:layout_marginBottom="5dp" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Medicamento: "
+        android:textColor="@color/black"
+        android:fontFamily="@font/montserrat_bold"
+        android:textSize="20dp"
+        android:layout_marginBottom="5dp" />
+    <TextView
+        android:id="@+id/tvMedicamentoInforme"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Medicamento"
+        android:fontFamily="@font/montserrat_medium"
+        android:textSize="18dp"
+        android:textColor="@color/black" />
+</LinearLayout>

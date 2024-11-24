@@ -92,7 +92,7 @@ public class EditarPersonalMedico extends AppCompatActivity {
                 if (snapshot.exists()) {
                     Medico medico = snapshot.getValue(Medico.class);
                     if (medico != null) {
-                        nombre.setText(medico.getNombre());
+                        nombre.setText("Dr. " + medico.getNombre());
                         nombreMedico.setText(medico.getNombre());
                         telefono.setText(medico.getTelefono());
 

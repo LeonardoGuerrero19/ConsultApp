@@ -53,7 +53,7 @@ public class CalendarioFragment extends Fragment {
             String userId = mAuth.getCurrentUser().getUid();
 
             // Referencia al nodo del médico en Realtime Database
-            dbRef.child("medicos").child(userId).addListenerForSingleValueEvent(new ValueEventListener() {
+            dbRef.child("Medicos").child(userId).addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot snapshot) {
                     if (snapshot.exists()) {

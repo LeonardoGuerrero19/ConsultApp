@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:background="@drawable/dialog_bkg2">
+
+    <ImageView
+        android:id="@+id/imageView"
+        android:layout_width="150dp"
+        android:layout_height="150dp"
+        android:layout_marginTop="20dp"
+        android:layout_gravity="center"
+        android:scaleType="centerCrop"
+        android:contentDescription="Vista previa de la imagen seleccionada"
+        android:src="@drawable/boton_seleccionado" />
+
+    <ImageButton
+        android:id="@+id/selectImageButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_plus"
+        android:backgroundTint="@color/gray"
+        android:background="@drawable/rounded"
+        android:layout_gravity="center"
+        android:layout_marginTop="-20dp" />
+
+    <Button
+        android:id="@+id/btn_cerrarS"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="20dp"
+        android:padding="10dp"
+        android:backgroundTint="@color/aqua"
+        app:cornerRadius="18dp"
+        android:layout_marginHorizontal="20dp"
+        android:fontFamily="@font/montserrat_bold"
+        android:textSize="22dp"
+        android:text="Cerrar sesión"
+        android:textColor="@color/white" />
+
+    <ImageView
+        android:layout_width="70dp"
+        android:layout_height="wrap_content"
+        android:src="@drawable/round_remove_24"
+        android:scaleType="centerCrop"
+        android:layout_gravity="center" />
+
+</LinearLayout>

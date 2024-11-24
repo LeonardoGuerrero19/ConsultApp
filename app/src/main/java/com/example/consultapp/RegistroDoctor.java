@@ -1,9 +1,12 @@
 package com.example.consultapp;
 
 import android.app.Dialog;
+import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
+import android.net.Uri;
 import android.os.Bundle;
+import android.text.method.LinkMovementMethod;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,6 +15,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
@@ -22,22 +26,22 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 public class RegistroDoctor extends AppCompatActivity {
 
-    private EditText etNombreMedico, etCorreoMedico, etContrasenaMedico, etTelefonoMedico;
+    private EditText etNombreMedico, etCedula, etCorreoMedico, etContrasenaMedico, etTelefonoMedico;
     private Spinner spinnerEspecializacion;
     private Button horarioButton, btnRegistrarMedico;
     private FirebaseAuth mAuth;
     private DatabaseReference databaseReference;
     private List<String> horarioSeleccionado;
+    private TextView verifyLink;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,6 +54,7 @@ public class RegistroDoctor extends AppCompatActivity {
 
         // Referencias a los elementos en el layout
         etNombreMedico = findViewById(R.id.nombreMedico);
+        etCedula = findViewById(R.id.cedula);
         spinnerEspecializacion = findViewById(R.id.spinner_especializacion);
         etCorreoMedico = findViewById(R.id.correoMedico);
         etContrasenaMedico = findViewById(R.id.contrasenaMedico);
@@ -63,16 +68,34 @@ public class RegistroDoctor extends AppCompatActivity {
         // Cargar especializaciones desde Realtime Database
         cargarEspecializacionesDesdeRealtime();
 
+        // Initialize views
+        verifyLink = findViewById(R.id.verify_link);
+
+        // Set up the link text and behavior
+        verifyLink.setText("Verificar");
+        verifyLink.setMovementMethod(LinkMovementMethod.getInstance());
+
+        // Set the click listener to open the URL
+        verifyLink.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String url = "https://www.cedulaprofesional.sep.gob.mx/cedula/presidencia/indexAvanzada.action"; // URL to open
+                Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+                startActivity(intent);
+            }
+        });
+
         // Registrar médico
         btnRegistrarMedico.setOnClickListener(v -> {
             String nombre = etNombreMedico.getText().toString();
+            String cedula = etCedula.getText().toString();
             String especializacion = spinnerEspecializacion.getSelectedItem().toString();
             String correo = etCorreoMedico.getText().toString();
             String telefono = etTelefonoMedico.getText().toString();
             String contrasena = etContrasenaMedico.getText().toString();
 
-            if (!nombre.isEmpty() && !especializacion.isEmpty() && !correo.isEmpty() && !contrasena.isEmpty() && !telefono.isEmpty() && horarioSeleccionado != null) {
-                registrarMedico(nombre, especializacion, correo, contrasena, telefono, horarioSeleccionado);
+            if (!nombre.isEmpty() && !cedula.isEmpty() && !especializacion.isEmpty() && !correo.isEmpty() && !contrasena.isEmpty() && !telefono.isEmpty() && horarioSeleccionado != null) {
+                registrarMedico(nombre, cedula, especializacion, correo, contrasena, telefono, horarioSeleccionado);
             } else {
                 Toast.makeText(RegistroDoctor.this, "Complete todos los campos", Toast.LENGTH_SHORT).show();
             }
@@ -140,7 +163,7 @@ public class RegistroDoctor extends AppCompatActivity {
         });
     }
 
-    private void registrarMedico(String nombre, String especializacion, String correo, String contrasena, String telefono, List<String> horarios) {
+    private void registrarMedico(String nombre, String cedula, String especializacion, String correo, String contrasena, String telefono, List<String> horarios) {
         mAuth.createUserWithEmailAndPassword(correo, contrasena).addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
                 String uid = mAuth.getCurrentUser().getUid();
@@ -149,6 +172,7 @@ public class RegistroDoctor extends AppCompatActivity {
                 Map<String, Object> medico = new HashMap<>();
                 medico.put("id", uid);
                 medico.put("nombre", nombre);
+                medico.put("cedula", cedula);
                 medico.put("especializacion", especializacion);
                 medico.put("correo", correo);
                 medico.put("telefono", telefono);
