@@ -29,6 +29,14 @@ import com.google.firebase.auth.FirebaseAuthUserCollisionException;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import java.util.Properties;
+import javax.mail.Message;
+import javax.mail.PasswordAuthentication;
+import javax.mail.Session;
+import javax.mail.Transport;
+import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeMessage;
+
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -173,15 +181,29 @@ public class registro extends AppCompatActivity {
                         if (task.isSuccessful()) {
                             FirebaseUser user = mAuth.getCurrentUser();
                             if (user != null) {
+                                // Envía el correo de verificación
                                 sendVerificationEmail(user, view);
+
+                                // Genera y guarda el número de cuenta
                                 saveUserToRealtimeDB(user.getUid(), nombreUser, correoUser, view);
+
+                                // Envía el número de cuenta por correo adicional
+                                String numeroCuenta = generarNumeroCuenta();
+                                sendAccountNumberEmail(correoUser, numeroCuenta);
+
+                                // Cierra sesión automáticamente
+                                mAuth.signOut();
+
+                                // Redirige al usuario a la pantalla de login
+                                startActivity(new Intent(registro.this, login.class));
+                                finish();
                             }
                         } else {
                             Exception exception = task.getException();
                             if (exception instanceof FirebaseAuthUserCollisionException) {
                                 Snackbar.make(view, "Este correo ya está registrado.", Snackbar.LENGTH_SHORT).show();
                             } else {
-                                Snackbar.make(view, "Error al registrar: Correo ya registrado ", Snackbar.LENGTH_SHORT).show();
+                                Snackbar.make(view, "Error al registrar: " + exception.getMessage(), Snackbar.LENGTH_SHORT).show();
                             }
                         }
                     }
@@ -198,6 +220,95 @@ public class registro extends AppCompatActivity {
                         Snackbar.make(view, "Error al enviar el correo de verificación.", Snackbar.LENGTH_SHORT).show();
                     }
                 });
+    }
+
+    private void sendAccountNumberEmail(String email, String accountNumber) {
+        new Thread(() -> {
+            try {
+                Log.d("Email", "Preparando para enviar correo a: " + email);
+
+                String host = "smtp.gmail.com"; // Servidor SMTP de Gmail
+                String user = "aconsultapp@gmail.com"; // Tu correo Gmail
+                String password = "mlqn jnkz drha ixqv"; // Contraseña de aplicación
+
+                // Configuración de las propiedades
+                Properties props = new Properties();
+                props.put("mail.smtp.auth", "true");
+                props.put("mail.smtp.starttls.enable", "true");
+                props.put("mail.smtp.host", host);
+                props.put("mail.smtp.port", "587");
+
+                Log.d("Email", "Propiedades del correo configuradas.");
+
+                // Sesión de correo
+                Session session = Session.getInstance(props,
+                        new javax.mail.Authenticator() {
+                            @Override
+                            protected PasswordAuthentication getPasswordAuthentication() {
+                                Log.d("Email", "Autenticando con el correo: " + user);
+                                return new PasswordAuthentication(user, password);
+                            }
+                        });
+
+                // Construcción del mensaje
+                MimeMessage message = new MimeMessage(session);
+                message.setFrom(new InternetAddress(user));
+                message.addRecipient(Message.RecipientType.TO, new InternetAddress(email));
+                message.setSubject("Tu número de cuenta");
+
+                // Contenido HTML del correo
+                String htmlContent = "<!DOCTYPE html>" +
+                        "<html>" +
+                        "<head>" +
+                        "    <style>" +
+                        "        body { font-family: Arial, sans-serif; background-color: #f4f4f9; margin: 0; padding: 0; }" +
+                        "        .container { max-width: 600px; margin: 20px auto; background: white; padding: 20px; border-radius: 10px; box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1); }" +
+                        "        .header { background-color: #00d4aa; color: white; padding: 10px 20px; text-align: center; border-radius: 10px 10px 0 0; }" +
+                        "        .content { padding: 20px; font-size: 16px; line-height: 1.5; color: #333; }" +
+                        "        .footer { text-align: center; padding: 10px; font-size: 12px; color: #777; border-top: 1px solid #eee; }" +
+                        "        .highlight { color: #00d4aa; font-size: 24px; font-weight: bold; text-align: center; margin: 20px 0; }" +
+                        "    </style>" +
+                        "</head>" +
+                        "<body>" +
+                        "    <div class='container'>" +
+                        "        <div class='header'>" +
+                        "            <h1>¡Bienvenido a ConsultApp!</h1>" +
+                        "        </div>" +
+                        "        <div class='content'>" +
+                        "            <p>Hola,</p>" +
+                        "            <p>Gracias por registrarte en nuestra plataforma. Tu cuenta ha sido creada exitosamente.</p>" +
+                        "            <p><strong>Tu número de cuenta es:</strong></p>" +
+                        "            <h2 class='highlight'>" + accountNumber + "</h2>" +
+                        "            <p>Puedes utilizar este número para acceder a nuestras funcionalidades.</p>" +
+                        "        </div>" +
+                        "        <div class='footer'>" +
+                        "            <p>&copy; 2024 ConsultApp. Todos los derechos reservados.</p>" +
+                        "        </div>" +
+                        "    </div>" +
+                        "</body>" +
+                        "</html>";
+
+                // Establecer el contenido HTML
+                message.setContent(htmlContent, "text/html; charset=utf-8");
+
+                Log.d("Email", "Correo construido con HTML.");
+
+                // Envío del correo
+                Transport.send(message);
+
+                Log.d("Email", "Correo enviado exitosamente a: " + email);
+            } catch (Exception e) {
+                Log.e("EmailError", "Error al enviar correo", e);
+            }
+        }).start();
+    }
+
+
+
+    private String generarNumeroCuenta() {
+        int year = Calendar.getInstance().get(Calendar.YEAR);
+        int randomNum = (int) (Math.random() * 9000) + 1000; // Genera un número aleatorio de 4 dígitos
+        return year + String.valueOf(randomNum); // Combina el año con el número aleatorio
     }
 
     private void saveUserToRealtimeDB(String userId, String nombreUser, String correoUser, View view) {
