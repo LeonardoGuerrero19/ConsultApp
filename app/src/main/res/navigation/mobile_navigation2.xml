@@ -22,10 +22,9 @@
         android:name="com.example.consultapp.ui.expediente_user.ExpedienteUserFragment"
         android:label="@string/title_expediente_user"
         tools:layout="@layout/fragment_expediente_user" />
-
     <fragment
-        android:id="@+id/navigation_notifications"
-        android:name="com.example.consultapp.ui.notifications.NotificationsFragment"
+        android:id="@+id/navigation_notifactions_user"
+        android:name="com.example.consultapp.ui.expediente_user.ExpedienteUserFragment"
         android:label="@string/title_notifications"
-        tools:layout="@layout/fragment_notifications" />
+        tools:layout="@layout/fragment_expediente_user" />
 </navigation>

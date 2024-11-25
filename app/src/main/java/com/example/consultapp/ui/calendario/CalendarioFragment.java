@@ -14,6 +14,8 @@ import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.resource.bitmap.RoundedCorners;
 import com.example.consultapp.InformeMedicoActivity;
 import com.example.consultapp.PerfilDoc;
 import com.example.consultapp.R;
@@ -58,8 +60,18 @@ public class CalendarioFragment extends Fragment {
                 public void onDataChange(@NonNull DataSnapshot snapshot) {
                     if (snapshot.exists()) {
                         String nombreDoctor = snapshot.child("nombre").getValue(String.class);
+                        String fotoDoctorUrl = snapshot.child("fotoPerfil").getValue(String.class); // Asume que el nodo "foto" tiene la URL
+
                         if (nombreDoctor != null) {
                             textSaludo.setText("Hola, " + nombreDoctor);
+                            // Cargar la foto del doctor en el ImageButton
+                            if (fotoDoctorUrl != null && !fotoDoctorUrl.isEmpty()) {
+                                Glide.with(requireContext())
+                                        .load(fotoDoctorUrl)
+                                        .transform(new RoundedCorners(150)) // Redondear las esquinas con un radio de 16dp
+                                        .placeholder(R.drawable.round_person_outline_24)
+                                        .into(imageButton);
+                            }
                             // Cargar las citas próximas del doctor logueado
                             cargarCitasProximas(linearCitas, nombreDoctor);
                         } else {

@@ -16,6 +16,7 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.example.consultapp.AgendaActivity;
+import com.example.consultapp.PerfilEspecialidadActivity;
 import com.example.consultapp.R;
 import com.example.consultapp.databinding.FragmentInicioBinding;
 import com.example.consultapp.login;
@@ -115,9 +116,10 @@ public class InicioFragment extends Fragment {
 
     private void cargarProximasCitas(String userId) {
         databaseReference.child("citas").orderByChild("usuario_id").equalTo(userId)
-                .addListenerForSingleValueEvent(new ValueEventListener() {
+                .addValueEventListener(new ValueEventListener() { // Cambiar a ValueEventListener
                     @Override
                     public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        linearProxCitas.removeAllViews(); // Limpiar citas previas para evitar duplicados
                         if (snapshot.exists()) {
                             for (DataSnapshot citaSnapshot : snapshot.getChildren()) {
                                 String estado = citaSnapshot.child("estado").getValue(String.class);
@@ -142,6 +144,7 @@ public class InicioFragment extends Fragment {
                     }
                 });
     }
+
 
     private void agregarTextoCita(String servicio, String doctor, String fecha, String horario) {
         View citaView = LayoutInflater.from(getContext()).inflate(R.layout.item_prox_citas, linearProxCitas, false);
@@ -179,29 +182,37 @@ public class InicioFragment extends Fragment {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if (snapshot.exists()) {
-                    for (DataSnapshot servicioSnapshot : snapshot.getChildren()) {
-                        String servicio = servicioSnapshot.getValue(String.class);
+                    int contador = 0; // Contador para limitar los servicios a 6
+                    gridLayout.removeAllViews(); // Limpiar el GridLayout antes de agregar los servicios
+                    gridLayout.setColumnCount(2); // Establecer 2 columnas
 
+                    for (DataSnapshot servicioSnapshot : snapshot.getChildren()) {
+                        if (contador >= 4) break; // Detener si ya se han agregado 6 servicios
+
+                        String servicio = servicioSnapshot.getValue(String.class);
                         if (servicio != null) {
                             View servicioView = LayoutInflater.from(getContext()).inflate(R.layout.item_button_service, gridLayout, false);
 
-                            Button btnService = servicioView.findViewById(R.id.servicioButton);
-                            btnService.setText(servicio);
+                            // Configurar el LayoutParams para cada servicio
+                            GridLayout.LayoutParams layoutParams = new GridLayout.LayoutParams();
+                            layoutParams.width = 0; // Ancho ajustado dinámicamente
+                            layoutParams.height = ViewGroup.LayoutParams.WRAP_CONTENT;
+                            layoutParams.columnSpec = GridLayout.spec(GridLayout.UNDEFINED, 1, 1f); // Ocupa una columna con peso igual
+                            layoutParams.rowSpec = GridLayout.spec(GridLayout.UNDEFINED, 1); // Una fila por elemento
+                            layoutParams.setMargins(8, 8, 40, 40); // Márgenes entre los elementos
 
-                            GridLayout.LayoutParams params = new GridLayout.LayoutParams();
-                            params.width = 0;
-                            params.height = ViewGroup.LayoutParams.WRAP_CONTENT;
-                            params.columnSpec = GridLayout.spec(GridLayout.UNDEFINED, 1f);
-                            params.setMargins(8, 8, 8, 8);
-                            servicioView.setLayoutParams(params);
+                            TextView servicioText = servicioView.findViewById(R.id.servicioText);
+                            servicioText.setText(servicio);
 
-                            btnService.setOnClickListener(v -> {
-                                Intent intent = new Intent(getContext(), AgendaActivity.class);
+                            servicioView.setOnClickListener(v -> {
+                                Intent intent = new Intent(getContext(), PerfilEspecialidadActivity.class);
                                 intent.putExtra("nombreServicio", servicio);
                                 startActivity(intent);
                             });
 
+                            servicioView.setLayoutParams(layoutParams);
                             gridLayout.addView(servicioView);
+                            contador++; // Incrementar el contador
                         }
                     }
                 } else {

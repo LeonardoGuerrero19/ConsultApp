@@ -55,7 +55,7 @@ public class AgendaActivity extends AppCompatActivity {
         btnRegresar = findViewById(R.id.btnRegresar);
 
         // Obtener el nombre del servicio desde el Intent
-        String servicioSeleccionado = getIntent().getStringExtra("nombreServicio");
+        String servicioSeleccionado = getIntent().getStringExtra("especializacion");
 
         // Mostrar el nombre del servicio
         if (servicioSeleccionado != null) {
@@ -82,31 +82,61 @@ public class AgendaActivity extends AppCompatActivity {
     }
 
     private void cargarHorariosParaFecha(String nombreServicio, String fecha) {
-        dbRef.child("horarios_medicos")
-                .orderByChild("especializacion")
-                .equalTo(nombreServicio)
+        // Lista para almacenar horarios ocupados
+        List<String> horariosOcupados = new ArrayList<>();
+
+        // Consultar horarios ocupados en "citas"
+        dbRef.child("citas")
+                .orderByChild("fecha")
+                .equalTo(fecha)
                 .addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot snapshot) {
-                        List<String> horariosDisponibles = new ArrayList<>();
-                        for (DataSnapshot horarioSnapshot : snapshot.getChildren()) {
-                            String fechaHorario = horarioSnapshot.child("fecha").getValue(String.class);
-                            if (fechaHorario != null && fechaHorario.equals(fecha)) {
-                                List<String> horarios = (List<String>) horarioSnapshot.child("horarios").getValue();
-                                if (horarios != null) {
-                                    horariosDisponibles.addAll(horarios);
-                                }
+                        for (DataSnapshot citaSnapshot : snapshot.getChildren()) {
+                            String horario = citaSnapshot.child("horario").getValue(String.class);
+                            if (horario != null) {
+                                horariosOcupados.add(horario); // Agregar horario ocupado a la lista
                             }
                         }
-                        actualizarBotonesHorarios(horariosDisponibles);
+
+                        // Consultar horarios disponibles de los médicos
+                        dbRef.child("horarios_medicos")
+                                .orderByChild("especializacion")
+                                .equalTo(nombreServicio)
+                                .addListenerForSingleValueEvent(new ValueEventListener() {
+                                    @Override
+                                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                        List<String> horariosDisponibles = new ArrayList<>();
+                                        for (DataSnapshot horarioSnapshot : snapshot.getChildren()) {
+                                            String fechaHorario = horarioSnapshot.child("fecha").getValue(String.class);
+                                            if (fechaHorario != null && fechaHorario.equals(fecha)) {
+                                                List<String> horarios = (List<String>) horarioSnapshot.child("horarios").getValue();
+                                                if (horarios != null) {
+                                                    for (String horario : horarios) {
+                                                        if (!horariosOcupados.contains(horario)) {
+                                                            horariosDisponibles.add(horario); // Solo horarios no ocupados
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                        actualizarBotonesHorarios(horariosDisponibles); // Crear botones
+                                    }
+
+                                    @Override
+                                    public void onCancelled(@NonNull DatabaseError error) {
+                                        Toast.makeText(AgendaActivity.this, "Error al cargar horarios", Toast.LENGTH_SHORT).show();
+                                    }
+                                });
                     }
 
                     @Override
                     public void onCancelled(@NonNull DatabaseError error) {
-                        Toast.makeText(AgendaActivity.this, "Error al cargar horarios", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(AgendaActivity.this, "Error al verificar horarios ocupados", Toast.LENGTH_SHORT).show();
                     }
                 });
     }
+
 
     private void actualizarBotonesHorarios(List<String> horarios) {
         linearHorarios.removeAllViews(); // Limpiar las vistas existentes
@@ -176,7 +206,40 @@ public class AgendaActivity extends AppCompatActivity {
 
         String userId = mAuth.getCurrentUser().getUid();
 
-        // Buscar el médico correspondiente a la especialización y horario
+        // Verificar si ya existe una cita para este usuario en la misma fecha y horario
+        dbRef.child("citas")
+                .orderByChild("usuario_id")
+                .equalTo(userId)
+                .addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        boolean citaDuplicada = false;
+
+                        for (DataSnapshot citaSnapshot : snapshot.getChildren()) {
+                            String fechaExistente = citaSnapshot.child("fecha").getValue(String.class);
+                            String horarioExistente = citaSnapshot.child("horario").getValue(String.class);
+
+                            if (fecha.equals(fechaExistente) && horarioSeleccionado.equals(horarioExistente)) {
+                                citaDuplicada = true;
+                                break;
+                            }
+                        }
+
+                        if (citaDuplicada) {
+                            Toast.makeText(AgendaActivity.this, "Ya tienes una cita en este horario", Toast.LENGTH_SHORT).show();
+                        } else {
+                            crearCita(nombreServicio, fecha, userId);
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {
+                        Toast.makeText(AgendaActivity.this, "Error al verificar citas existentes", Toast.LENGTH_SHORT).show();
+                    }
+                });
+    }
+
+    private void crearCita(String nombreServicio, String fecha, String userId) {
         dbRef.child("horarios_medicos")
                 .orderByChild("especializacion")
                 .equalTo(nombreServicio)
@@ -190,7 +253,7 @@ public class AgendaActivity extends AppCompatActivity {
                             List<String> horarios = (List<String>) horarioSnapshot.child("horarios").getValue();
 
                             if (fechaHorario != null && fechaHorario.equals(fecha) && horarios != null && horarios.contains(horarioSeleccionado)) {
-                                nombreMedico = horarioSnapshot.child("nombre").getValue(String.class); // Suponiendo que "nombre" es el campo con el nombre del médico
+                                nombreMedico = horarioSnapshot.child("nombre").getValue(String.class);
                                 break;
                             }
                         }
@@ -200,14 +263,12 @@ public class AgendaActivity extends AppCompatActivity {
                             return;
                         }
 
-                        // Generar un nuevo ID único para la cita
                         String citaId = dbRef.child("citas").push().getKey();
                         if (citaId == null) {
                             Toast.makeText(AgendaActivity.this, "Error al generar cita", Toast.LENGTH_SHORT).show();
                             return;
                         }
 
-                        // Crear datos de la cita
                         Map<String, Object> citaData = new HashMap<>();
                         citaData.put("cita_id", citaId);
                         citaData.put("usuario_id", userId);
@@ -215,9 +276,8 @@ public class AgendaActivity extends AppCompatActivity {
                         citaData.put("fecha", fecha);
                         citaData.put("horario", horarioSeleccionado);
                         citaData.put("estado", "proxima");
-                        citaData.put("doctor", nombreMedico); // Agregar el nombre del médico
+                        citaData.put("doctor", nombreMedico);
 
-                        // Guardar en la base de datos
                         dbRef.child("citas").child(citaId).setValue(citaData)
                                 .addOnSuccessListener(aVoid -> {
                                     Toast.makeText(AgendaActivity.this, "Cita guardada exitosamente", Toast.LENGTH_SHORT).show();
@@ -234,5 +294,6 @@ public class AgendaActivity extends AppCompatActivity {
                     }
                 });
     }
+
 
 }

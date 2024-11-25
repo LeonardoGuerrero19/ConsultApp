@@ -15,4 +15,8 @@
         android:id="@+id/navigation_expedientes"
         android:icon="@drawable/round_person_outline_24"
         android:title="@string/title_expedientes" />
+    <item
+        android:id="@+id/navigation_notifications"
+        android:icon="@drawable/round_notifications_24"
+        android:title="@string/title_notifications" />
 </menu>

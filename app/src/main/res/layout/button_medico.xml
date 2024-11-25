@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Button xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/btnMedico"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:text="Nombre del Médico"
+    android:textSize="16sp"
+    android:layout_marginBottom="8dp"
+    android:background="@color/gray" />
