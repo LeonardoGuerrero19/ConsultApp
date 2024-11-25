@@ -9,16 +9,13 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 import androidx.annotation.NonNull;
-
 import androidx.appcompat.app.AppCompatActivity;
-
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -176,38 +173,38 @@ public class AgendaActivity extends AppCompatActivity {
 
         String userId = mAuth.getCurrentUser().getUid();
 
-        // Buscar el médico correspondiente a la especialización y horario
         dbRef.child("horarios_medicos")
                 .orderByChild("especializacion")
                 .equalTo(nombreServicio)
                 .addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot snapshot) {
-                        String nombreMedico = null;
+                        final String[] nombreMedicoRef = new String[1];
+                        final String[] medicoIdRef = new String[1];
 
                         for (DataSnapshot horarioSnapshot : snapshot.getChildren()) {
                             String fechaHorario = horarioSnapshot.child("fecha").getValue(String.class);
                             List<String> horarios = (List<String>) horarioSnapshot.child("horarios").getValue();
 
-                            if (fechaHorario != null && fechaHorario.equals(fecha) && horarios != null && horarios.contains(horarioSeleccionado)) {
-                                nombreMedico = horarioSnapshot.child("nombre").getValue(String.class); // Suponiendo que "nombre" es el campo con el nombre del médico
+                            if (fechaHorario != null && fechaHorario.equals(fecha) &&
+                                    horarios != null && horarios.contains(horarioSeleccionado)) {
+                                nombreMedicoRef[0] = horarioSnapshot.child("nombre").getValue(String.class);
+                                medicoIdRef[0] = horarioSnapshot.getKey();
                                 break;
                             }
                         }
 
-                        if (nombreMedico == null) {
+                        if (nombreMedicoRef[0] == null || medicoIdRef[0] == null) {
                             Toast.makeText(AgendaActivity.this, "No se encontró un médico para esta cita", Toast.LENGTH_SHORT).show();
                             return;
                         }
 
-                        // Generar un nuevo ID único para la cita
                         String citaId = dbRef.child("citas").push().getKey();
                         if (citaId == null) {
                             Toast.makeText(AgendaActivity.this, "Error al generar cita", Toast.LENGTH_SHORT).show();
                             return;
                         }
 
-                        // Crear datos de la cita
                         Map<String, Object> citaData = new HashMap<>();
                         citaData.put("cita_id", citaId);
                         citaData.put("usuario_id", userId);
@@ -215,11 +212,11 @@ public class AgendaActivity extends AppCompatActivity {
                         citaData.put("fecha", fecha);
                         citaData.put("horario", horarioSeleccionado);
                         citaData.put("estado", "proxima");
-                        citaData.put("doctor", nombreMedico); // Agregar el nombre del médico
+                        citaData.put("doctor", nombreMedicoRef[0]);
 
-                        // Guardar en la base de datos
                         dbRef.child("citas").child(citaId).setValue(citaData)
                                 .addOnSuccessListener(aVoid -> {
+                                    agregarNotificacionAlMedico(medicoIdRef[0], nombreMedicoRef[0], nombreServicio, fecha, horarioSeleccionado);
                                     Toast.makeText(AgendaActivity.this, "Cita guardada exitosamente", Toast.LENGTH_SHORT).show();
                                     finish();
                                 })
@@ -235,4 +232,31 @@ public class AgendaActivity extends AppCompatActivity {
                 });
     }
 
+    private void agregarNotificacionAlMedico(String medicoId, String nombreMedico, String servicio, String fecha, String horario) {
+        if (medicoId == null || medicoId.isEmpty()) {
+            Toast.makeText(this, "ID del médico no válido.", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        String notificacionId = dbRef.child("Notificaciones").child(medicoId).push().getKey();
+        if (notificacionId == null) {
+            Toast.makeText(this, "Error al generar notificación", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        Map<String, Object> notificacionData = new HashMap<>();
+        notificacionData.put("titulo", "Nueva cita agendada");
+        notificacionData.put("mensaje", "Se ha agendado una nueva cita para el servicio: " + servicio +
+                " el " + fecha + " a las " + horario);
+        notificacionData.put("estado", "no_leida");
+        notificacionData.put("nombreMedico", nombreMedico); // Agregamos el nombre del médico
+
+        dbRef.child("Notificaciones").child(medicoId).child(notificacionId).setValue(notificacionData)
+                .addOnSuccessListener(aVoid -> {
+                    Toast.makeText(this, "Notificación creada para el médico.", Toast.LENGTH_SHORT).show();
+                })
+                .addOnFailureListener(e -> {
+                    Toast.makeText(this, "Error al agregar notificación.", Toast.LENGTH_SHORT).show();
+                });
+    }
 }

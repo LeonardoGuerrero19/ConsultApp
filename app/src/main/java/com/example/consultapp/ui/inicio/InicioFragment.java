@@ -7,6 +7,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.GridLayout;
+import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -40,6 +41,7 @@ public class InicioFragment extends Fragment {
     private GridLayout gridLayout;
     private LinearLayout linearProxCitas;
     private Button btn_cerrarS;
+    private ImageButton imgCerrarSesion; // Declarar el ImageButton
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
@@ -57,6 +59,7 @@ public class InicioFragment extends Fragment {
         TextView textSaludo = binding.textSaludo;
         gridLayout = root.findViewById(R.id.gridLayout);
         linearProxCitas = root.findViewById(R.id.linearProxCitas);
+        imgCerrarSesion = root.findViewById(R.id.image);
 
         // Obtener el usuario actual de FirebaseAuth
         FirebaseUser currentUser = mAuth.getCurrentUser();
@@ -95,6 +98,13 @@ public class InicioFragment extends Fragment {
             textSaludo.setText("Hola, Usuario");
             Toast.makeText(getContext(), "Usuario no logueado", Toast.LENGTH_SHORT).show();
         }
+
+        imgCerrarSesion.setOnClickListener(v -> {
+            mAuth.signOut();
+            Intent intent = new Intent(getActivity(), login.class);
+            startActivity(intent);
+            getActivity().finish(); // Cierra la actividad actual
+        });
 
         // Obtener y mostrar los servicios
         obtenerServicios();

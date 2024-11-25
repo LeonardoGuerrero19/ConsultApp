@@ -139,7 +139,7 @@ public class PerfilDoc extends AppCompatActivity {
                 String userId = mAuth.getCurrentUser().getUid();
 
                 // Actualizar la descripción en Realtime Database
-                databaseReference.child("medicos").child(userId).child("descripcion").setValue(descripcion)
+                databaseReference.child("Medicos").child(userId).child("descripcion").setValue(descripcion)
                         .addOnSuccessListener(aVoid -> {
                             Toast.makeText(PerfilDoc.this, "Descripción guardada con éxito", Toast.LENGTH_SHORT).show();
                             btnDescripcion.setText(descripcion);
