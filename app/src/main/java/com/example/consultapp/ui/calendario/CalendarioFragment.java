@@ -28,13 +28,17 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Date;
 
 public class CalendarioFragment extends Fragment {
 
     private FragmentCalendarioBinding binding;
     private DatabaseReference dbRef;
     private FirebaseAuth mAuth;
+    // Variable para almacenar la fecha seleccionada
+    private String selectedDate;
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater,
@@ -56,7 +60,6 @@ public class CalendarioFragment extends Fragment {
 
         // Obtener la referencia del CalendarView y el TextView donde mostrar la fecha
         CalendarView calendarView = binding.calendarView;
-        TextView textPrueba = binding.textPrueba;
 
         // Establecer la fecha actual en el CalendarView
         Calendar calendar = Calendar.getInstance();
@@ -64,14 +67,17 @@ public class CalendarioFragment extends Fragment {
         calendarView.setDate(currentDate, true, true);
 
         // Mostrar la fecha actual en textPrueba
-        textPrueba.setText("Fecha seleccionada: " + calendar.get(Calendar.DAY_OF_MONTH) + "/" +
-                (calendar.get(Calendar.MONTH) + 1) + "/" + calendar.get(Calendar.YEAR));
+        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
 
         // Configurar el listener para cambios de fecha en CalendarView
         calendarView.setOnDateChangeListener((view, year, month, dayOfMonth) -> {
-            // Mostrar la fecha seleccionada
-            textPrueba.setText("Fecha seleccionada: " + dayOfMonth + "/" + (month + 1) + "/" + year);
+            // Crear la fecha seleccionada en formato dd/MM/yyyy
+            selectedDate = dayOfMonth + "/" + (month + 1) + "/" + year;
+
+            // Ahora puedes usar la variable selectedDate en cualquier lugar de tu fragmento
+            cargarCitasPorFecha(linearCitas, selectedDate);
         });
+
 
         if (mAuth.getCurrentUser() != null) {
             String userId = mAuth.getCurrentUser().getUid();
@@ -94,8 +100,8 @@ public class CalendarioFragment extends Fragment {
                                         .placeholder(R.drawable.round_person_outline_24)
                                         .into(imageButton);
                             }
-                            // Cargar las citas próximas del doctor logueado
-                            cargarCitasProximas(linearCitas, nombreDoctor);
+                            // Cargar las citas para la fecha seleccionada
+                            cargarCitasPorFecha(linearCitas, sdf.format(new Date(currentDate)));
                         } else {
                             textSaludo.setText("Hola, Usuario");
                         }
@@ -125,7 +131,11 @@ public class CalendarioFragment extends Fragment {
         return root;
     }
 
-    private void cargarCitasProximas(LinearLayout linearCitas, String nombreDoctor) {
+    private void cargarCitasPorFecha(LinearLayout linearCitas, String selectedDate) {
+        // Obtener la fecha actual
+        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+        String todayDate = sdf.format(new Date());
+
         dbRef.child("citas").orderByChild("estado").equalTo("proxima")
                 .addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
@@ -136,7 +146,8 @@ public class CalendarioFragment extends Fragment {
                             String doctor = citaSnapshot.child("doctor").getValue(String.class);
                             String fechaCita = citaSnapshot.child("fecha").getValue(String.class); // Asume que la fecha está guardada en el campo "fecha"
 
-                            if (nombreDoctor.equals(doctor)) {
+                            if (fechaCita != null && fechaCita.equals(selectedDate) && doctor != null) {
+                                // Aquí comprobamos que la fecha de la cita coincida con la seleccionada
                                 String horario = citaSnapshot.child("horario").getValue(String.class);
                                 String usuarioId = citaSnapshot.child("usuario_id").getValue(String.class);
                                 String citaId = citaSnapshot.getKey();
@@ -175,13 +186,19 @@ public class CalendarioFragment extends Fragment {
                                     }
                                 });
 
+                                // Si la fecha seleccionada no es hoy, ocultamos los botones
+                                if (!selectedDate.equals(todayDate)) {
+                                    btnRealizada.setVisibility(View.GONE);
+                                    btnCancelada.setVisibility(View.GONE);
+                                }
+
                                 // Configurar botones
                                 btnRealizada.setOnClickListener(v -> {
                                     Intent intent = new Intent(getContext(), InformeMedicoActivity.class);
                                     intent.putExtra("usuarioId", usuarioId);
                                     intent.putExtra("numeroCuenta", txtCuenta.getText().toString());
                                     intent.putExtra("citaId", citaId);
-                                    intent.putExtra("nombreDoctor", nombreDoctor);
+                                    intent.putExtra("nombreDoctor", doctor);
                                     intent.putExtra("fechaCita", fechaCita); // Aquí enviamos la fecha de la cita
                                     intent.putExtra("nombre", txtNombre.getText().toString());
                                     startActivity(intent);
@@ -191,14 +208,14 @@ public class CalendarioFragment extends Fragment {
                                     dbRef.child("citas").child(citaId).child("estado").setValue("cancelada")
                                             .addOnSuccessListener(aVoid -> {
                                                 Toast.makeText(getContext(), "Cita cancelada", Toast.LENGTH_SHORT).show();
-                                                cargarCitasProximas(linearCitas, nombreDoctor);
+                                                cargarCitasPorFecha(linearCitas, selectedDate);
                                             })
                                             .addOnFailureListener(e -> {
                                                 Toast.makeText(getContext(), "Error al cancelar la cita", Toast.LENGTH_SHORT).show();
                                             });
                                 });
 
-                                // Agregar la vista inflada al LinearLayout
+                                // Agregar la vista de la cita al LinearLayout
                                 linearCitas.addView(citaView);
                             }
                         }
@@ -206,10 +223,11 @@ public class CalendarioFragment extends Fragment {
 
                     @Override
                     public void onCancelled(@NonNull DatabaseError error) {
-                        Toast.makeText(getContext(), "Error al cargar citas", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getContext(), "Error al cargar las citas", Toast.LENGTH_SHORT).show();
                     }
                 });
     }
+
 
     @Override
     public void onDestroyView() {

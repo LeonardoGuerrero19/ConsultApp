@@ -22,6 +22,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners;
+import com.bumptech.glide.request.RequestOptions;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -130,12 +131,15 @@ public class PerfilDoc extends AppCompatActivity {
                         btnTelefono.setText("Añade un número de télefono");
                     }
 
+                    // Convertir 18dp a píxeles
+                    float radius = 18 * getResources().getDisplayMetrics().density;
+
                     // Cargar la imagen usando Glide
                     if (fotoPerfilUrl != null && !fotoPerfilUrl.isEmpty()) {
                         ImageView imageViewPreview = findViewById(R.id.imageView);
                         Glide.with(PerfilDoc.this)
                                 .load(fotoPerfilUrl)
-                                .transform(new RoundedCorners(150)) // Redondear las esquinas con un radio de 16dp
+                                .apply(RequestOptions.bitmapTransform(new RoundedCorners((int) radius))) // Aplicar borde redondeado
                                 .placeholder(R.drawable.round_person_outline_24)
                                 .into(imageViewPreview);
                     }
