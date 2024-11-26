@@ -14,7 +14,7 @@
         android:layout_width="300dp"
         android:layout_height="300dp"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="100dp"
+        android:layout_marginTop="90dp"
         app:srcCompat="@drawable/logo" />
 
     <!-- ProgressBar para la pantalla de carga -->
@@ -33,12 +33,12 @@
         android:layout_height="wrap_content"
         android:layout_below="@id/imageView"
         android:layout_marginHorizontal="20dp"
-        android:layout_marginTop="50dp"
+        android:layout_marginTop="100dp"
         android:fontFamily="@font/montserrat_bold"
         android:text="Tu administrador de citas favorito"
         android:textAlignment="center"
         android:textColor="@color/white"
-        android:textSize="20dp" />
+        android:textSize="30dp" />
 
     <TextView
         android:id="@+id/text2"
@@ -50,6 +50,6 @@
         android:text="Consulta, administra y verifica"
         android:textAlignment="center"
         android:textColor="@color/white"
-        android:textSize="18dp" />
+        android:textSize="20dp" />
 
 </RelativeLayout>

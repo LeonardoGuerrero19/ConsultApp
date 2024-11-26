@@ -1,10 +1,19 @@
 package com.example.consultapp.ui.inicio;
 
+import static android.app.Activity.RESULT_OK;
+
+import android.app.Dialog;
+import android.app.ProgressDialog;
 import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
+import android.net.Uri;
 import android.os.Bundle;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
 import android.widget.Button;
 import android.widget.GridLayout;
 import android.widget.ImageButton;
@@ -22,6 +31,9 @@ import com.bumptech.glide.load.resource.bitmap.RoundedCorners;
 import com.bumptech.glide.request.RequestOptions;
 import com.example.consultapp.AgendaActivity;
 import com.example.consultapp.MedicoPerfilActivity;
+import com.example.consultapp.MoreDoctoresActivity;
+import com.example.consultapp.MoreEspecialidadesActivity;
+import com.example.consultapp.PerfilDoc;
 import com.example.consultapp.PerfilEspecialidadActivity;
 import com.example.consultapp.R;
 import com.example.consultapp.databinding.FragmentInicioBinding;
@@ -33,6 +45,8 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -48,6 +62,9 @@ public class InicioFragment extends Fragment {
     private LinearLayout linearProxCitas, linearSerivicios, linearPersonalMedico;
     private Button btn_cerrarS;
     private ImageButton imgCerrarSesion; // Declarar el ImageButton
+    private Dialog dialog; // Declarar como variable de instancia
+    private static final int PICK_IMAGE_REQUEST = 1; // Código de solicitud para seleccionar la imagen
+    private Uri imageUri = null; // URI de la imagen seleccionada
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
@@ -124,19 +141,29 @@ public class InicioFragment extends Fragment {
             getActivity().finish(); // Cierra la actividad actual
         });
 
+        // Inicializar el TextView
+        TextView moreLink = root.findViewById(R.id.more_link);
+        TextView moreLink2 = root.findViewById(R.id.more_link2);
+
+
+        // Configurar el OnClickListener
+        moreLink.setOnClickListener(v -> {
+            Intent intent = new Intent(getActivity(), MoreEspecialidadesActivity.class); // Cambia 'NuevaActivity' por tu clase destino
+            startActivity(intent);
+        });
+
+        // Configurar el OnClickListener
+        moreLink2.setOnClickListener(v -> {
+            Intent intent = new Intent(getActivity(), MoreDoctoresActivity.class); // Cambia 'NuevaActivity' por tu clase destino
+            startActivity(intent);
+        });
+
+
         // Obtener y mostrar los servicios
         cargarServicios();
 
-        // Usar la vista inflada para encontrar el botón
-        btn_cerrarS = root.findViewById(R.id.btn_cerrarS);
-
-        // Configurar el botón para cerrar sesión
-        btn_cerrarS.setOnClickListener(v -> {
-            mAuth.signOut();
-            Intent intent = new Intent(getActivity(), login.class);
-            startActivity(intent);
-            getActivity().finish(); // Cierra la actividad actual
-        });
+        // Listener del botón para ir al perfil del doctor
+        imageButton.setOnClickListener(view -> showBottomDialog());
 
         return root;
     }
@@ -323,6 +350,7 @@ public class InicioFragment extends Fragment {
                         if (fotoPerfil != null && !fotoPerfil.isEmpty()) {
                             Glide.with(getContext())
                                     .load(fotoPerfil)
+                                    .transform(new RoundedCorners(150)) // Redondear las esquinas
                                     .into(ivFotoPerfil);
                         }
 
@@ -351,6 +379,131 @@ public class InicioFragment extends Fragment {
                 Toast.makeText(getContext(), "Error al cargar los médicos", Toast.LENGTH_SHORT).show();
             }
         });
+    }
+
+    private void showBottomDialog() {
+        // Crear y mostrar el modal para agregar un nuevo servicio
+        dialog = new Dialog(requireContext());  // Asignar a la variable de instancia
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        dialog.setContentView(R.layout.topsheet_admin);
+
+        ImageButton selectImageButton = dialog.findViewById(R.id.selectImageButton); // Botón para seleccionar imagen
+        ImageView imageViewPreview = dialog.findViewById(R.id.imageView); // O el ID adecuado del ImageView en tu layout
+        Button btn_cerrarS = dialog.findViewById(R.id.btn_cerrarS);
+
+        // Cargar la imagen predeterminada al abrir el modal
+        FirebaseUser currentUser = mAuth.getCurrentUser();
+        if (currentUser != null) {
+            String userId = currentUser.getUid();
+            databaseReference.child("users").child(userId).addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                    String userProfileImageUrl = snapshot.child("profileImage").getValue(String.class);
+                    if (userProfileImageUrl != null) {
+                        // Mostrar la imagen del usuario en el modal
+                        Glide.with(getContext())
+                                .load(userProfileImageUrl)
+                                .transform(new RoundedCorners(150)) // Redondear las esquinas con un radio de 16dp
+                                .placeholder(R.drawable.round_person_outline_24)  // Imágen de placeholder
+                                .into(imageViewPreview);  // Aquí mostramos la imagen en el ImageView
+                    }
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError error) {
+                    // Manejar error si es necesario
+                }
+            });
+        }
+
+        // Configura el clic en el botón de seleccionar imagen
+        selectImageButton.setOnClickListener(v -> openImageSelector());
+
+        // Mostrar el dialog
+        dialog.show();
+        dialog.getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        dialog.getWindow().getAttributes().windowAnimations = R.style.TopDialogAnimation;
+        dialog.getWindow().setGravity(Gravity.TOP);
+    }
+
+    private void openImageSelector() {
+        Intent intent = new Intent(Intent.ACTION_PICK);
+        intent.setType("image/*");
+        startActivityForResult(intent, PICK_IMAGE_REQUEST);
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == PICK_IMAGE_REQUEST && resultCode == RESULT_OK && data != null && data.getData() != null) {
+            imageUri = data.getData(); // Guardar la URI de la imagen seleccionada
+
+            // Mostrar la imagen seleccionada en el ImageView del modal
+            ImageView imageViewPreview = dialog.findViewById(R.id.imageView); // Asegúrate de usar el ID correcto
+            imageViewPreview.setImageURI(imageUri);
+
+            // Llamar a la función para subir la imagen directamente
+            uploadImageToFirebase();
+        }
+    }
+
+
+    private void uploadImageToFirebase() {
+        if (imageUri != null) {
+            // Mostrar un ProgressDialog mientras se sube la imagen
+            ProgressDialog progressDialog = new ProgressDialog(getContext());
+            progressDialog.setMessage("Subiendo imagen...");
+            progressDialog.setCancelable(false);
+            progressDialog.show();
+
+            // Crear una referencia en Firebase Storage
+            StorageReference storageReference = FirebaseStorage.getInstance().getReference();
+            StorageReference fileReference = storageReference.child("Servicios/Imagenes/" + System.currentTimeMillis() + ".jpg");
+
+            // Subir la imagen
+            fileReference.putFile(imageUri)
+                    .addOnSuccessListener(taskSnapshot -> {
+                        // Obtener la URL de descarga
+                        fileReference.getDownloadUrl().addOnSuccessListener(uri -> {
+                            String imageUrl = uri.toString(); // URL de la imagen subida
+
+                            // Guardar la URL en la base de datos de usuarios
+                            saveImageUrlToUserDatabase(imageUrl);
+
+                            if (progressDialog.isShowing()) progressDialog.dismiss();
+                            Toast.makeText(getContext(), "Imagen subida con éxito", Toast.LENGTH_SHORT).show();
+                        });
+                    })
+                    .addOnFailureListener(e -> {
+                        if (progressDialog.isShowing()) progressDialog.dismiss();
+                        Toast.makeText(getContext(), "Error al subir la imagen", Toast.LENGTH_SHORT).show();
+                    });
+        } else {
+            Toast.makeText(getContext(), "No se seleccionó ninguna imagen", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void saveImageUrlToUserDatabase(String imageUrl) {
+        // Obtener el UID del usuario autenticado
+        FirebaseAuth auth = FirebaseAuth.getInstance();
+        String userId = auth.getCurrentUser().getUid();
+
+        if (userId != null) {
+            // Referencia a la base de datos en la colección "users"
+            DatabaseReference userRef = FirebaseDatabase.getInstance().getReference("users").child(userId);
+
+            // Actualizar el campo "profileImage" o el nombre que prefieras
+            userRef.child("profileImage").setValue(imageUrl)
+                    .addOnSuccessListener(aVoid -> {
+                        Toast.makeText(getContext(), "URL guardada en la base de datos", Toast.LENGTH_SHORT).show();
+                    })
+                    .addOnFailureListener(e -> {
+                        Toast.makeText(getContext(), "Error al guardar la URL en la base de datos", Toast.LENGTH_SHORT).show();
+                    });
+        } else {
+            Toast.makeText(getContext(), "Usuario no autenticado", Toast.LENGTH_SHORT).show();
+        }
     }
 
 

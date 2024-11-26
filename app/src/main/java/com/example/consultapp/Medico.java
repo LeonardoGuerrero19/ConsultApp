@@ -6,6 +6,7 @@ public class Medico {
     private String id;
     private String nombre;
     private String especializacion;
+    private String cedula;
     private String telefono;
     private List<String> horarios; // Cambiar a lista de horarios
     private boolean emailVerified; // Nuevo campo
@@ -15,9 +16,10 @@ public class Medico {
     public Medico() {}
 
     // Constructor completo
-    public Medico(String nombre, String especializacion, String telefono, List<String> horarios) {
+    public Medico(String nombre, String especializacion, String cedula, String telefono, List<String> horarios) {
         this.nombre = nombre;
         this.especializacion = especializacion;
+        this.cedula = cedula;
         this.telefono = telefono;
         this.horarios = horarios;
     }
@@ -37,6 +39,10 @@ public class Medico {
 
     public String getEspecializacion() {
         return especializacion;
+    }
+
+    public String getCedula() {
+        return cedula;
     }
 
     public String getTelefono() {

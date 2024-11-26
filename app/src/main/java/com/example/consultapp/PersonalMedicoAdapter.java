@@ -41,8 +41,11 @@ public class PersonalMedicoAdapter extends RecyclerView.Adapter<PersonalMedicoAd
 
         // Funcionalidad para el botón de ver
         holder.btnVer.setOnClickListener(v -> {
-            Intent intent = new Intent(context, PerfilPersonalMedico.class);
+            Intent intent = new Intent(context, MedicoPerfilActivity.class);
             intent.putExtra("medicoId", medico.getId());
+            intent.putExtra("nombre", medico.getNombre());
+            intent.putExtra("especializacion", medico.getEspecializacion());
+            intent.putExtra("cedula", medico.getCedula());
             context.startActivity(intent);
         });
 

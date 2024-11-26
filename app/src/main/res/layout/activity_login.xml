@@ -13,7 +13,7 @@
         android:layout_height="250dp"
         android:layout_marginHorizontal="20dp"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="50dp"
+        android:layout_marginTop="20dp"
         android:layout_marginBottom="50dp"
         app:srcCompat="@drawable/iniciosesion" />
 
@@ -39,7 +39,7 @@
         android:fontFamily="@font/montserrat_medium"
         android:textColor="@color/black"
         android:textSize="20dp"
-        android:text="Correo" />
+        android:text="Correo electrónico" />
 
     <EditText
         android:id="@+id/correo"
@@ -52,8 +52,7 @@
         android:textColor="@color/black"
         android:background="@drawable/rounded"
         android:backgroundTint="@color/gray"
-        android:textSize="20dp"
-        android:hint="Ingresa tu correo"/>
+        android:textSize="20dp" />
 
     <TextView
         android:id="@+id/text2"
@@ -89,7 +88,6 @@
             android:backgroundTint="@color/gray"
             android:textSize="20dp"
             android:inputType="textPassword"
-            android:hint="Ingresa tu contraseña"
             android:imeOptions="actionDone" />
 
         <ImageButton
@@ -168,7 +166,7 @@
         android:id="@+id/btnIniciarSesion"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/linear2"
+        android:layout_below="@id/linear3"
         android:layout_marginTop="50dp"
         android:padding="15dp"
         android:backgroundTint="@color/aqua"

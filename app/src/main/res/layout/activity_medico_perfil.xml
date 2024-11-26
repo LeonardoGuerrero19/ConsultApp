@@ -91,7 +91,8 @@
         android:layout_marginHorizontal="20dp"
         android:textSize="20dp"
         android:fontFamily="@font/montserrat_medium"
-        android:textColor="@color/black" />
+        android:textColor="@color/black"
+        android:layout_marginBottom="30dp"/>
 
     <TextView
         android:id="@+id/txt2"
@@ -113,7 +114,8 @@
         android:layout_marginHorizontal="20dp"
         android:textSize="20dp"
         android:fontFamily="@font/montserrat_medium"
-        android:textColor="@color/black" />
+        android:textColor="@color/black"
+        android:layout_marginBottom="30dp"/>
 
     <TextView
         android:id="@+id/txt3"
@@ -135,5 +137,6 @@
         android:layout_marginHorizontal="20dp"
         android:textSize="20dp"
         android:fontFamily="@font/montserrat_medium"
-        android:textColor="@color/black" />
+        android:textColor="@color/black"
+        android:layout_marginBottom="30dp"/>
 </LinearLayout>
