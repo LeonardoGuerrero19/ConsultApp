@@ -52,7 +52,8 @@
         android:textColor="@color/black"
         android:background="@drawable/rounded"
         android:backgroundTint="@color/gray"
-        android:textSize="20dp" />
+        android:textSize="20dp"
+        android:hint="Ingresa tu correo"/>
 
     <TextView
         android:id="@+id/text2"
@@ -67,27 +68,49 @@
         android:textSize="20dp"
         android:text="Contraseña" />
 
-    <EditText
-        android:id="@+id/contrasena"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/text2"
+        android:id="@+id/linear1"
         android:layout_marginHorizontal="20dp"
-        android:padding="20dp"
-        android:fontFamily="@font/montserrat_medium"
-        android:textColor="@color/black"
-        android:background="@drawable/rounded"
-        android:backgroundTint="@color/gray"
-        android:textSize="20dp" />
+        android:orientation="horizontal"
+        android:gravity="center_vertical">
+
+        <EditText
+            android:id="@+id/contrasena"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:padding="20dp"
+            android:fontFamily="@font/montserrat_medium"
+            android:textColor="@color/black"
+            android:background="@drawable/rounded"
+            android:backgroundTint="@color/gray"
+            android:textSize="20dp"
+            android:inputType="textPassword"
+            android:hint="Ingresa tu contraseña"
+            android:imeOptions="actionDone" />
+
+        <ImageButton
+            android:id="@+id/togglePasswordVisibility"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="10dp"
+            android:background="@android:color/transparent"
+            android:src="@drawable/baseline_check_box_outline_blank_24"
+            android:contentDescription="Mostrar/Ocultar contraseña" />
+    </LinearLayout>
+
 
     <LinearLayout
-        android:id="@+id/linear"
+        android:id="@+id/linear2"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="20dp"
         android:layout_marginTop="20dp"
         android:orientation="horizontal"
-        android:layout_below="@id/contrasena" >
+        android:layout_below="@id/linear1" >
 
         <TextView
             android:layout_width="wrap_content"
@@ -112,7 +135,7 @@
         android:id="@+id/btnIniciarSesion"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/linear"
+        android:layout_below="@id/linear2"
         android:layout_marginTop="50dp"
         android:padding="15dp"
         android:backgroundTint="@color/aqua"

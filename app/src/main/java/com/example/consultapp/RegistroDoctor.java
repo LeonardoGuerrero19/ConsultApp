@@ -23,7 +23,6 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
@@ -42,6 +41,9 @@ public class RegistroDoctor extends AppCompatActivity {
     private List<String> horarioSeleccionado;
     private TextView verifyLink;
 
+    // Variables para guardar las credenciales del administrador
+    private String adminEmail;
+    private String adminPassword = "Administracion123"; // Cambia esto por la contraseña real
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,6 +53,12 @@ public class RegistroDoctor extends AppCompatActivity {
         // Inicializar FirebaseAuth y Realtime Database
         mAuth = FirebaseAuth.getInstance();
         databaseReference = FirebaseDatabase.getInstance().getReference();
+
+        // Guardar el correo del administrador
+        FirebaseAuth currentUser = FirebaseAuth.getInstance();
+        if (currentUser.getCurrentUser() != null) {
+            adminEmail = currentUser.getCurrentUser().getEmail();
+        }
 
         // Referencias a los elementos en el layout
         etNombreMedico = findViewById(R.id.nombreMedico);
@@ -74,15 +82,10 @@ public class RegistroDoctor extends AppCompatActivity {
         // Set up the link text and behavior
         verifyLink.setText("Verificar");
         verifyLink.setMovementMethod(LinkMovementMethod.getInstance());
-
-        // Set the click listener to open the URL
-        verifyLink.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                String url = "https://www.cedulaprofesional.sep.gob.mx/cedula/presidencia/indexAvanzada.action"; // URL to open
-                Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
-                startActivity(intent);
-            }
+        verifyLink.setOnClickListener(v -> {
+            String url = "https://www.cedulaprofesional.sep.gob.mx/cedula/presidencia/indexAvanzada.action"; // URL to open
+            Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+            startActivity(intent);
         });
 
         // Registrar médico
@@ -184,9 +187,21 @@ public class RegistroDoctor extends AppCompatActivity {
                         .addOnSuccessListener(aVoid -> {
                             enviarCorreoVerificacion();
                             Toast.makeText(RegistroDoctor.this, "Médico registrado con éxito", Toast.LENGTH_SHORT).show();
-                            finish();
+
+                            // Restaurar la sesión del administrador
+                            mAuth.signOut();
+                            mAuth.signInWithEmailAndPassword(adminEmail, adminPassword).addOnCompleteListener(adminTask -> {
+                                if (adminTask.isSuccessful()) {
+                                    Toast.makeText(RegistroDoctor.this, "Sesión restaurada para el administrador", Toast.LENGTH_SHORT).show();
+                                    finish();
+                                } else {
+                                    Toast.makeText(RegistroDoctor.this, "Error al restaurar sesión del administrador", Toast.LENGTH_SHORT).show();
+                                }
+                            });
                         })
-                        .addOnFailureListener(e -> Toast.makeText(RegistroDoctor.this, "Error al registrar médico", Toast.LENGTH_SHORT).show());
+                        .addOnFailureListener(e -> {
+                            Toast.makeText(RegistroDoctor.this, "Error al registrar médico", Toast.LENGTH_SHORT).show();
+                        });
             } else {
                 Toast.makeText(RegistroDoctor.this, "Error en el registro", Toast.LENGTH_SHORT).show();
             }
@@ -194,15 +209,15 @@ public class RegistroDoctor extends AppCompatActivity {
     }
 
     private void enviarCorreoVerificacion() {
-        FirebaseUser user = mAuth.getCurrentUser();
-        if (user != null) {
-            user.sendEmailVerification().addOnCompleteListener(task -> {
-                if (task.isSuccessful()) {
-                    Toast.makeText(RegistroDoctor.this, "Correo de verificación enviado", Toast.LENGTH_SHORT).show();
-                } else {
-                    Toast.makeText(RegistroDoctor.this, "Error al enviar el correo de verificación", Toast.LENGTH_SHORT).show();
-                }
-            });
+        if (mAuth.getCurrentUser() != null) {
+            mAuth.getCurrentUser().sendEmailVerification()
+                    .addOnCompleteListener(task -> {
+                        if (task.isSuccessful()) {
+                            Toast.makeText(RegistroDoctor.this, "Correo de verificación enviado", Toast.LENGTH_SHORT).show();
+                        } else {
+                            Toast.makeText(RegistroDoctor.this, "Error al enviar el correo de verificación", Toast.LENGTH_SHORT).show();
+                        }
+                    });
         }
     }
 

@@ -8,7 +8,7 @@
     tools:context=".ui.calendario.CalendarioFragment">
 
     <LinearLayout
-        android:id="@+id/linear"
+        android:id="@+id/linear2"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
@@ -36,7 +36,7 @@
         android:id="@+id/divider"
         android:layout_width="match_parent"
         android:layout_height="2dp"
-        android:layout_below="@id/linear"
+        android:layout_below="@id/linear2"
         android:background="@color/aqua" />
 
     <CalendarView

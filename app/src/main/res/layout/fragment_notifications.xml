@@ -7,17 +7,29 @@
     tools:context=".ui.notifications.NotificationsFragment">
 
     <ScrollView
-        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/notifications_scroll_view"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:padding="16dp"
-        tools:ignore="MissingConstraints">
+        android:layout_height="match_parent"
+        android:padding="16dp">
 
         <LinearLayout
             android:id="@+id/linearLayout_notifications"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical" />
-    </ScrollView>
+            android:orientation="vertical"
+            android:padding="8dp"
+            android:background="@color/white"
+            android:layout_margin="8dp">
 
+            <!-- Mensaje predeterminado -->
+            <TextView
+                android:id="@+id/no_notifications_text"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="No tienes notificaciones."
+                android:gravity="center"
+                android:padding="16dp"
+                android:visibility="gone" />
+        </LinearLayout>
+    </ScrollView>
 </RelativeLayout>
