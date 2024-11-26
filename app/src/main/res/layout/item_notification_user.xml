@@ -6,32 +6,15 @@
     android:background="@android:color/white">
 
     <TextView
-        android:id="@+id/notification_message"
+        android:id="@+id/notification_user_message"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Mensaje de notificación"
         android:textSize="16sp"
-        android:textStyle="bold"
-        android:paddingBottom="8dp" />
-
-    <TextView
-        android:id="@+id/notification_date_time"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Fecha y hora"
-        android:textSize="14sp"
-        android:paddingBottom="8dp" />
-
-    <TextView
-        android:id="@+id/notification_status"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Estado"
-        android:textSize="14sp"
         android:paddingBottom="8dp" />
 
     <Button
-        android:id="@+id/btn_mark_as_read"
+        android:id="@+id/btn_mark_as_read_user"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Marcar como leída"

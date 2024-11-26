@@ -49,7 +49,7 @@ public class InformeMedicoActivity extends AppCompatActivity {
         String citaId = getIntent().getStringExtra("citaId");
         String nombreDoctor = getIntent().getStringExtra("nombreDoctor");
         String nombrePaciente = getIntent().getStringExtra("nombre");
-        String fechaCita = getIntent().getStringExtra("fechaCita"); // Recuperamos la fecha de la cita
+        String fechaCita = getIntent().getStringExtra("fechaCita");
 
         // Referencia a los campos
         TextView tvCuenta = findViewById(R.id.tvCuenta);
@@ -62,11 +62,7 @@ public class InformeMedicoActivity extends AppCompatActivity {
         Button btnGuardar = findViewById(R.id.btnGuardar);
 
         // Establecer el número de cuenta en el TextView
-        if (numeroCuenta != null) {
-            tvCuenta.setText(numeroCuenta);
-        } else {
-            tvCuenta.setText("No. de cuenta no disponible");
-        }
+        tvCuenta.setText(numeroCuenta != null ? numeroCuenta : "No. de cuenta no disponible");
 
         // Acción para guardar datos
         btnGuardar.setOnClickListener(v -> {
@@ -93,7 +89,7 @@ public class InformeMedicoActivity extends AppCompatActivity {
             informeData.put("medicamento", medicamento);
             informeData.put("nombreDoctor", nombreDoctor);
             informeData.put("nombre", nombrePaciente);
-            informeData.put("fechaCita", fechaCita); // Guardar la fecha de la cita
+            informeData.put("fechaCita", fechaCita);
 
             // Generar un ID único para el informe
             String informeId = dbRef.child("informe").push().getKey();
@@ -107,6 +103,9 @@ public class InformeMedicoActivity extends AppCompatActivity {
 
                             // Generar y guardar el PDF
                             generarYGuardarPDF(informeId, informeData);
+
+                            // Enviar notificación al usuario
+                            enviarNotificacionUsuario(usuarioId, nombreDoctor, informeId);
 
                             // Actualizar el estado de la cita
                             if (citaId != null) {
@@ -124,16 +123,13 @@ public class InformeMedicoActivity extends AppCompatActivity {
     }
 
     private void generarYGuardarPDF(String informeId, Map<String, Object> informeData) {
-        // Crear un documento PDF
         PdfDocument pdfDocument = new PdfDocument();
         Paint paint = new Paint();
 
-        // Crear una página en el documento
         PdfDocument.PageInfo pageInfo = new PdfDocument.PageInfo.Builder(300, 600, 1).create();
         PdfDocument.Page page = pdfDocument.startPage(pageInfo);
         Canvas canvas = page.getCanvas();
 
-        // Configurar estilos de texto
         Paint titlePaint = new Paint();
         titlePaint.setTextSize(16);
         titlePaint.setFakeBoldText(true);
@@ -141,40 +137,27 @@ public class InformeMedicoActivity extends AppCompatActivity {
         Paint contentPaint = new Paint();
         contentPaint.setTextSize(12);
 
-        // Cargar el logo
-        Bitmap logoBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.logo); // Cambia "consultapp_logo" al nombre de tu archivo de logo
-        Bitmap scaledLogo = Bitmap.createScaledBitmap(logoBitmap, 80, 80, false); // Ajustar tamaño del logo
-
-        // Dibujar el logo en la parte superior derecha
+        Bitmap logoBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.logo);
+        Bitmap scaledLogo = Bitmap.createScaledBitmap(logoBitmap, 80, 80, false);
         canvas.drawBitmap(scaledLogo, pageInfo.getPageWidth() - 100, 10, paint);
 
-        // Dibujar el título
         canvas.drawText("ConsultApp", 10, 40, titlePaint);
         canvas.drawText("Gestión y administración de citas médicas", 10, 60, contentPaint);
-
-        // Dibujar una línea separadora
         canvas.drawLine(10, 80, pageInfo.getPageWidth() - 10, 80, paint);
 
-        // Dibujar el contenido del informe
-        int y = 100; // Posición inicial en Y
+        int y = 100;
         for (Map.Entry<String, Object> entry : informeData.entrySet()) {
             canvas.drawText(entry.getKey() + ": " + entry.getValue(), 10, y, contentPaint);
-            y += 20; // Incrementar la posición en Y
+            y += 20;
         }
 
-        // Terminar la página
         pdfDocument.finishPage(page);
 
-        // Crear archivo local para el PDF
-        File pdfFile = new File(getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS),
-                "Informe_" + informeId + ".pdf");
+        File pdfFile = new File(getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS), "Informe_" + informeId + ".pdf");
         try {
             pdfDocument.writeTo(new FileOutputStream(pdfFile));
             Log.d(TAG, "Archivo PDF creado en: " + pdfFile.getPath());
-
-            // Subir el archivo PDF a Firebase Storage
             subirPDFaFirebase(pdfFile, informeId);
-
         } catch (IOException e) {
             e.printStackTrace();
             Toast.makeText(this, "Error al guardar el PDF", Toast.LENGTH_SHORT).show();
@@ -183,7 +166,6 @@ public class InformeMedicoActivity extends AppCompatActivity {
         }
     }
 
-
     private void subirPDFaFirebase(File pdfFile, String informeId) {
         StorageReference fileRef = storageRef.child(informeId + ".pdf");
 
@@ -191,8 +173,6 @@ public class InformeMedicoActivity extends AppCompatActivity {
                 .addOnSuccessListener(taskSnapshot -> {
                     Toast.makeText(this, "PDF subido a Firebase Storage", Toast.LENGTH_SHORT).show();
                     Log.d(TAG, "Archivo PDF subido correctamente");
-
-                    // Finalizar la actividad después de subir exitosamente
                     finish();
                 })
                 .addOnFailureListener(e -> {
@@ -211,5 +191,28 @@ public class InformeMedicoActivity extends AppCompatActivity {
                     Toast.makeText(this, "Error al actualizar el estado de la cita", Toast.LENGTH_SHORT).show();
                     Log.e(TAG, "Error al actualizar estado de la cita", e);
                 });
+    }
+
+    private void enviarNotificacionUsuario(String usuarioId, String nombreDoctor, String informeId) {
+        if (usuarioId == null || nombreDoctor == null || informeId == null) {
+            Log.e(TAG, "Datos insuficientes para crear la notificación.");
+            return;
+        }
+
+        String notificacionId = dbRef.child("Notificaciones_user").child(usuarioId).push().getKey();
+        if (notificacionId == null) {
+            Log.e(TAG, "Error al generar ID de notificación para el usuario.");
+            return;
+        }
+
+        Map<String, Object> notificacionData = new HashMap<>();
+        notificacionData.put("informe_id", informeId);
+        notificacionData.put("mensaje", "El Dr. " + nombreDoctor + " ha generado un informe médico.");
+        notificacionData.put("estado", "no_leido");
+        notificacionData.put("fecha", System.currentTimeMillis());
+
+        dbRef.child("Notificaciones_user").child(usuarioId).child(notificacionId).setValue(notificacionData)
+                .addOnSuccessListener(aVoid -> Log.d(TAG, "Notificación enviada correctamente al usuario con ID: " + usuarioId))
+                .addOnFailureListener(e -> Log.e(TAG, "Error al enviar notificación al usuario.", e));
     }
 }

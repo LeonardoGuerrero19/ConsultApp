@@ -131,7 +131,7 @@ public class AgendaActivity extends AppCompatActivity {
             return;
         }
 
-        dbRef.child("citas")  // Consultamos las citas existentes
+        dbRef.child("Citas")  // Consultamos las citas existentes
                 .orderByChild("fecha")
                 .equalTo(fechaSeleccionada)  // Filtrar por la fecha seleccionada
                 .addListenerForSingleValueEvent(new ValueEventListener() {
@@ -291,45 +291,28 @@ public class AgendaActivity extends AppCompatActivity {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot snapshot) {
                         String nombreMedico = null;
+                        String idMedico = null;
 
+                        // Realizar asignación fuera del contexto lambda
                         for (DataSnapshot horarioSnapshot : snapshot.getChildren()) {
                             String fechaHorario = horarioSnapshot.child("fecha").getValue(String.class);
                             List<String> horarios = (List<String>) horarioSnapshot.child("horarios").getValue();
 
                             if (fechaHorario != null && fechaHorario.equals(fecha) && horarios != null && horarios.contains(horarioSeleccionado)) {
                                 nombreMedico = horarioSnapshot.child("nombre").getValue(String.class);
+                                idMedico = horarioSnapshot.getKey(); // Obtener el ID del médico
                                 break;
                             }
                         }
 
-                        if (nombreMedico == null) {
+                        // Asegurarse de que las variables estén inicializadas antes de la siguiente lambda
+                        if (nombreMedico == null || idMedico == null) {
                             Toast.makeText(AgendaActivity.this, "No se encontró un médico para esta cita", Toast.LENGTH_SHORT).show();
                             return;
                         }
 
-                        String citaId = dbRef.child("citas").push().getKey();
-                        if (citaId == null) {
-                            Toast.makeText(AgendaActivity.this, "Error al generar cita", Toast.LENGTH_SHORT).show();
-                            return;
-                        }
-
-                        Map<String, Object> citaData = new HashMap<>();
-                        citaData.put("cita_id", citaId);
-                        citaData.put("usuario_id", userId);
-                        citaData.put("servicio", nombreServicio);
-                        citaData.put("fecha", fecha);
-                        citaData.put("horario", horarioSeleccionado);
-                        citaData.put("estado", "proxima");
-                        citaData.put("doctor", nombreMedico);
-
-                        dbRef.child("citas").child(citaId).setValue(citaData)
-                                .addOnSuccessListener(aVoid -> {
-                                    Toast.makeText(AgendaActivity.this, "Cita guardada exitosamente", Toast.LENGTH_SHORT).show();
-                                    finish();
-                                })
-                                .addOnFailureListener(e -> {
-                                    Toast.makeText(AgendaActivity.this, "Error al guardar la cita", Toast.LENGTH_SHORT).show();
-                                });
+                        // Guardar la cita
+                        guardarCitaEnBaseDeDatos(nombreServicio, fecha, userId, idMedico, nombreMedico);
                     }
 
                     @Override
@@ -339,6 +322,57 @@ public class AgendaActivity extends AppCompatActivity {
                 });
     }
 
+    private void guardarCitaEnBaseDeDatos(String nombreServicio, String fecha, String userId, String idMedico, String nombreMedico) {
+        String citaId = dbRef.child("citas").push().getKey();
+        if (citaId == null) {
+            Toast.makeText(AgendaActivity.this, "Error al generar cita", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        Map<String, Object> citaData = new HashMap<>();
+        citaData.put("cita_id", citaId);
+        citaData.put("usuario_id", userId);
+        citaData.put("servicio", nombreServicio);
+        citaData.put("fecha", fecha);
+        citaData.put("horario", horarioSeleccionado);
+        citaData.put("estado", "proxima");
+        citaData.put("doctor", nombreMedico);
+
+        dbRef.child("citas").child(citaId).setValue(citaData)
+                .addOnSuccessListener(aVoid -> {
+                    Toast.makeText(AgendaActivity.this, "Cita guardada exitosamente", Toast.LENGTH_SHORT).show();
+
+                    // Crear notificación para el médico
+                    String mensaje = "Tienes una nueva cita el " + fecha + " a las " + horarioSeleccionado;
+                    crearNotificacion(idMedico, mensaje, fecha, horarioSeleccionado, nombreMedico);
+
+                    finish();
+                })
+                .addOnFailureListener(e -> {
+                    Toast.makeText(AgendaActivity.this, "Error al guardar la cita", Toast.LENGTH_SHORT).show();
+                });
+    }
+
+    private void crearNotificacion(String doctorId, String mensaje, String fecha, String hora, String nombreMedico) {
+        String notificacionId = dbRef.child("notificaciones").push().getKey(); // Generar ID único para la notificación
+
+        if (notificacionId == null) {
+            Toast.makeText(this, "Error al generar notificación", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        Map<String, Object> notificacionData = new HashMap<>();
+        notificacionData.put("mensaje", mensaje);
+        notificacionData.put("fecha", fecha);
+        notificacionData.put("hora", hora);
+        notificacionData.put("estado", "no_leido");
+        notificacionData.put("nombre_medico", nombreMedico);
+        notificacionData.put("doctor_id", doctorId);
+
+        dbRef.child("notificaciones").child(notificacionId).setValue(notificacionData)
+                .addOnSuccessListener(aVoid -> Toast.makeText(this, "Notificación creada", Toast.LENGTH_SHORT).show())
+                .addOnFailureListener(e -> Toast.makeText(this, "Error al crear notificación", Toast.LENGTH_SHORT).show());
+    }
 
     private void mostrarMensajeNoHayHorarios() {
         TextView noHorarios = new TextView(AgendaActivity.this);

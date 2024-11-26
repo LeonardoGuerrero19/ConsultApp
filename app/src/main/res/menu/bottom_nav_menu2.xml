@@ -13,7 +13,7 @@
         android:icon="@drawable/round_person_outline_24"
         android:title="@string/title_expediente_user" />
     <item
-        android:id="@+id/navigation_notifications"
+        android:id="@+id/navigation_notifications_user"
         android:icon="@drawable/round_notifications_24"
         android:title="@string/title_notifications" />
 </menu>
