@@ -17,6 +17,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -49,6 +50,8 @@ public class ExpedienteUserFragment extends Fragment {
     private static final int PICK_IMAGE_REQUEST = 1; // Código para seleccionar imagen
     private Uri imageUri = null; // URI de la imagen seleccionada
     private StorageReference storageReference;
+    private LinearLayout llInformesUser;
+
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -64,12 +67,15 @@ public class ExpedienteUserFragment extends Fragment {
         ImageView imageViewPreview = root.findViewById(R.id.imageView); // Vista previa de la imagen
         ImageButton selectImageButton = root.findViewById(R.id.selectImageButton); // Botón para seleccionar imagen
 
+        llInformesUser = root.findViewById(R.id.linearExpedientesUser);
+
         // Inicializa Firebase
         auth = FirebaseAuth.getInstance();
         dbRef = FirebaseDatabase.getInstance().getReference();
 
         // Carga el nombre del usuario
         loadUserName();
+        loadUserReports();
 
         // Configura el botón para mostrar el diálogo
         btnEditar.setOnClickListener(v -> showBottomDialog());
@@ -124,6 +130,85 @@ public class ExpedienteUserFragment extends Fragment {
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
                 Toast.makeText(requireContext(), "Error al cargar los datos", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    // Método para cargar los informes del usuario
+    private void loadUserReports() {
+        String userId = auth.getCurrentUser().getUid();
+        DatabaseReference userRef = dbRef.child("users").child(userId);
+
+        userRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if (snapshot.exists()) {
+                    String numeroCuenta = snapshot.child("numeroCuenta").getValue(String.class);
+
+                    // Buscar informes que coincidan con el numeroCuenta
+                    DatabaseReference informesRef = dbRef.child("Informes");
+                    informesRef.orderByChild("numeroCuenta").equalTo(numeroCuenta).addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot informesSnapshot) {
+                            if (informesSnapshot.exists()) {
+                                llInformesUser.removeAllViews(); // Limpiar el layout antes de agregar los nuevos informes
+
+                                // Iterar a través de los informes
+                                for (DataSnapshot informeSnapshot : informesSnapshot.getChildren()) {
+                                    String nombre = informeSnapshot.child("nombre").getValue(String.class);
+                                    String fechaCita = informeSnapshot.child("fechaCita").getValue(String.class);
+                                    String motivo = informeSnapshot.child("motivo").getValue(String.class);
+                                    String padecimiento = informeSnapshot.child("padecimiento").getValue(String.class);
+                                    String medicamentos = informeSnapshot.child("medicamento").getValue(String.class);
+
+                                    // Verificar si el informe pertenece al doctor logueado
+                                    if (nombre != null && nombre.equals(nombre)) {
+                                        // Inflar el diseño del informe
+                                        View informeView = getLayoutInflater().inflate(R.layout.item_historial, llInformesUser, false);
+
+                                        // Rellenar los TextViews con los datos del informe
+                                        TextView txtFechaCita = informeView.findViewById(R.id.txtFechaCita);
+                                        TextView txtMotivo = informeView.findViewById(R.id.txtMotivo);
+                                        TextView txtPadecimiento = informeView.findViewById(R.id.txtPadecimiento);
+                                        TextView txtMedicamentos = informeView.findViewById(R.id.txtMedicamentos);
+                                        LinearLayout modalDetalles = informeView.findViewById(R.id.modalDetalles);
+
+
+                                        txtFechaCita.setText(fechaCita);
+                                        txtMotivo.setText(motivo);
+                                        txtPadecimiento.setText(padecimiento);
+                                        txtMedicamentos.setText(medicamentos);
+
+                                        // Establecer un listener de clic en el ítem
+                                        informeView.setOnClickListener(v -> {
+                                            // Cambiar la visibilidad del modal al hacer clic
+                                            if (modalDetalles.getVisibility() == View.GONE) {
+                                                modalDetalles.setVisibility(View.VISIBLE);
+                                            } else {
+                                                modalDetalles.setVisibility(View.GONE);
+                                            }
+                                        });
+
+                                        // Agregar la vista inflada al LinearLayout
+                                        llInformesUser.addView(informeView);
+                                    }
+                                }
+                            } else {
+                                Toast.makeText(requireContext(), "No se encontraron informes para este usuario", Toast.LENGTH_SHORT).show();
+                            }
+                        }
+
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError error) {
+                            Toast.makeText(requireContext(), "Error al cargar los informes", Toast.LENGTH_SHORT).show();
+                        }
+                    });
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                Toast.makeText(requireContext(), "Error al cargar los datos del usuario", Toast.LENGTH_SHORT).show();
             }
         });
     }

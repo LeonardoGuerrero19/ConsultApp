@@ -333,6 +333,10 @@ public class InicioFragment extends Fragment {
                         btnVerPerfil.setOnClickListener(v -> {
                             // Redirigir a la actividad de perfil del médico
                             Intent intent = new Intent(getContext(), MedicoPerfilActivity.class);
+                            intent.putExtra("nombre", nombre);  // Aquí asegúrate de que "nombre" no sea null
+                            intent.putExtra("especialidad", especialidad);
+                            intent.putExtra("cedula", cedula);
+                            intent.putExtra("fotoPerfil", fotoPerfil);
                             intent.putExtra("medicoId", medicoId); // Pasar el ID del médico
                             startActivity(intent);
                         });

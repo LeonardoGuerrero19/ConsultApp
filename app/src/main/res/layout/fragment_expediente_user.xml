@@ -1,10 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/scrollView"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:clipToPadding="false"
+    android:paddingBottom="110dp"
+    tools:context=".ui.expediente_user.ExpedienteUserFragment" >
+
+<LinearLayout
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:orientation="vertical"
-    tools:context=".ui.expediente_user.ExpedienteUserFragment" >
+    android:orientation="vertical" >
 
     <LinearLayout
         android:id="@+id/linear"
@@ -172,4 +179,14 @@
         android:layout_margin="20dp"
         android:layout_below="@id/linear2"
         android:background="@color/aqua" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginVertical="20dp"
+        android:layout_marginHorizontal="20dp"
+        android:orientation="vertical"
+        android:id="@+id/linearExpedientesUser"
+        android:layout_below="@id/frame"/>
 </LinearLayout>
+</androidx.core.widget.NestedScrollView>
