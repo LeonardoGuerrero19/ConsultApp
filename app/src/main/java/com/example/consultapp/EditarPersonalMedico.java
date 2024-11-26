@@ -3,6 +3,7 @@ package com.example.consultapp;
 import android.app.Dialog;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.Gravity;
 import android.view.ViewGroup;
@@ -25,7 +26,6 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -75,7 +75,7 @@ public class EditarPersonalMedico extends AppCompatActivity {
             String nuevoTelefono = telefono.getText().toString();
 
             // Validar que los campos no estén vacíos
-            if (nuevoNombre.isEmpty() || nuevaEspecializacion.isEmpty() || nuevoTelefono.isEmpty() || horarioSeleccionado.isEmpty()) {
+            if (nuevoNombre.isEmpty() || nuevaEspecializacion.isEmpty() || nuevoTelefono.isEmpty() || horarioSeleccionado == null || horarioSeleccionado.isEmpty()) {
                 Toast.makeText(EditarPersonalMedico.this, "Todos los campos deben ser llenados", Toast.LENGTH_SHORT).show();
                 return;
             }
@@ -109,6 +109,7 @@ public class EditarPersonalMedico extends AppCompatActivity {
                         // Obtener horarios y mostrar el rango
                         List<String> horarios = medico.getHorarios();
                         if (horarios != null && !horarios.isEmpty()) {
+                            horarioSeleccionado = horarios; // Guardar los horarios en la lista
                             String primerHorario = horarios.get(0);
                             String ultimoHorario = horarios.get(horarios.size() - 1);
                             horario.setText(String.format("%s - %s", primerHorario, ultimoHorario));
@@ -125,7 +126,6 @@ public class EditarPersonalMedico extends AppCompatActivity {
             }
         });
     }
-
 
     private void cargarEspecializacionesDesdeRealtime() {
         databaseReference.child("Servicios").child("TodosLosServicios").addListenerForSingleValueEvent(new com.google.firebase.database.ValueEventListener() {
@@ -180,8 +180,21 @@ public class EditarPersonalMedico extends AppCompatActivity {
         TimePicker timePickerInicio = dialog.findViewById(R.id.timePickerInicio);
         TimePicker timePickerFin = dialog.findViewById(R.id.timePickerFin);
 
+        // Cambiar según la versión de Android
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            timePickerInicio.setHour(timePickerInicio.getHour());
+            timePickerInicio.setMinute(timePickerInicio.getMinute());
+            timePickerFin.setHour(timePickerFin.getHour());
+            timePickerFin.setMinute(timePickerFin.getMinute());
+        } else {
+            timePickerInicio.setCurrentHour(timePickerInicio.getCurrentHour());
+            timePickerInicio.setCurrentMinute(timePickerInicio.getCurrentMinute());
+            timePickerFin.setCurrentHour(timePickerFin.getCurrentHour());
+            timePickerFin.setCurrentMinute(timePickerFin.getCurrentMinute());
+        }
+
         // Acción para actualizar el horario cuando el usuario cierre el diálogo
-        Button btnAceptar = dialog.findViewById(R.id.btnAceptar);
+        Button btnAceptar = dialog.findViewById(R.id.btnAceptarHorario); // Asegúrate de que el ID sea correcto
         btnAceptar.setOnClickListener(v -> {
             int horaInicio = timePickerInicio.getHour();
             int minutoInicio = timePickerInicio.getMinute();
@@ -196,8 +209,10 @@ public class EditarPersonalMedico extends AppCompatActivity {
                 return;
             }
 
-            // Actualizar el horario seleccionado
-            horarioSeleccionado = horarios;
+            // Actualizar el horario seleccionado solo si se ha hecho una selección
+            if (!horarios.equals(horarioSeleccionado)) {
+                horarioSeleccionado = horarios;
+            }
 
             // Actualizar el texto del botón para mostrar el rango
             horario.setText(String.format("%02d:%02d - %02d:%02d", horaInicio, minutoInicio, horaFin, minutoFin));
@@ -205,31 +220,25 @@ public class EditarPersonalMedico extends AppCompatActivity {
             dialog.dismiss();
         });
 
-        dialog.show();
-        dialog.getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        // Configuración de la ventana emergente
         dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-        dialog.getWindow().getAttributes().windowAnimations = R.style.DialogAnimation;
+        dialog.getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         dialog.getWindow().setGravity(Gravity.BOTTOM);
+        dialog.show();
     }
-
 
     private List<String> generarHorarios(int horaInicio, int minutoInicio, int horaFin, int minutoFin) {
         List<String> horarios = new ArrayList<>();
 
-        int inicioEnMinutos = horaInicio * 60 + minutoInicio;
-        int finEnMinutos = horaFin * 60 + minutoFin;
+        while (horaInicio < horaFin || (horaInicio == horaFin && minutoInicio < minutoFin)) {
+            // Formatear la hora y minuto en el formato de 24 horas
+            horarios.add(String.format("%02d:%02d", horaInicio, minutoInicio));
 
-        if (inicioEnMinutos >= finEnMinutos) {
-            return horarios; // Devuelve una lista vacía si el rango no es válido
-        }
-
-        for (int tiempo = inicioEnMinutos; tiempo <= finEnMinutos; tiempo += 30) {
-            int horas = tiempo / 60;
-            int minutos = tiempo % 60;
-
-            String periodo = (horas >= 12) ? "PM" : "AM";
-            int horasFormato12 = (horas == 0 || horas == 12) ? 12 : horas % 12;
-            horarios.add(String.format("%02d:%02d %s", horasFormato12, minutos, periodo));
+            minutoInicio += 30;
+            if (minutoInicio == 60) {
+                minutoInicio = 0;
+                horaInicio++;
+            }
         }
 
         return horarios;

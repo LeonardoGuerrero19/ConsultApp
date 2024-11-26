@@ -53,7 +53,6 @@ public class RegistroDoctor extends AppCompatActivity {
         // Inicializar FirebaseAuth y Realtime Database
         mAuth = FirebaseAuth.getInstance();
         databaseReference = FirebaseDatabase.getInstance().getReference();
-
         // Guardar el correo del administrador
         FirebaseAuth currentUser = FirebaseAuth.getInstance();
         if (currentUser.getCurrentUser() != null) {
@@ -115,7 +114,7 @@ public class RegistroDoctor extends AppCompatActivity {
         TimePicker timePickerFin = dialog.findViewById(R.id.timePickerFin);
 
         // Acción para actualizar el horario cuando el usuario cierre el diálogo
-        Button btnAceptar = dialog.findViewById(R.id.btnAceptar);
+        Button btnAceptar = dialog.findViewById(R.id.btnAceptarHorario);
         btnAceptar.setOnClickListener(v -> {
             int horaInicio = timePickerInicio.getHour();
             int minutoInicio = timePickerInicio.getMinute();
