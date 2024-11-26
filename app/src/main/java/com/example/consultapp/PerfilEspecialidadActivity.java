@@ -93,12 +93,17 @@ public class PerfilEspecialidadActivity extends AppCompatActivity {
 
                                     // Establecer el listener para el botón
                                     medicoButton.setOnClickListener(v -> {
-                                        // Redirigir a la actividad de agendar cita con información del médico
+                                        // Obtener el ID del médico
+                                        String medicoId = medicoSnapshot.getKey();  // Esto es el ID único del médico en Firebase
+
+                                        // Redirigir a la actividad de agendar cita con el ID y la información del médico
                                         Intent intent = new Intent(PerfilEspecialidadActivity.this, AgendaActivity.class);
                                         intent.putExtra("nombreMedico", medicoNombre); // Pasar el nombre del médico
+                                        intent.putExtra("medicoId", medicoId); // Pasar el ID del médico
                                         intent.putExtra("especializacion", nombreServicio); // Pasar la especialización
                                         startActivity(intent);
                                     });
+
 
                                     // Agregar el botón al layout
                                     linearMedicos.addView(medicoButton);

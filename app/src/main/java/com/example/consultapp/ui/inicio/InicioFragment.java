@@ -7,6 +7,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.GridLayout;
+import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -15,6 +17,8 @@ import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.resource.bitmap.RoundedCorners;
 import com.example.consultapp.AgendaActivity;
 import com.example.consultapp.PerfilEspecialidadActivity;
 import com.example.consultapp.R;
@@ -39,7 +43,7 @@ public class InicioFragment extends Fragment {
     private FirebaseAuth mAuth;
     private DatabaseReference databaseReference;
     private GridLayout gridLayout;
-    private LinearLayout linearProxCitas;
+    private LinearLayout linearProxCitas, linearSerivicios;
     private Button btn_cerrarS;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
@@ -56,7 +60,8 @@ public class InicioFragment extends Fragment {
 
         // Inicializar vistas
         TextView textSaludo = binding.textSaludo;
-        gridLayout = root.findViewById(R.id.gridLayout);
+        ImageButton imageButton = binding.image;
+        linearSerivicios = root.findViewById(R.id.linearServicios);
         linearProxCitas = root.findViewById(R.id.linearProxCitas);
 
         // Obtener el usuario actual de FirebaseAuth
@@ -71,8 +76,17 @@ public class InicioFragment extends Fragment {
                 public void onDataChange(@NonNull DataSnapshot snapshot) {
                     if (snapshot.exists()) {
                         String nombreUsuario = snapshot.child("nombre").getValue(String.class);
+                        String fotoUserUrl = snapshot.child("fotoPerfil").getValue(String.class); // Asume que el nodo "foto" tiene la URL
                         if (nombreUsuario != null) {
                             textSaludo.setText("Hola, " + nombreUsuario);
+                            // Cargar la foto del doctor en el ImageButton
+                            if (fotoUserUrl != null && !fotoUserUrl.isEmpty()) {
+                                Glide.with(requireContext())
+                                        .load(fotoUserUrl)
+                                        .transform(new RoundedCorners(150)) // Redondear las esquinas con un radio de 16dp
+                                        .placeholder(R.drawable.round_person_outline_24)
+                                        .into(imageButton);
+                            }
                         } else {
                             textSaludo.setText("Hola, Usuario");
                         }
@@ -98,7 +112,7 @@ public class InicioFragment extends Fragment {
         }
 
         // Obtener y mostrar los servicios
-        obtenerServicios();
+        cargarServicios();
 
         // Usar la vista inflada para encontrar el botón
         btn_cerrarS = root.findViewById(R.id.btn_cerrarS);
@@ -177,55 +191,86 @@ public class InicioFragment extends Fragment {
         }
     }
 
-    private void obtenerServicios() {
-        databaseReference.child("Servicios").child("TodosLosServicios").addListenerForSingleValueEvent(new ValueEventListener() {
+    private void cargarServicios() {
+        DatabaseReference serviciosRef = databaseReference.child("Servicios").child("DetalleServicios");
+
+        serviciosRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                if (snapshot.exists()) {
-                    int contador = 0; // Contador para limitar los servicios a 6
-                    gridLayout.removeAllViews(); // Limpiar el GridLayout antes de agregar los servicios
-                    gridLayout.setColumnCount(2); // Establecer 2 columnas
+                binding.linearServicios.removeAllViews(); // Limpia el contenido previo
+                LinearLayout fila = null;
+                int contador = 0;
 
-                    for (DataSnapshot servicioSnapshot : snapshot.getChildren()) {
-                        if (contador >= 4) break; // Detener si ya se han agregado 6 servicios
+                for (DataSnapshot servicioSnapshot : snapshot.getChildren()) {
+                    if (contador >= 4) break;  // Limita a 4 servicios
 
-                        String servicio = servicioSnapshot.getValue(String.class);
-                        if (servicio != null) {
-                            View servicioView = LayoutInflater.from(getContext()).inflate(R.layout.item_button_service, gridLayout, false);
+                    String nombre = servicioSnapshot.child("nombre").getValue(String.class);
+                    String imagenUrl = servicioSnapshot.child("imagenUrl").getValue(String.class); // Suponiendo que la URL está almacenada en "imagenUrl"
 
-                            // Configurar el LayoutParams para cada servicio
-                            GridLayout.LayoutParams layoutParams = new GridLayout.LayoutParams();
-                            layoutParams.width = 0; // Ancho ajustado dinámicamente
-                            layoutParams.height = ViewGroup.LayoutParams.WRAP_CONTENT;
-                            layoutParams.columnSpec = GridLayout.spec(GridLayout.UNDEFINED, 1, 1f); // Ocupa una columna con peso igual
-                            layoutParams.rowSpec = GridLayout.spec(GridLayout.UNDEFINED, 1); // Una fila por elemento
-                            layoutParams.setMargins(8, 8, 40, 40); // Márgenes entre los elementos
+                    View servicioView = LayoutInflater.from(getContext()).inflate(R.layout.item_servicio, null);
+                    TextView nombreServicio = servicioView.findViewById(R.id.nombre_servicio);
+                    ImageView imagenServicio = servicioView.findViewById(R.id.imagen_servicio); // Obtener el ImageView
 
-                            TextView servicioText = servicioView.findViewById(R.id.servicioText);
-                            servicioText.setText(servicio);
+                    nombreServicio.setText(nombre);
 
-                            servicioView.setOnClickListener(v -> {
-                                Intent intent = new Intent(getContext(), PerfilEspecialidadActivity.class);
-                                intent.putExtra("nombreServicio", servicio);
-                                startActivity(intent);
-                            });
-
-                            servicioView.setLayoutParams(layoutParams);
-                            gridLayout.addView(servicioView);
-                            contador++; // Incrementar el contador
-                        }
+                    // Cargar la imagen usando Glide
+                    if (imagenUrl != null) {
+                        Glide.with(getContext())
+                                .load(imagenUrl)
+                                .into(imagenServicio);
                     }
-                } else {
-                    Toast.makeText(getContext(), "Error al cargar los servicios", Toast.LENGTH_SHORT).show();
+
+                    // Establecer el OnClickListener para redirigir a AgendaActivity
+                    servicioView.setOnClickListener(v -> {
+                        // Crear un Intent para redirigir a AgendaActivity
+                        Intent intent = new Intent(getContext(), AgendaActivity.class);
+                        intent.putExtra("nombre_servicio", nombre); // Pasar el nombre del servicio (si lo necesitas)
+                        startActivity(intent);
+                    });
+
+                    // Crear una fila nueva si es necesario
+                    if (contador % 2 == 0) {
+                        fila = new LinearLayout(getContext());
+                        fila.setOrientation(LinearLayout.HORIZONTAL);
+                        fila.setLayoutParams(new LinearLayout.LayoutParams(
+                                LinearLayout.LayoutParams.MATCH_PARENT,
+                                LinearLayout.LayoutParams.WRAP_CONTENT));
+                        fila.setPadding(0, 0, 0, 0); // Margen entre filas
+                        binding.linearServicios.addView(fila);
+                    }
+
+                    LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+                            0,
+                            LinearLayout.LayoutParams.WRAP_CONTENT,
+                            1
+                    );
+                    params.setMargins(0, 0, 40, 50); // Margen entre los elementos
+                    servicioView.setLayoutParams(params);
+
+                    fila.addView(servicioView);
+                    contador++;
+                }
+
+                // Si solo hay un servicio, agregar una vista vacía al final
+                if (snapshot.getChildrenCount() == 1) {
+                    LinearLayout.LayoutParams paramsVacia = new LinearLayout.LayoutParams(
+                            0,
+                            LinearLayout.LayoutParams.WRAP_CONTENT,
+                            1
+                    );
+                    View viewVacia = new View(getContext());
+                    viewVacia.setLayoutParams(paramsVacia);
+                    fila.addView(viewVacia);
                 }
             }
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
-                Toast.makeText(getContext(), "Error al cargar los servicios.", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getContext(), "Error al cargar los servicios", Toast.LENGTH_SHORT).show();
             }
         });
     }
+
 
     @Override
     public void onDestroyView() {

@@ -49,6 +49,7 @@ public class InformeMedicoActivity extends AppCompatActivity {
         String citaId = getIntent().getStringExtra("citaId");
         String nombreDoctor = getIntent().getStringExtra("nombreDoctor");
         String nombrePaciente = getIntent().getStringExtra("nombre");
+        String fechaCita = getIntent().getStringExtra("fechaCita"); // Recuperamos la fecha de la cita
 
         // Referencia a los campos
         TextView tvCuenta = findViewById(R.id.tvCuenta);
@@ -92,6 +93,7 @@ public class InformeMedicoActivity extends AppCompatActivity {
             informeData.put("medicamento", medicamento);
             informeData.put("nombreDoctor", nombreDoctor);
             informeData.put("nombre", nombrePaciente);
+            informeData.put("fechaCita", fechaCita); // Guardar la fecha de la cita
 
             // Generar un ID único para el informe
             String informeId = dbRef.child("informe").push().getKey();

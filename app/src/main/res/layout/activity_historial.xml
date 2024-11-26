@@ -33,5 +33,13 @@
         android:textColor="@color/black"
         android:gravity="center_vertical|center" />
 
-
+    <!-- LinearLayout para mostrar los informes -->
+    <LinearLayout
+        android:id="@+id/llInformes"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_below="@id/txtNumeroCuenta"
+        android:layout_marginTop="20dp">
+    </LinearLayout>
 </RelativeLayout>

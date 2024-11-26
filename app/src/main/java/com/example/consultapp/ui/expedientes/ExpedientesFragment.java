@@ -149,6 +149,7 @@ public class ExpedientesFragment extends Fragment {
                                     Intent intent = new Intent(getContext(), HistorialActivity.class);
                                     intent.putExtra("numeroCuenta", numeroCuenta); // Pasa el número de cuenta
                                     intent.putExtra("nombrePaciente", nombrePaciente); // Pasa el nombre del paciente
+                                    intent.putExtra("nombreDoctor", nombreDoctor);
                                     intent.putExtra("peso", peso);
                                     intent.putExtra("altura", altura);
                                     intent.putExtra("alergias", alergias);

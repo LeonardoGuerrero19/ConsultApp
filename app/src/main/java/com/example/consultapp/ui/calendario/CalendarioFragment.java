@@ -112,6 +112,8 @@ public class CalendarioFragment extends Fragment {
 
                         for (DataSnapshot citaSnapshot : snapshot.getChildren()) {
                             String doctor = citaSnapshot.child("doctor").getValue(String.class);
+                            String fechaCita = citaSnapshot.child("fecha").getValue(String.class); // Asume que la fecha está guardada en el campo "fecha"
+
                             if (nombreDoctor.equals(doctor)) {
                                 String horario = citaSnapshot.child("horario").getValue(String.class);
                                 String usuarioId = citaSnapshot.child("usuario_id").getValue(String.class);
@@ -158,6 +160,7 @@ public class CalendarioFragment extends Fragment {
                                     intent.putExtra("numeroCuenta", txtCuenta.getText().toString());
                                     intent.putExtra("citaId", citaId);
                                     intent.putExtra("nombreDoctor", nombreDoctor);
+                                    intent.putExtra("fechaCita", fechaCita); // Aquí enviamos la fecha de la cita
                                     intent.putExtra("nombre", txtNombre.getText().toString());
                                     startActivity(intent);
                                 });
