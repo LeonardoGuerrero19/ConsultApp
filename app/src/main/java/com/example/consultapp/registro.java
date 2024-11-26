@@ -8,6 +8,7 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.os.Handler;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -36,7 +37,6 @@ import javax.mail.Session;
 import javax.mail.Transport;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
-
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -181,22 +181,25 @@ public class registro extends AppCompatActivity {
                         if (task.isSuccessful()) {
                             FirebaseUser user = mAuth.getCurrentUser();
                             if (user != null) {
-                                // Envía el correo de verificación
+                                // Enviar el correo de verificación
                                 sendVerificationEmail(user, view);
 
                                 // Genera y guarda el número de cuenta
-                                saveUserToRealtimeDB(user.getUid(), nombreUser, correoUser, view);
+                                String accountNumber = generarNumeroCuenta();
+                                saveUserToRealtimeDB(user.getUid(), nombreUser, correoUser, view, accountNumber);
 
-                                // Envía el número de cuenta por correo adicional
-                                String numeroCuenta = generarNumeroCuenta();
-                                sendAccountNumberEmail(correoUser, numeroCuenta);
+                                // Enviar el correo con el número de cuenta
+                                sendAccountNumberEmail(correoUser, accountNumber);
 
-                                // Cierra sesión automáticamente
-                                mAuth.signOut();
-
-                                // Redirige al usuario a la pantalla de login
-                                startActivity(new Intent(registro.this, login.class));
-                                finish();
+                                // Redirigir al login después de 3 segundos
+                                new Handler().postDelayed(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        Intent intent = new Intent(registro.this, login.class);
+                                        startActivity(intent);
+                                        finish();
+                                    }
+                                }, 3000);  // 3 segundos
                             }
                         } else {
                             Exception exception = task.getException();
@@ -211,11 +214,26 @@ public class registro extends AppCompatActivity {
                 .addOnFailureListener(e -> Snackbar.make(view, "Error al registrar: " + e.getMessage(), Snackbar.LENGTH_SHORT).show());
     }
 
+    private void saveUserToRealtimeDB(String userId, String nombreUser, String correoUser, View view, String accountNumber) {
+        Map<String, Object> userMap = new HashMap<>();
+        userMap.put("id", userId);
+        userMap.put("nombre", nombreUser);
+        userMap.put("correo", correoUser);
+        userMap.put("rol", "usuario");
+        userMap.put("numeroCuenta", accountNumber);
+
+        databaseReference.child("users").child(userId).setValue(userMap)
+                .addOnSuccessListener(aVoid -> {
+                    Snackbar.make(view, "Usuario registrado correctamente.", Snackbar.LENGTH_SHORT).show();
+                })
+                .addOnFailureListener(e -> Snackbar.make(view, "Error al guardar los datos en Realtime Database: " + e.getMessage(), Snackbar.LENGTH_SHORT).show());
+    }
+
     private void sendVerificationEmail(FirebaseUser user, View view) {
         user.sendEmailVerification()
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
-                        Snackbar.make(view, "Registro exitoso. Verifica tu correo para activar la cuenta.", Snackbar.LENGTH_SHORT).show();
+
                     } else {
                         Snackbar.make(view, "Error al enviar el correo de verificación.", Snackbar.LENGTH_SHORT).show();
                     }
@@ -303,32 +321,10 @@ public class registro extends AppCompatActivity {
         }).start();
     }
 
-
-
     private String generarNumeroCuenta() {
         int year = Calendar.getInstance().get(Calendar.YEAR);
         int randomNum = (int) (Math.random() * 9000) + 1000; // Genera un número aleatorio de 4 dígitos
         return year + String.valueOf(randomNum); // Combina el año con el número aleatorio
-    }
-
-    private void saveUserToRealtimeDB(String userId, String nombreUser, String correoUser, View view) {
-        int year = Calendar.getInstance().get(Calendar.YEAR);
-        int randomNum = (int) (Math.random() * 9000) + 1000;
-        String numeroCuenta = year + String.valueOf(randomNum);
-
-        Map<String, Object> userMap = new HashMap<>();
-        userMap.put("id", userId);
-        userMap.put("nombre", nombreUser);
-        userMap.put("correo", correoUser);
-        userMap.put("rol", "usuario");
-        userMap.put("numeroCuenta", numeroCuenta);
-
-        databaseReference.child("users").child(userId).setValue(userMap)
-                .addOnSuccessListener(aVoid -> {
-                    Snackbar.make(view, "Usuario registrado correctamente.", Snackbar.LENGTH_SHORT).show();
-                    startActivity(new Intent(registro.this, login.class));
-                })
-                .addOnFailureListener(e -> Snackbar.make(view, "Error al guardar los datos en Realtime Database: " + e.getMessage(), Snackbar.LENGTH_SHORT).show());
     }
 
     private String validatePassword(String password) {
