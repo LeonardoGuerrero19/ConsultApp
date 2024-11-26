@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_marginHorizontal="20dp"
+    tools:context=".HistorialActivity">
+
+    <TextView
+        android:id="@+id/text"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginVertical="20dp"
+        android:fontFamily="@font/montserrat_bold"
+        android:text="Historial clínico"
+        android:textColor="@color/black"
+        android:textSize="26dp" />
+
+    <TextView
+        android:id="@+id/txtNumeroCuenta"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/text"
+        android:backgroundTint="@color/gray"
+        android:background="@drawable/rounded"
+        android:text="No. de cuenta: "
+        android:textSize="20dp"
+        android:padding="10dp"
+        android:layout_marginBottom="20dp"
+        android:fontFamily="@font/montserrat_bold"
+        android:textColor="@color/black"
+        android:gravity="center_vertical|center" />
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:fillViewport="true">
+        <!-- LinearLayout para mostrar los informes -->
+        <LinearLayout
+            android:id="@+id/llInformes"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_below="@id/txtNumeroCuenta"
+            android:layout_marginTop="20dp">
+        </LinearLayout>
+    </ScrollView>
+</RelativeLayout>

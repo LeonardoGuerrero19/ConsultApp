@@ -7,36 +7,76 @@
     tools:context=".ui.expediente_user.ExpedienteUserFragment" >
 
     <LinearLayout
+        android:id="@+id/linear"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@drawable/header_profile_doctor"
-        android:orientation="vertical">
+        android:orientation="horizontal">
 
-        <ImageButton
-            android:id="@+id/btn_editar"
+        <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:src="@drawable/round_edit_24"
-            android:backgroundTint="@color/aqua"
-            android:background="@drawable/rounded"
-            android:layout_gravity="end"
-            android:padding="10dp" />
+            android:orientation="vertical">
+            <ImageView
+                android:id="@+id/imageView"
+                android:layout_width="120dp"
+                android:layout_height="120dp"
+                android:layout_margin="20dp"
+                android:layout_gravity="center"
+                android:scaleType="centerCrop"
+                android:contentDescription="Vista previa de la imagen seleccionada"
+                android:src="@drawable/boton_seleccionado" />
 
-        <TextView
-            android:id="@+id/nombre"
+            <ImageButton
+                android:id="@+id/selectImageButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_plus"
+                android:layout_marginBottom="20dp"
+                android:backgroundTint="@color/white"
+                android:background="@drawable/rounded"
+                android:layout_gravity="center"
+                android:layout_marginTop="-40dp" />
+        </LinearLayout>
+
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
-            android:layout_marginBottom="10dp"
-            android:layout_marginHorizontal="20dp"
-            android:textSize="22dp"
-            android:fontFamily="@font/montserrat_bold"
-            android:textColor="@color/black" />
+            android:layout_marginTop="16dp"
+            android:orientation="vertical">
+            <TextView
+                android:id="@+id/nombre"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:layout_marginBottom="10dp"
+                android:layout_marginRight="20dp"
+                android:textSize="22dp"
+                android:fontFamily="@font/montserrat_bold"
+                android:textColor="@color/black" />
+
+            <TextView
+                android:id="@+id/numeroCuenta"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="20dp"
+                android:textSize="20dp"
+                android:layout_marginBottom="20dp"
+                android:fontFamily="@font/montserrat_medium"
+                android:textColor="@color/black" />
+        </LinearLayout>
+
     </LinearLayout>
 
-    <TextView
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginRight="20dp">
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
         android:layout_marginHorizontal="20dp"
         android:layout_marginTop="20dp"
         android:layout_marginBottom="10dp"
@@ -44,6 +84,16 @@
         android:fontFamily="@font/montserrat_bold"
         android:textColor="@color/black"
         android:text="Edad:" />
+    <ImageButton
+        android:id="@+id/btn_editar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/round_edit_24"
+        android:backgroundTint="@color/aqua"
+        android:background="@drawable/rounded"
+        android:layout_gravity="end|bottom"
+        android:padding="10dp" />
+    </LinearLayout>
 
     <TextView
         android:id="@+id/edad"

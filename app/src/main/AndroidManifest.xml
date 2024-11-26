@@ -23,6 +23,12 @@
         android:theme="@style/Theme.ConsultApp"
         tools:targetApi="31">
         <activity
+            android:name=".PerfilEspecialidadActivity"
+            android:exported="false" />
+        <activity
+            android:name=".HistorialActivity"
+            android:exported="false" />
+        <activity
             android:name=".InformePacienteActivity"
             android:exported="false" />
         <activity

@@ -26,10 +26,10 @@
 
     <ImageButton
         android:id="@+id/image"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:src="@drawable/ic_plus"
-        android:background="?attr/selectableItemBackgroundBorderless" />
+        android:layout_width="45dp"
+        android:layout_height="45dp"
+        android:src="@drawable/round_person_outline_24"
+        android:background="@drawable/button_border" />
     </LinearLayout>
 
     <View
@@ -62,10 +62,16 @@
         android:text="Citas del día"
         android:textSize="24dp" />
 
+    <TextView
+        android:id="@+id/textPrueba"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/text"/>
+
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/text"
+        android:layout_below="@id/textPrueba"
         android:paddingBottom="80dp" >
 
         <LinearLayout

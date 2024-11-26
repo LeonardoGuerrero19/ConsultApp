@@ -1,4 +1,3 @@
-<?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
@@ -9,23 +8,199 @@
     android:backgroundTint="@color/gray"
     android:background="@drawable/rounded">
 
-    <TextView
-        android:id="@+id/txtNumeroCuenta"
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:fontFamily="@font/montserrat_bold"
-        android:layout_marginBottom="10dp"
-        android:textColor="@color/black"
-        android:text="Número de cuenta"
-        android:textSize="20dp" />
+        android:orientation="horizontal">
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+            <TextView
+                android:id="@+id/txtNumeroCuenta"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/montserrat_bold"
+                android:layout_marginBottom="10dp"
+                android:textColor="@color/black"
+                android:text="Número de cuenta"
+                android:textSize="20dp" />
 
-    <TextView
-        android:id="@+id/txtNombrePaciente"
-        android:layout_width="wrap_content"
+            <TextView
+                android:id="@+id/txtNombrePaciente"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Nombre del paciente"
+                android:textSize="20dp"
+                android:fontFamily="@font/montserrat_medium"
+                android:textColor="@color/black" />
+        </LinearLayout>
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_weight="1"
+            android:layout_gravity="center_vertical"
+            android:gravity="end">
+            <ImageButton
+                android:id="@+id/btnHistorial"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:backgroundTint="@color/aqua"
+                android:background="@drawable/rounded"
+                android:src="@drawable/round_medical_information_24" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <!-- Modal que será desplegado debajo -->
+    <LinearLayout
+        android:id="@+id/modalDetalles"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Nombre del paciente"
-        android:textSize="18dp"
-        android:fontFamily="@font/montserrat_medium"
-        android:textColor="@color/black"/>
+        android:orientation="vertical"
+        android:visibility="gone"
+        android:paddingTop="15dp"
+        android:background="#0000">
+
+        <!-- Contenedor horizontal -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/montserrat_bold"
+                android:textColor="@color/black"
+                android:textSize="18dp"
+                android:text="Edad: " />
+
+            <TextView
+                android:id="@+id/edad"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:fontFamily="@font/montserrat_medium"
+                android:textSize="18dp"
+                android:textColor="@color/black"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/montserrat_bold"
+                android:textColor="@color/black"
+                android:textSize="18dp"
+                android:text="Género: " />
+
+            <TextView
+                android:id="@+id/genero"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:fontFamily="@font/montserrat_medium"
+                android:textSize="18dp"
+                android:textColor="@color/black"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/montserrat_bold"
+                android:textColor="@color/black"
+                android:textSize="18dp"
+                android:text="Peso: " />
+
+            <TextView
+                android:id="@+id/peso"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:fontFamily="@font/montserrat_medium"
+                android:textSize="18dp"
+                android:textColor="@color/black"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/montserrat_bold"
+                android:textSize="18dp"
+                android:textColor="@color/black"
+                android:text="Altura: " />
+
+            <TextView
+                android:id="@+id/altura"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:fontFamily="@font/montserrat_medium"
+                android:textSize="18dp"
+                android:textColor="@color/black"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/montserrat_bold"
+                android:textSize="18dp"
+                android:textColor="@color/black"
+                android:text="Alergías: " />
+
+            <TextView
+                android:id="@+id/alergias"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:fontFamily="@font/montserrat_medium"
+                android:textSize="18dp"
+                android:textColor="@color/black"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/montserrat_bold"
+                android:textSize="18dp"
+                android:textColor="@color/black"
+                android:text="Télefono de contacto: " />
+
+            <TextView
+                android:id="@+id/telefono"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:fontFamily="@font/montserrat_medium"
+                android:textSize="18dp"
+                android:textColor="@color/black"/>
+        </LinearLayout>
+
+    </LinearLayout>
 
 </LinearLayout>

@@ -49,11 +49,13 @@ public class InformeMedicoActivity extends AppCompatActivity {
         String citaId = getIntent().getStringExtra("citaId");
         String nombreDoctor = getIntent().getStringExtra("nombreDoctor");
         String nombrePaciente = getIntent().getStringExtra("nombre");
+        String fechaCita = getIntent().getStringExtra("fechaCita"); // Recuperamos la fecha de la cita
 
         // Referencia a los campos
         TextView tvCuenta = findViewById(R.id.tvCuenta);
         EditText etPeso = findViewById(R.id.peso);
         EditText etAltura = findViewById(R.id.estatura);
+        EditText etAlergias = findViewById(R.id.etAlergias);
         EditText etMotivo = findViewById(R.id.etMotivoConsulta);
         EditText etPadecimiento = findViewById(R.id.etPrincipioEvolucion);
         EditText etMedicamento = findViewById(R.id.etMedicamentosRecetados);
@@ -70,11 +72,12 @@ public class InformeMedicoActivity extends AppCompatActivity {
         btnGuardar.setOnClickListener(v -> {
             String peso = etPeso.getText().toString().trim();
             String altura = etAltura.getText().toString().trim();
+            String alergias = etAlergias.getText().toString().trim();
             String motivo = etMotivo.getText().toString().trim();
             String padecimiento = etPadecimiento.getText().toString().trim();
             String medicamento = etMedicamento.getText().toString().trim();
 
-            if (peso.isEmpty() || altura.isEmpty()) {
+            if (peso.isEmpty() && altura.isEmpty() && alergias.isEmpty() && motivo.isEmpty() && padecimiento.isEmpty() && medicamento.isEmpty()) {
                 Toast.makeText(this, "Por favor, completa todos los campos", Toast.LENGTH_SHORT).show();
                 return;
             }
@@ -84,11 +87,13 @@ public class InformeMedicoActivity extends AppCompatActivity {
             informeData.put("numeroCuenta", numeroCuenta);
             informeData.put("peso", peso);
             informeData.put("altura", altura);
+            informeData.put("alergias", alergias);
             informeData.put("motivo", motivo);
             informeData.put("padecimiento", padecimiento);
             informeData.put("medicamento", medicamento);
             informeData.put("nombreDoctor", nombreDoctor);
             informeData.put("nombre", nombrePaciente);
+            informeData.put("fechaCita", fechaCita); // Guardar la fecha de la cita
 
             // Generar un ID único para el informe
             String informeId = dbRef.child("informe").push().getKey();

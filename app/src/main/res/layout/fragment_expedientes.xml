@@ -49,13 +49,23 @@
             android:layout_marginEnd="10dp" />
     </FrameLayout>
 
-    <LinearLayout
+    <androidx.core.widget.NestedScrollView
+        android:id="@+id/scrollView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginVertical="20dp"
-        android:orientation="vertical"
-        android:id="@+id/linearExpedientes"
-        android:layout_below="@id/frame">
-    </LinearLayout>
+        android:layout_below="@id/frame"
+        android:paddingBottom="80dp"
+        android:clipToPadding="false">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginVertical="20dp"
+            android:orientation="vertical"
+            android:id="@+id/linearExpedientes"
+            android:layout_below="@id/frame">
+        </LinearLayout>
+
+    </androidx.core.widget.NestedScrollView>
 
 </RelativeLayout>
