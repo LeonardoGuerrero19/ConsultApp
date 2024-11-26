@@ -104,7 +104,6 @@
             android:contentDescription="Mostrar/Ocultar contraseña" />
     </LinearLayout>
 
-
     <LinearLayout
         android:id="@+id/linear2"
         android:layout_width="match_parent"
@@ -113,6 +112,38 @@
         android:layout_marginTop="20dp"
         android:orientation="horizontal"
         android:layout_below="@id/linear1" >
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="¿Olvidaste tu contraseña?"
+            android:fontFamily="@font/montserrat_medium"
+            android:textSize="16dp"
+            android:layout_gravity="center_vertical"/>
+
+        <TextView
+            android:id="@+id/txtOlvidasteContrasena"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/linear1"
+            android:layout_centerHorizontal="true"
+            android:fontFamily="@font/montserrat_bold"
+            android:text="Recuperar"
+            android:textSize="16dp"
+            android:layout_gravity="center_vertical"
+            android:textColor="@color/aqua"/>
+
+    </LinearLayout>
+
+
+    <LinearLayout
+        android:id="@+id/linear3"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="20dp"
+        android:layout_marginTop="20dp"
+        android:orientation="horizontal"
+        android:layout_below="@id/linear2" >
 
         <TextView
             android:layout_width="wrap_content"

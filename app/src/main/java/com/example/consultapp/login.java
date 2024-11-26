@@ -25,7 +25,7 @@ public class login extends AppCompatActivity {
 
     private EditText correo, contrasena;
     private Button btnIniciarSesion;
-    private TextView txtRegistrate;
+    private TextView txtRegistrate, txtOlvidasteContrasena;
     private ImageButton togglePasswordVisibility;
     private FirebaseAuth auth;
     private DatabaseReference databaseReference;
@@ -44,6 +44,7 @@ public class login extends AppCompatActivity {
         contrasena = findViewById(R.id.contrasena);
         btnIniciarSesion = findViewById(R.id.btnIniciarSesion);
         txtRegistrate = findViewById(R.id.txtRegistrate);
+        txtOlvidasteContrasena = findViewById(R.id.txtOlvidasteContrasena);
         togglePasswordVisibility = findViewById(R.id.togglePasswordVisibility);
 
         // Configurar el botón de alternar visibilidad de contraseña
@@ -64,6 +65,23 @@ public class login extends AppCompatActivity {
         });
 
         txtRegistrate.setOnClickListener(v -> startActivity(new Intent(login.this, registro.class)));
+
+        // Configurar la funcionalidad de recuperación de contraseña
+        txtOlvidasteContrasena.setOnClickListener(v -> {
+            String correoUser = correo.getText().toString().trim();
+
+            if (correoUser.isEmpty()) {
+                Toast.makeText(login.this, "Por favor, ingresa tu correo electrónico en el campo del correo.", Toast.LENGTH_SHORT).show();
+            } else {
+                auth.sendPasswordResetEmail(correoUser).addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        Toast.makeText(login.this, "Correo enviado. Revisa tu bandeja de entrada.", Toast.LENGTH_SHORT).show();
+                    } else {
+                        Toast.makeText(login.this, "Error al enviar el correo. Verifica que el correo esté registrado.", Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }
+        });
     }
 
     // Alternar entre mostrar y ocultar contraseña

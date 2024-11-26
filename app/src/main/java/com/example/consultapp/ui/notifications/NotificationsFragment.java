@@ -84,53 +84,59 @@ public class NotificationsFragment extends Fragment {
     }
 
     private void cargarNotificacionesParaMedico(String nombreMedico) {
-        dbRef.child("Notificaciones").addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                linearLayoutNotifications.removeAllViews();
+        dbRef.child("notificaciones")
+                .orderByChild("nombre_medico")
+                .equalTo(nombreMedico) // Filtrar por el nombre del médico
+                .addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        linearLayoutNotifications.removeAllViews();
 
-                for (DataSnapshot medicoSnapshot : snapshot.getChildren()) {
-                    for (DataSnapshot notificacionSnapshot : medicoSnapshot.getChildren()) {
-                        String notificacionNombreMedico = notificacionSnapshot.child("nombreMedico").getValue(String.class);
+                        boolean hasUnreadNotifications = false;
 
-                        if (nombreMedico.equals(notificacionNombreMedico)) {
-                            agregarNotificacionVista(notificacionSnapshot);
+                        for (DataSnapshot notificacionSnapshot : snapshot.getChildren()) {
+                            String estado = notificacionSnapshot.child("estado").getValue(String.class);
+
+                            // Mostrar solo notificaciones en estado "no_leido"
+                            if ("no_leido".equals(estado)) {
+                                agregarNotificacionVista(notificacionSnapshot);
+                                hasUnreadNotifications = true;
+                            }
+                        }
+
+                        if (!hasUnreadNotifications) {
+                            Toast.makeText(getContext(), "No tienes notificaciones no leídas.", Toast.LENGTH_SHORT).show();
                         }
                     }
-                }
-            }
 
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-                Log.e("NotificationsFragment", "Error al cargar notificaciones: " + error.getMessage());
-                Toast.makeText(getContext(), "Error al cargar notificaciones.", Toast.LENGTH_SHORT).show();
-            }
-        });
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {
+                        Log.e("NotificationsFragment", "Error al cargar notificaciones: " + error.getMessage());
+                        Toast.makeText(getContext(), "Error al cargar notificaciones.", Toast.LENGTH_SHORT).show();
+                    }
+                });
     }
 
-
     private void agregarNotificacionVista(DataSnapshot notificacionSnapshot) {
-        String titulo = notificacionSnapshot.child("titulo").getValue(String.class);
         String mensaje = notificacionSnapshot.child("mensaje").getValue(String.class);
         String estado = notificacionSnapshot.child("estado").getValue(String.class);
+        String fecha = notificacionSnapshot.child("fecha").getValue(String.class);
+        String hora = notificacionSnapshot.child("hora").getValue(String.class);
         String notificacionId = notificacionSnapshot.getKey();
-
-        Log.d(TAG, "Creando vista para la notificación. Título: " + titulo + ", Estado: " + estado);
 
         View notificacionView = LayoutInflater.from(getContext())
                 .inflate(R.layout.item_notification, linearLayoutNotifications, false);
 
-        TextView tvTitulo = notificacionView.findViewById(R.id.notification_title);
         TextView tvMensaje = notificacionView.findViewById(R.id.notification_message);
         TextView tvEstado = notificacionView.findViewById(R.id.notification_status);
+        TextView tvFechaHora = notificacionView.findViewById(R.id.notification_date_time);
         Button btnMarcarLeida = notificacionView.findViewById(R.id.btn_mark_as_read);
 
-        tvTitulo.setText(titulo != null ? titulo : "Sin título");
         tvMensaje.setText(mensaje != null ? mensaje : "Sin mensaje");
-        tvEstado.setText(estado != null ? estado : "Sin estado");
+        tvEstado.setText(estado != null ? estado : "no_leido");
+        tvFechaHora.setText(fecha != null && hora != null ? fecha + " " + hora : "Sin fecha/hora");
 
         btnMarcarLeida.setOnClickListener(v -> {
-            Log.d(TAG, "Botón 'Marcar como leída' presionado para la notificación: " + notificacionId);
             new android.app.AlertDialog.Builder(getContext())
                     .setTitle("Confirmación")
                     .setMessage("¿Deseas marcar esta notificación como leída?")
@@ -140,20 +146,19 @@ public class NotificationsFragment extends Fragment {
         });
 
         linearLayoutNotifications.addView(notificacionView);
-        Log.d(TAG, "Vista de notificación añadida al LinearLayout.");
     }
 
     private void marcarNotificacionComoLeida(String notificacionId, View notificacionView) {
-        if (userId == null || notificacionId == null) {
-            Log.e(TAG, "Datos de notificación no válidos. userId o notificacionId son nulos.");
-            Toast.makeText(getContext(), "Datos de notificación no válidos.", Toast.LENGTH_SHORT).show();
+        if (notificacionId == null) {
+            Log.e(TAG, "ID de notificación nulo. No se puede marcar como leída.");
+            Toast.makeText(getContext(), "Error al marcar como leída.", Toast.LENGTH_SHORT).show();
             return;
         }
 
-        Log.d(TAG, "Marcando notificación como leída. ID: " + notificacionId);
-        dbRef.child("Notificaciones").child(userId).child(notificacionId).child("estado").setValue("leída")
+        // Acceder directamente al nodo de la notificación y actualizar el estado
+        dbRef.child("notificaciones").child(notificacionId).child("estado").setValue("leída")
                 .addOnSuccessListener(aVoid -> {
-                    Log.d(TAG, "Notificación marcada como leída. Eliminando de la vista.");
+                    Log.d(TAG, "Notificación marcada como leída correctamente.");
                     linearLayoutNotifications.removeView(notificacionView);
                     Toast.makeText(getContext(), "Notificación marcada como leída.", Toast.LENGTH_SHORT).show();
                 })
