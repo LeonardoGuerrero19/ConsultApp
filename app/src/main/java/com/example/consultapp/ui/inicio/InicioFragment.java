@@ -61,7 +61,6 @@ public class InicioFragment extends Fragment {
     private GridLayout gridLayout;
     private LinearLayout linearProxCitas, linearSerivicios, linearPersonalMedico;
     private Button btn_cerrarS;
-    private ImageButton imgCerrarSesion; // Declarar el ImageButton
     private Dialog dialog; // Declarar como variable de instancia
     private static final int PICK_IMAGE_REQUEST = 1; // Código de solicitud para seleccionar la imagen
     private Uri imageUri = null; // URI de la imagen seleccionada
@@ -84,7 +83,7 @@ public class InicioFragment extends Fragment {
         linearSerivicios = root.findViewById(R.id.linearServicios);
         linearProxCitas = root.findViewById(R.id.linearProxCitas);
         linearPersonalMedico = root.findViewById(R.id.linearPersonalMedico);
-        imgCerrarSesion = root.findViewById(R.id.image);
+        btn_cerrarS = root.findViewById(R.id.btn_cerrarS);
 
         // Obtener el usuario actual de FirebaseAuth
         FirebaseUser currentUser = mAuth.getCurrentUser();
@@ -133,13 +132,6 @@ public class InicioFragment extends Fragment {
             textSaludo.setText("Hola, Usuario");
             Toast.makeText(getContext(), "Usuario no logueado", Toast.LENGTH_SHORT).show();
         }
-
-        imgCerrarSesion.setOnClickListener(v -> {
-            mAuth.signOut();
-            Intent intent = new Intent(getActivity(), login.class);
-            startActivity(intent);
-            getActivity().finish(); // Cierra la actividad actual
-        });
 
         // Inicializar el TextView
         TextView moreLink = root.findViewById(R.id.more_link);
@@ -418,6 +410,13 @@ public class InicioFragment extends Fragment {
 
         // Configura el clic en el botón de seleccionar imagen
         selectImageButton.setOnClickListener(v -> openImageSelector());
+
+        btn_cerrarS.setOnClickListener(v -> {
+            mAuth.signOut();
+            Intent intent = new Intent(getActivity(), login.class);
+            startActivity(intent);
+            getActivity().finish(); // Cierra la actividad actual
+        });
 
         // Mostrar el dialog
         dialog.show();
