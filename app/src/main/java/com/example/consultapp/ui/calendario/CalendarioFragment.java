@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.CalendarView;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -26,6 +27,8 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+
+import java.util.Calendar;
 
 public class CalendarioFragment extends Fragment {
 
@@ -50,6 +53,25 @@ public class CalendarioFragment extends Fragment {
         TextView textSaludo = binding.textSaludo;
         ImageButton imageButton = binding.image;
         LinearLayout linearCitas = binding.linearCitas;
+
+        // Obtener la referencia del CalendarView y el TextView donde mostrar la fecha
+        CalendarView calendarView = binding.calendarView;
+        TextView textPrueba = binding.textPrueba;
+
+        // Establecer la fecha actual en el CalendarView
+        Calendar calendar = Calendar.getInstance();
+        long currentDate = calendar.getTimeInMillis();
+        calendarView.setDate(currentDate, true, true);
+
+        // Mostrar la fecha actual en textPrueba
+        textPrueba.setText("Fecha seleccionada: " + calendar.get(Calendar.DAY_OF_MONTH) + "/" +
+                (calendar.get(Calendar.MONTH) + 1) + "/" + calendar.get(Calendar.YEAR));
+
+        // Configurar el listener para cambios de fecha en CalendarView
+        calendarView.setOnDateChangeListener((view, year, month, dayOfMonth) -> {
+            // Mostrar la fecha seleccionada
+            textPrueba.setText("Fecha seleccionada: " + dayOfMonth + "/" + (month + 1) + "/" + year);
+        });
 
         if (mAuth.getCurrentUser() != null) {
             String userId = mAuth.getCurrentUser().getUid();

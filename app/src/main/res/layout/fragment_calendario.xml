@@ -62,10 +62,16 @@
         android:text="Citas del día"
         android:textSize="24dp" />
 
+    <TextView
+        android:id="@+id/textPrueba"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/text"/>
+
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/text"
+        android:layout_below="@id/textPrueba"
         android:paddingBottom="80dp" >
 
         <LinearLayout
