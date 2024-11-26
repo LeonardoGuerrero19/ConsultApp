@@ -1,5 +1,5 @@
-<?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -7,12 +7,16 @@
     android:layout_marginHorizontal="20dp"
     tools:context=".ui.inicio.InicioFragment">
 
+    <!-- Encabezado con saludo y botón -->
     <LinearLayout
         android:id="@+id/linear2"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:gravity="center_vertical" >
+        android:gravity="center_vertical"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
 
         <TextView
             android:id="@+id/text_saludo"
@@ -21,7 +25,7 @@
             android:layout_weight="1"
             android:layout_marginVertical="20dp"
             android:fontFamily="@font/montserrat_bold"
-            android:textSize="22dp"
+            android:textSize="22sp"
             android:textColor="@color/black" />
 
         <ImageButton
@@ -32,64 +36,107 @@
             android:background="?attr/selectableItemBackgroundBorderless" />
     </LinearLayout>
 
+    <!-- Línea divisoria -->
     <View
         android:id="@+id/divider"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="2dp"
-        android:layout_below="@id/linear2"
-        android:background="@color/aqua" />
+        android:background="@color/aqua"
+        app:layout_constraintTop_toBottomOf="@id/linear2"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
 
-    <TextView
-        android:id="@+id/txtProximasCitas"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/divider"
-        android:layout_marginVertical="20dp"
-        android:textColor="@color/black"
-        android:text="Proximas citas"
-        android:fontFamily="@font/montserrat_bold"
-        android:textSize="20dp" />
-
-    <HorizontalScrollView
+    <!-- Contenido desplazable -->
+    <ScrollView
         android:id="@+id/scrollView"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:scrollbars="horizontal"
-        android:layout_below="@id/txtProximasCitas">
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:paddingBottom="110dp"
+        app:layout_constraintTop_toBottomOf="@id/divider"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent">
 
         <LinearLayout
-            android:id="@+id/linearProxCitas"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal" />
-    </HorizontalScrollView>
+            android:orientation="vertical">
 
-    <TextView
-        android:id="@+id/txtServicios"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/scrollView"
-        android:layout_alignParentEnd="true"
-        android:layout_marginVertical="20dp"
-        android:layout_marginTop="18dp"
-        android:layout_marginEnd="0dp"
-        android:fontFamily="@font/montserrat_bold"
-        android:text="Especialidades"
-        android:textColor="@color/black"
-        android:textSize="20dp" />
+            <!-- Título: Próximas citas -->
+            <TextView
+                android:id="@+id/txtProximasCitas"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Próximas citas"
+                android:fontFamily="@font/montserrat_bold"
+                android:textSize="20sp"
+                android:textColor="@color/black"
+                android:layout_marginVertical="20dp" />
 
-    <LinearLayout
-        android:id="@+id/linearServicios"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/txtServicios"
-        android:orientation="vertical" />
+            <!-- Scroll horizontal de próximas citas -->
+            <HorizontalScrollView
+                android:id="@+id/scrollView1"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:scrollbars="horizontal">
 
-    <Button
-        android:id="@+id/btn_cerrarS"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/linearServicios"
-        android:text="Cerrar sesión"
-        android:layout_marginTop="16dp"/>
-</RelativeLayout>
+                <LinearLayout
+                    android:id="@+id/linearProxCitas"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal" />
+            </HorizontalScrollView>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+                <!-- Título: Especialidades -->
+                <TextView
+                    android:id="@+id/txtServicios"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Especialidades"
+                    android:fontFamily="@font/montserrat_bold"
+                    android:textSize="20sp"
+                    android:textColor="@color/black"
+                    android:layout_marginVertical="20dp" />
+            </LinearLayout>
+
+            <!-- Contenedor de especialidades -->
+            <LinearLayout
+                android:id="@+id/linearServicios"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical" />
+
+            <!-- Título: Personal médico -->
+            <TextView
+                android:id="@+id/txtPersonalMedico"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Personal médico"
+                android:fontFamily="@font/montserrat_bold"
+                android:textSize="20sp"
+                android:textColor="@color/black"
+                android:layout_marginVertical="20dp" />
+
+            <!-- Contenedor de personal médico -->
+            <LinearLayout
+                android:id="@+id/linearPersonalMedico"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical" />
+
+            <!-- Botón cerrar sesión -->
+            <Button
+                android:id="@+id/btn_cerrarS"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Cerrar sesión"
+                android:layout_marginTop="16dp" />
+
+        </LinearLayout>
+    </ScrollView>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

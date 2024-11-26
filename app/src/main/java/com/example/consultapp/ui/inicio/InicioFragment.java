@@ -19,7 +19,9 @@ import androidx.lifecycle.ViewModelProvider;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners;
+import com.bumptech.glide.request.RequestOptions;
 import com.example.consultapp.AgendaActivity;
+import com.example.consultapp.MedicoPerfilActivity;
 import com.example.consultapp.PerfilEspecialidadActivity;
 import com.example.consultapp.R;
 import com.example.consultapp.databinding.FragmentInicioBinding;
@@ -43,13 +45,13 @@ public class InicioFragment extends Fragment {
     private FirebaseAuth mAuth;
     private DatabaseReference databaseReference;
     private GridLayout gridLayout;
-    private LinearLayout linearProxCitas, linearSerivicios;
+    private LinearLayout linearProxCitas, linearSerivicios, linearPersonalMedico;
     private Button btn_cerrarS;
     private ImageButton imgCerrarSesion; // Declarar el ImageButton
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
-        InicioViewModel homeViewModel =
+        InicioViewModel inicioViewModel =
                 new ViewModelProvider(this).get(InicioViewModel.class);
 
         binding = FragmentInicioBinding.inflate(inflater, container, false);
@@ -64,6 +66,7 @@ public class InicioFragment extends Fragment {
         ImageButton imageButton = binding.image;
         linearSerivicios = root.findViewById(R.id.linearServicios);
         linearProxCitas = root.findViewById(R.id.linearProxCitas);
+        linearPersonalMedico = root.findViewById(R.id.linearPersonalMedico);
         imgCerrarSesion = root.findViewById(R.id.image);
 
         // Obtener el usuario actual de FirebaseAuth
@@ -107,6 +110,7 @@ public class InicioFragment extends Fragment {
 
             // Cargar próximas citas del usuario
             cargarProximasCitas(userId);
+            cargarPersonalMedico();
 
         } else {
             textSaludo.setText("Hola, Usuario");
@@ -156,8 +160,6 @@ public class InicioFragment extends Fragment {
                                     agregarTextoCita(servicio, doctor, fecha, horario);
                                 }
                             }
-                        } else {
-                            Toast.makeText(getContext(), "No tienes citas próximas.", Toast.LENGTH_SHORT).show();
                         }
                     }
 
@@ -279,6 +281,79 @@ public class InicioFragment extends Fragment {
             }
         });
     }
+
+    private void cargarPersonalMedico() {
+        DatabaseReference medicosRef = databaseReference.child("Medicos"); // Suponiendo que los médicos están en la rama "medicos"
+
+        medicosRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                // Limpiar las vistas previas para evitar duplicados
+                LinearLayout linearPersonalMedico = binding.linearPersonalMedico;
+                linearPersonalMedico.removeAllViews();
+
+                // Iterar sobre los médicos en la base de datos
+                if (snapshot.exists()) {
+                    int contador = 0; // Variable para contar los médicos
+
+                    for (DataSnapshot medicoSnapshot : snapshot.getChildren()) {
+                        if (contador >= 4) break; // Detener la iteración después de los primeros 3 médicos
+
+                        String nombre = medicoSnapshot.child("nombre").getValue(String.class);
+                        String especialidad = medicoSnapshot.child("especializacion").getValue(String.class);
+                        String cedula = medicoSnapshot.child("cedula").getValue(String.class);
+                        String fotoPerfil = medicoSnapshot.child("fotoPerfil").getValue(String.class); // Obtener la URL de la foto de perfil
+                        String medicoId = medicoSnapshot.getKey(); // Obtener la clave única del médico, que es el ID en Firebase
+
+                        // Crear un layout dinámico para cada médico
+                        View medicoView = LayoutInflater.from(getContext()).inflate(R.layout.item_medico, linearPersonalMedico, false);
+
+                        // Configurar los TextViews con los datos del médico
+                        TextView tvNombre = medicoView.findViewById(R.id.tvNombreMedico);
+                        TextView tvEspecialidad = medicoView.findViewById(R.id.tvEspecialidad);
+                        TextView tvCedula = medicoView.findViewById(R.id.tvCedula);
+                        ImageView ivFotoPerfil = medicoView.findViewById(R.id.imageView); // ImageView donde se mostrará la foto de perfil
+                        Button btnVerPerfil = medicoView.findViewById(R.id.btnVerPerfilMedico); // Botón de "Ver perfil"
+
+                        tvNombre.setText("Dr. " + nombre);
+                        tvEspecialidad.setText(especialidad);
+                        tvCedula.setText(cedula);
+
+                        // Cargar la foto del médico usando Glide
+                        if (fotoPerfil != null && !fotoPerfil.isEmpty()) {
+                            Glide.with(getContext())
+                                    .load(fotoPerfil)
+                                    .into(ivFotoPerfil);
+                        }
+
+                        // Agregar el layout del médico al contenedor
+                        linearPersonalMedico.addView(medicoView);
+
+                        // Configurar el botón de "Ver perfil"
+                        btnVerPerfil.setOnClickListener(v -> {
+                            // Redirigir a la actividad de perfil del médico
+                            Intent intent = new Intent(getContext(), MedicoPerfilActivity.class);
+                            intent.putExtra("nombre", nombre);  // Aquí asegúrate de que "nombre" no sea null
+                            intent.putExtra("especialidad", especialidad);
+                            intent.putExtra("cedula", cedula);
+                            intent.putExtra("fotoPerfil", fotoPerfil);
+                            intent.putExtra("medicoId", medicoId); // Pasar el ID del médico
+                            startActivity(intent);
+                        });
+
+                        contador++; // Incrementar el contador
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                Toast.makeText(getContext(), "Error al cargar los médicos", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+
 
 
     @Override

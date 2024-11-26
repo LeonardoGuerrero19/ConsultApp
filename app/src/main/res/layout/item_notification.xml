@@ -1,39 +1,52 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
-    android:padding="16dp"
-    android:background="@android:color/white">
+    android:paddingVertical="15dp"
+    android:paddingHorizontal="20dp"
+    android:backgroundTint="@color/gray"
+    android:background="@drawable/rounded">
+
+    <TextView
+        android:id="@+id/notification_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Título de notificación"
+        android:textSize="20dp"
+        android:textColor="@color/black"
+        android:fontFamily="@font/montserrat_bold"/>
 
     <TextView
         android:id="@+id/notification_message"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Mensaje de notificación"
-        android:textSize="16sp"
-        android:textStyle="bold"
-        android:paddingBottom="8dp" />
 
-    <TextView
-        android:id="@+id/notification_date_time"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Fecha y hora"
-        android:textSize="14sp"
-        android:paddingBottom="8dp" />
+        android:textSize="18dp"
+        android:textColor="@color/black"
+        android:fontFamily="@font/montserrat_medium"
+        android:layout_marginTop="10dp" />
 
     <TextView
         android:id="@+id/notification_status"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Estado"
-        android:textSize="14sp"
-        android:paddingBottom="8dp" />
+        android:text="Estado de la notificación"
+        android:fontFamily="@font/montserrat_medium"
+        android:textSize="18dp"
+        android:textColor="@android:color/darker_gray"
+        android:layout_marginTop="10dp" />
 
     <Button
         android:id="@+id/btn_mark_as_read"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Marcar como leída"
-        android:layout_gravity="end" />
+        android:layout_marginTop="15dp"
+        android:backgroundTint="@color/aqua"
+        android:textColor="@color/white"
+        android:textSize="18dp"
+        android:padding="10dp"
+        app:cornerRadius="18dp"/>
 </LinearLayout>

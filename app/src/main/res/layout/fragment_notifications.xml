@@ -4,32 +4,44 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:layout_marginHorizontal="20dp"
     tools:context=".ui.notifications.NotificationsFragment">
+
+    <TextView
+        android:id="@+id/text"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginVertical="20dp"
+        android:fontFamily="@font/montserrat_bold"
+        android:text="Notificaciones"
+        android:textColor="@color/black"
+        android:textSize="26dp" />
 
     <ScrollView
         android:id="@+id/notifications_scroll_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:padding="16dp">
+        android:layout_marginTop="20dp"
+        android:layout_below="@id/text" >
 
         <LinearLayout
             android:id="@+id/linearLayout_notifications"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:padding="8dp"
-            android:background="@color/white"
-            android:layout_margin="8dp">
+            android:padding="10dp"
+            android:backgroundTint="@color/gray"
+            android:background="@drawable/rounded" >
 
             <!-- Mensaje predeterminado -->
             <TextView
                 android:id="@+id/no_notifications_text"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="No tienes notificaciones."
-                android:gravity="center"
-                android:padding="16dp"
-                android:visibility="gone" />
+                android:text="No tienes notificaciones"
+                android:fontFamily="@font/montserrat_bold"
+                android:textColor="@color/black"
+                android:textSize="20dp"/>
         </LinearLayout>
     </ScrollView>
 </RelativeLayout>

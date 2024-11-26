@@ -1,17 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/scrollView"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:clipToPadding="false"
-    android:paddingBottom="110dp"
-    tools:context=".ui.expediente_user.ExpedienteUserFragment" >
-
-<LinearLayout
+    android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical" >
+    android:orientation="vertical"
+    tools:context=".MedicoPerfilActivity">
 
     <LinearLayout
         android:id="@+id/linear"
@@ -25,7 +20,7 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
             <ImageView
-                android:id="@+id/imageView"
+                android:id="@+id/ivFotoPerfil"
                 android:layout_width="120dp"
                 android:layout_height="120dp"
                 android:layout_margin="20dp"
@@ -33,17 +28,6 @@
                 android:scaleType="centerCrop"
                 android:contentDescription="Vista previa de la imagen seleccionada"
                 android:src="@drawable/boton_seleccionado" />
-
-            <ImageButton
-                android:id="@+id/selectImageButton"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:src="@drawable/ic_plus"
-                android:layout_marginBottom="20dp"
-                android:backgroundTint="@color/white"
-                android:background="@drawable/rounded"
-                android:layout_gravity="center"
-                android:layout_marginTop="-40dp" />
         </LinearLayout>
 
         <LinearLayout
@@ -52,7 +36,7 @@
             android:layout_marginTop="16dp"
             android:orientation="vertical">
             <TextView
-                android:id="@+id/nombre"
+                android:id="@+id/tvNombre"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="20dp"
@@ -63,7 +47,7 @@
                 android:textColor="@color/black" />
 
             <TextView
-                android:id="@+id/numeroCuenta"
+                android:id="@+id/tvEspecialidad"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginRight="20dp"
@@ -75,86 +59,67 @@
 
     </LinearLayout>
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:layout_marginRight="20dp">
-    <TextView
+    <!-- RatingBar para calificar al médico -->
+    <RatingBar
+        android:id="@+id/ratingBar"
+        android:layout_marginTop="20dp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_weight="1"
+        android:numStars="5"
+        android:progressTint="@color/aqua"
+        android:secondaryProgressTint="@color/gray"
+        android:layout_gravity="center"/>
+
+    <TextView
+        android:id="@+id/txt"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/linear"
         android:layout_marginHorizontal="20dp"
         android:layout_marginTop="20dp"
         android:layout_marginBottom="10dp"
         android:textSize="20dp"
         android:fontFamily="@font/montserrat_bold"
         android:textColor="@color/black"
-        android:text="Edad:" />
-    <ImageButton
-        android:id="@+id/btn_editar"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:src="@drawable/round_edit_24"
-        android:backgroundTint="@color/aqua"
-        android:background="@drawable/rounded"
-        android:layout_gravity="end|bottom"
-        android:padding="10dp" />
-    </LinearLayout>
+        android:text="Cédula profesional:" />
 
     <TextView
-        android:id="@+id/edad"
+        android:id="@+id/tvCedula"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_below="@id/txt2"
         android:layout_marginHorizontal="20dp"
         android:textSize="20dp"
-        android:text="Edad no especificada"
         android:fontFamily="@font/montserrat_medium"
         android:textColor="@color/black" />
 
     <TextView
+        android:id="@+id/txt2"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_below="@id/btn_descripcion"
         android:layout_marginHorizontal="20dp"
         android:layout_marginVertical="10dp"
         android:textSize="20dp"
         android:fontFamily="@font/montserrat_bold"
         android:textColor="@color/black"
-        android:text="Fecha de nacimiento:" />
+        android:text="Horario de servicio:" />
 
     <TextView
-        android:id="@+id/fechaNacimiento"
+        android:id="@+id/horario"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_below="@id/txt2"
         android:layout_marginHorizontal="20dp"
         android:textSize="20dp"
-        android:text="Fecha de nacimiento no registrada"
         android:fontFamily="@font/montserrat_medium"
         android:textColor="@color/black" />
 
     <TextView
+        android:id="@+id/txt3"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginHorizontal="20dp"
-        android:layout_marginVertical="10dp"
-        android:textSize="20dp"
-        android:fontFamily="@font/montserrat_bold"
-        android:textColor="@color/black"
-        android:text="Género:" />
-
-    <TextView
-        android:id="@+id/genero"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginHorizontal="20dp"
-        android:textSize="20dp"
-        android:text="Género no especificado"
-        android:fontFamily="@font/montserrat_medium"
-        android:textColor="@color/black" />
-
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_below="@+id/horario"
         android:layout_marginHorizontal="20dp"
         android:layout_marginVertical="10dp"
         android:textSize="20dp"
@@ -166,27 +131,9 @@
         android:id="@+id/telefono"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_below="@id/txt2"
         android:layout_marginHorizontal="20dp"
         android:textSize="20dp"
-        android:text="Teléfono no registrado"
         android:fontFamily="@font/montserrat_medium"
         android:textColor="@color/black" />
-
-    <View
-        android:id="@+id/divider"
-        android:layout_width="match_parent"
-        android:layout_height="2dp"
-        android:layout_margin="20dp"
-        android:layout_below="@id/linear2"
-        android:background="@color/aqua" />
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginVertical="20dp"
-        android:layout_marginHorizontal="20dp"
-        android:orientation="vertical"
-        android:id="@+id/linearExpedientesUser"
-        android:layout_below="@id/frame"/>
 </LinearLayout>
-</androidx.core.widget.NestedScrollView>

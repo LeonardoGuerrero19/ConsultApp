@@ -1,0 +1,64 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="horizontal"
+    android:layout_marginBottom="20dp">
+
+    <ImageView
+        android:id="@+id/imageView"
+        android:layout_width="80dp"
+        android:layout_height="match_parent"
+        android:backgroundTint="#0000"
+        android:src="@drawable/round_person_outline_24"
+        android:scaleType="centerCrop"
+        android:background="@drawable/rounded"/>
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:orientation="vertical"
+        android:layout_marginLeft="20dp">
+        <TextView
+            android:id="@+id/tvNombreMedico"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Nombre del médico"
+            android:fontFamily="@font/montserrat_bold"
+            android:textSize="18dp"
+            android:textColor="@color/black"/>
+
+        <TextView
+            android:id="@+id/tvEspecialidad"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Especialidad"
+            android:layout_marginTop="10dp"
+            android:fontFamily="@font/montserrat_medium"
+            android:textSize="18dp"
+            android:textColor="@color/black"/>
+
+        <TextView
+            android:id="@+id/tvCedula"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Cédula"
+            android:layout_marginTop="10dp"
+            android:fontFamily="@font/montserrat_medium"
+            android:textSize="18dp"
+            android:textColor="@color/black"/>
+    </LinearLayout>
+    <Button
+        android:id="@+id/btnVerPerfilMedico"
+        android:layout_width="88dp"
+        android:layout_height="wrap_content"
+        android:text="Ver perfil"
+        android:fontFamily="@font/montserrat_bold"
+        android:textColor="@color/black"
+        android:backgroundTint="@color/gray"
+        app:cornerRadius="18dp"
+        android:layout_marginLeft="9dp"
+        android:layout_gravity="end|center_vertical"
+        />
+</LinearLayout>
